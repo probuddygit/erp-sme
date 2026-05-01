@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +11,14 @@ export const Route = createFileRoute("/_authenticated/app/")({
 });
 
 function Dashboard() {
-  const { profile, company, roles, isSuperAdmin, isCompanyAdmin } = useAuth();
+  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && isSuperAdmin) navigate({ to: "/admin" });
+  }, [loading, isSuperAdmin, navigate]);
+
+  if (isSuperAdmin) return null;
 
   if (!company && !isSuperAdmin) {
     return (
