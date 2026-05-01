@@ -25,6 +25,7 @@ import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
 import { Route as AuthenticatedAppSalesPipelineRouteImport } from './routes/_authenticated.app.sales.pipeline'
 import { Route as AuthenticatedAppSalesOrdersRouteImport } from './routes/_authenticated.app.sales.orders'
+import { Route as AuthenticatedAppSalesInvoicesRouteImport } from './routes/_authenticated.app.sales.invoices'
 import { Route as AuthenticatedAppSalesCustomersRouteImport } from './routes/_authenticated.app.sales.customers'
 
 const LoginRoute = LoginRouteImport.update({
@@ -110,6 +111,12 @@ const AuthenticatedAppSalesOrdersRoute =
     path: '/orders',
     getParentRoute: () => AuthenticatedAppSalesRoute,
   } as any)
+const AuthenticatedAppSalesInvoicesRoute =
+  AuthenticatedAppSalesInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedAppSalesRoute,
+  } as any)
 const AuthenticatedAppSalesCustomersRoute =
   AuthenticatedAppSalesCustomersRouteImport.update({
     id: '/customers',
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
@@ -165,6 +174,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/_authenticated/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/_authenticated/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/_authenticated/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/app/'
     | '/app/sales/customers'
+    | '/app/sales/invoices'
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/app/sales/customers'
+    | '/app/sales/invoices'
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
@@ -219,6 +231,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/app/sales/customers'
+    | '/_authenticated/app/sales/invoices'
     | '/_authenticated/app/sales/orders'
     | '/_authenticated/app/sales/pipeline'
     | '/_authenticated/app/sales/quotations'
@@ -345,6 +358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSalesOrdersRouteImport
       parentRoute: typeof AuthenticatedAppSalesRoute
     }
+    '/_authenticated/app/sales/invoices': {
+      id: '/_authenticated/app/sales/invoices'
+      path: '/invoices'
+      fullPath: '/app/sales/invoices'
+      preLoaderRoute: typeof AuthenticatedAppSalesInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAppSalesRoute
+    }
     '/_authenticated/app/sales/customers': {
       id: '/_authenticated/app/sales/customers'
       path: '/customers'
@@ -370,6 +390,7 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedAppSalesRouteChildren {
   AuthenticatedAppSalesCustomersRoute: typeof AuthenticatedAppSalesCustomersRoute
+  AuthenticatedAppSalesInvoicesRoute: typeof AuthenticatedAppSalesInvoicesRoute
   AuthenticatedAppSalesOrdersRoute: typeof AuthenticatedAppSalesOrdersRoute
   AuthenticatedAppSalesPipelineRoute: typeof AuthenticatedAppSalesPipelineRoute
   AuthenticatedAppSalesQuotationsRoute: typeof AuthenticatedAppSalesQuotationsRoute
@@ -378,6 +399,7 @@ interface AuthenticatedAppSalesRouteChildren {
 
 const AuthenticatedAppSalesRouteChildren: AuthenticatedAppSalesRouteChildren = {
   AuthenticatedAppSalesCustomersRoute: AuthenticatedAppSalesCustomersRoute,
+  AuthenticatedAppSalesInvoicesRoute: AuthenticatedAppSalesInvoicesRoute,
   AuthenticatedAppSalesOrdersRoute: AuthenticatedAppSalesOrdersRoute,
   AuthenticatedAppSalesPipelineRoute: AuthenticatedAppSalesPipelineRoute,
   AuthenticatedAppSalesQuotationsRoute: AuthenticatedAppSalesQuotationsRoute,
