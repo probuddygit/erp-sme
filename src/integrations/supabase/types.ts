@@ -47,6 +47,374 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_pricing_rules: {
+        Row: {
+          company_id: string
+          created_at: string
+          customer_id: string
+          discount_percent: number
+          id: string
+          notes: string | null
+          product_name: string | null
+          special_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          customer_id: string
+          discount_percent?: number
+          id?: string
+          notes?: string | null
+          product_name?: string | null
+          special_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          customer_id?: string
+          discount_percent?: number
+          id?: string
+          notes?: string | null
+          product_name?: string | null
+          special_price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_pricing_rules_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          billing_address: string | null
+          company_id: string
+          contact_person: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          gst_number: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+          shipping_address: string | null
+          state_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_address?: string | null
+          company_id: string
+          contact_person?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          gst_number?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+          shipping_address?: string | null
+          state_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_address?: string | null
+          company_id?: string
+          contact_person?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          gst_number?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          shipping_address?: string | null
+          state_code?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      invoice_items: {
+        Row: {
+          cgst_amount: number
+          company_id: string
+          description: string | null
+          discount_percent: number
+          id: string
+          igst_amount: number
+          invoice_id: string
+          line_total: number
+          position: number
+          product_name: string
+          quantity: number
+          sgst_amount: number
+          tax_percent: number
+          unit_price: number
+        }
+        Insert: {
+          cgst_amount?: number
+          company_id: string
+          description?: string | null
+          discount_percent?: number
+          id?: string
+          igst_amount?: number
+          invoice_id: string
+          line_total?: number
+          position?: number
+          product_name: string
+          quantity?: number
+          sgst_amount?: number
+          tax_percent?: number
+          unit_price?: number
+        }
+        Update: {
+          cgst_amount?: number
+          company_id?: string
+          description?: string | null
+          discount_percent?: number
+          id?: string
+          igst_amount?: number
+          invoice_id?: string
+          line_total?: number
+          position?: number
+          product_name?: string
+          quantity?: number
+          sgst_amount?: number
+          tax_percent?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount_due: number
+          amount_paid: number
+          cgst_total: number
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          discount_total: number
+          due_date: string | null
+          grand_total: number
+          id: string
+          igst_total: number
+          invoice_date: string
+          invoice_number: string
+          last_reminder_at: string | null
+          notes: string | null
+          sales_order_id: string | null
+          sgst_total: number
+          status: Database["public"]["Enums"]["invoice_status"]
+          subtotal: number
+          tax_total: number
+          tax_type: Database["public"]["Enums"]["tax_type"]
+          updated_at: string
+        }
+        Insert: {
+          amount_due?: number
+          amount_paid?: number
+          cgst_total?: number
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          discount_total?: number
+          due_date?: string | null
+          grand_total?: number
+          id?: string
+          igst_total?: number
+          invoice_date?: string
+          invoice_number: string
+          last_reminder_at?: string | null
+          notes?: string | null
+          sales_order_id?: string | null
+          sgst_total?: number
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subtotal?: number
+          tax_total?: number
+          tax_type?: Database["public"]["Enums"]["tax_type"]
+          updated_at?: string
+        }
+        Update: {
+          amount_due?: number
+          amount_paid?: number
+          cgst_total?: number
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          discount_total?: number
+          due_date?: string | null
+          grand_total?: number
+          id?: string
+          igst_total?: number
+          invoice_date?: string
+          invoice_number?: string
+          last_reminder_at?: string | null
+          notes?: string | null
+          sales_order_id?: string | null
+          sgst_total?: number
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subtotal?: number
+          tax_total?: number
+          tax_type?: Database["public"]["Enums"]["tax_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_sales_order_id_fkey"
+            columns: ["sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          company_id: string
+          company_name: string | null
+          contact_name: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          email: string | null
+          expected_close_date: string | null
+          expected_value: number
+          id: string
+          notes: string | null
+          owner_id: string | null
+          phone: string | null
+          source: Database["public"]["Enums"]["lead_source"]
+          status: Database["public"]["Enums"]["lead_status"]
+          title: string
+          updated_at: string
+          win_probability: number
+        }
+        Insert: {
+          company_id: string
+          company_name?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          email?: string | null
+          expected_close_date?: string | null
+          expected_value?: number
+          id?: string
+          notes?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["lead_source"]
+          status?: Database["public"]["Enums"]["lead_status"]
+          title: string
+          updated_at?: string
+          win_probability?: number
+        }
+        Update: {
+          company_id?: string
+          company_name?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          email?: string | null
+          expected_close_date?: string | null
+          expected_value?: number
+          id?: string
+          notes?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["lead_source"]
+          status?: Database["public"]["Enums"]["lead_status"]
+          title?: string
+          updated_at?: string
+          win_probability?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          invoice_id: string
+          method: Database["public"]["Enums"]["payment_method"]
+          notes: string | null
+          payment_date: string
+          reference: string | null
+        }
+        Insert: {
+          amount: number
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id: string
+          method?: Database["public"]["Enums"]["payment_method"]
+          notes?: string | null
+          payment_date?: string
+          reference?: string | null
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id?: string
+          method?: Database["public"]["Enums"]["payment_method"]
+          notes?: string | null
+          payment_date?: string
+          reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_id: string | null
@@ -78,6 +446,265 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotation_items: {
+        Row: {
+          company_id: string
+          description: string | null
+          discount_percent: number
+          id: string
+          line_total: number
+          position: number
+          product_name: string
+          quantity: number
+          quotation_id: string
+          tax_percent: number
+          unit_price: number
+        }
+        Insert: {
+          company_id: string
+          description?: string | null
+          discount_percent?: number
+          id?: string
+          line_total?: number
+          position?: number
+          product_name: string
+          quantity?: number
+          quotation_id: string
+          tax_percent?: number
+          unit_price?: number
+        }
+        Update: {
+          company_id?: string
+          description?: string | null
+          discount_percent?: number
+          id?: string
+          line_total?: number
+          position?: number
+          product_name?: string
+          quantity?: number
+          quotation_id?: string
+          tax_percent?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotation_items_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotations: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          discount_total: number
+          grand_total: number
+          id: string
+          issue_date: string
+          lead_id: string | null
+          notes: string | null
+          quotation_number: string
+          status: Database["public"]["Enums"]["quotation_status"]
+          subtotal: number
+          tax_total: number
+          tax_type: Database["public"]["Enums"]["tax_type"]
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          discount_total?: number
+          grand_total?: number
+          id?: string
+          issue_date?: string
+          lead_id?: string | null
+          notes?: string | null
+          quotation_number: string
+          status?: Database["public"]["Enums"]["quotation_status"]
+          subtotal?: number
+          tax_total?: number
+          tax_type?: Database["public"]["Enums"]["tax_type"]
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          discount_total?: number
+          grand_total?: number
+          id?: string
+          issue_date?: string
+          lead_id?: string | null
+          notes?: string | null
+          quotation_number?: string
+          status?: Database["public"]["Enums"]["quotation_status"]
+          subtotal?: number
+          tax_total?: number
+          tax_type?: Database["public"]["Enums"]["tax_type"]
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_order_items: {
+        Row: {
+          company_id: string
+          description: string | null
+          discount_percent: number
+          id: string
+          line_total: number
+          position: number
+          product_name: string
+          quantity: number
+          sales_order_id: string
+          tax_percent: number
+          unit_price: number
+        }
+        Insert: {
+          company_id: string
+          description?: string | null
+          discount_percent?: number
+          id?: string
+          line_total?: number
+          position?: number
+          product_name: string
+          quantity?: number
+          sales_order_id: string
+          tax_percent?: number
+          unit_price?: number
+        }
+        Update: {
+          company_id?: string
+          description?: string | null
+          discount_percent?: number
+          id?: string
+          line_total?: number
+          position?: number
+          product_name?: string
+          quantity?: number
+          sales_order_id?: string
+          tax_percent?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_order_items_sales_order_id_fkey"
+            columns: ["sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_orders: {
+        Row: {
+          approval_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          delivery_date: string | null
+          discount_total: number
+          grand_total: number
+          id: string
+          notes: string | null
+          order_date: string
+          order_number: string
+          quotation_id: string | null
+          status: Database["public"]["Enums"]["sales_order_status"]
+          subtotal: number
+          tax_total: number
+          tax_type: Database["public"]["Enums"]["tax_type"]
+          updated_at: string
+        }
+        Insert: {
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          delivery_date?: string | null
+          discount_total?: number
+          grand_total?: number
+          id?: string
+          notes?: string | null
+          order_date?: string
+          order_number: string
+          quotation_id?: string | null
+          status?: Database["public"]["Enums"]["sales_order_status"]
+          subtotal?: number
+          tax_total?: number
+          tax_type?: Database["public"]["Enums"]["tax_type"]
+          updated_at?: string
+        }
+        Update: {
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          delivery_date?: string | null
+          discount_total?: number
+          grand_total?: number
+          id?: string
+          notes?: string | null
+          order_date?: string
+          order_number?: string
+          quotation_id?: string | null
+          status?: Database["public"]["Enums"]["sales_order_status"]
+          subtotal?: number
+          tax_total?: number
+          tax_type?: Database["public"]["Enums"]["tax_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
             referencedColumns: ["id"]
           },
         ]
@@ -120,6 +747,14 @@ export type Database = {
     }
     Functions: {
       get_user_company: { Args: { _user_id: string }; Returns: string }
+      has_company_role: {
+        Args: {
+          _company_id: string
+          _roles: Database["public"]["Enums"]["app_role"][]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -132,6 +767,10 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      next_doc_number: {
+        Args: { _company_id: string; _prefix: string }
+        Returns: string
+      }
     }
     Enums: {
       app_module:
@@ -149,7 +788,45 @@ export type Database = {
         | "production"
         | "finance"
         | "hr"
+      invoice_status:
+        | "draft"
+        | "sent"
+        | "partially_paid"
+        | "paid"
+        | "overdue"
+        | "cancelled"
+      lead_source:
+        | "website"
+        | "referral"
+        | "cold_call"
+        | "email"
+        | "event"
+        | "other"
+      lead_status:
+        | "new"
+        | "contacted"
+        | "qualified"
+        | "proposal"
+        | "negotiation"
+        | "won"
+        | "lost"
+      payment_method:
+        | "cash"
+        | "bank_transfer"
+        | "cheque"
+        | "upi"
+        | "card"
+        | "other"
+      quotation_status: "draft" | "sent" | "accepted" | "rejected" | "expired"
+      sales_order_status:
+        | "draft"
+        | "pending_approval"
+        | "approved"
+        | "rejected"
+        | "fulfilled"
+        | "cancelled"
       subscription_plan: "trial" | "starter" | "pro" | "enterprise"
+      tax_type: "intra_state" | "inter_state" | "exempt"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -294,7 +971,50 @@ export const Constants = {
         "finance",
         "hr",
       ],
+      invoice_status: [
+        "draft",
+        "sent",
+        "partially_paid",
+        "paid",
+        "overdue",
+        "cancelled",
+      ],
+      lead_source: [
+        "website",
+        "referral",
+        "cold_call",
+        "email",
+        "event",
+        "other",
+      ],
+      lead_status: [
+        "new",
+        "contacted",
+        "qualified",
+        "proposal",
+        "negotiation",
+        "won",
+        "lost",
+      ],
+      payment_method: [
+        "cash",
+        "bank_transfer",
+        "cheque",
+        "upi",
+        "card",
+        "other",
+      ],
+      quotation_status: ["draft", "sent", "accepted", "rejected", "expired"],
+      sales_order_status: [
+        "draft",
+        "pending_approval",
+        "approved",
+        "rejected",
+        "fulfilled",
+        "cancelled",
+      ],
       subscription_plan: ["trial", "starter", "pro", "enterprise"],
+      tax_type: ["intra_state", "inter_state", "exempt"],
     },
   },
 } as const
