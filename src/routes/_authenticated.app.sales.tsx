@@ -8,14 +8,15 @@ export const Route = createFileRoute("/_authenticated/app/sales")({
   component: SalesLayout,
 });
 
-const TABS = [
+type Tab = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const TABS: Tab[] = [
   { to: "/app/sales", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/app/sales/pipeline", label: "Pipeline", icon: Kanban },
   { to: "/app/sales/customers", label: "Customers", icon: Users2 },
   { to: "/app/sales/quotations", label: "Quotations", icon: FileText },
   { to: "/app/sales/orders", label: "Sales Orders", icon: ClipboardList },
   { to: "/app/sales/invoices", label: "Invoices", icon: Receipt },
-] as const;
+];
 
 function SalesLayout() {
   const { canAccessModule, hasModule, company } = useAuth();
