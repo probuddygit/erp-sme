@@ -68,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="px-6 py-5 border-b border-sidebar-border">
-          <Link to="/app" className="flex items-center gap-2">
+          <Link to={isSuperAdmin ? "/admin" : "/app"} className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-accent)" }}>
               <Cog className="h-5 w-5 text-accent-foreground" />
             </div>
