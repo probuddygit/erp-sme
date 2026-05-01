@@ -48,7 +48,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const adminItems = isSuperAdmin
     ? [
-        { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { to: "/admin", label: "Companies", icon: Building2 },
         { to: "/admin/users", label: "All Users", icon: Users },
       ]
