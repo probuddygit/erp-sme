@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
 import { Route as AuthenticatedAppUsersRouteImport } from './routes/_authenticated.app.users'
+import { Route as AuthenticatedAppCompanyRouteImport } from './routes/_authenticated.app.company'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -45,17 +46,24 @@ const AuthenticatedAppUsersRoute = AuthenticatedAppUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppCompanyRoute = AuthenticatedAppCompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/app/company': typeof AuthenticatedAppCompanyRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/app/company': typeof AuthenticatedAppCompanyRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/app': typeof AuthenticatedAppIndexRoute
 }
@@ -65,20 +73,22 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/app/company': typeof AuthenticatedAppCompanyRoute
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/app' | '/app/users' | '/app/'
+  fullPaths: '/' | '/login' | '/app' | '/app/company' | '/app/users' | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/app/users' | '/app'
+  to: '/' | '/login' | '/app/company' | '/app/users' | '/app'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/app'
+    | '/_authenticated/app/company'
     | '/_authenticated/app/users'
     | '/_authenticated/app/'
   fileRoutesById: FileRoutesById
@@ -133,15 +143,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppUsersRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/company': {
+      id: '/_authenticated/app/company'
+      path: '/company'
+      fullPath: '/app/company'
+      preLoaderRoute: typeof AuthenticatedAppCompanyRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
   }
 }
 
 interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppCompanyRoute: typeof AuthenticatedAppCompanyRoute
   AuthenticatedAppUsersRoute: typeof AuthenticatedAppUsersRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppCompanyRoute: AuthenticatedAppCompanyRoute,
   AuthenticatedAppUsersRoute: AuthenticatedAppUsersRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
