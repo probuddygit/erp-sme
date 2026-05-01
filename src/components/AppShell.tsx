@@ -35,15 +35,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   const navItems: { to: string; label: string; icon: typeof LayoutDashboard; show: boolean }[] = [
-    { to: "/app", label: "Dashboard", icon: LayoutDashboard, show: true },
+    { to: "/app", label: "Dashboard", icon: LayoutDashboard, show: !isSuperAdmin },
     ...MODULES.map((m) => ({
       to: m.path,
       label: m.label,
       icon: m.icon,
-      show: canAccessModule(m.key),
+      show: !isSuperAdmin && canAccessModule(m.key),
     })),
-    { to: "/app/users", label: "Users & Roles", icon: Users, show: isCompanyAdmin || isSuperAdmin },
-    { to: "/app/company", label: "Company", icon: Settings, show: isCompanyAdmin || isSuperAdmin },
+    { to: "/app/users", label: "Users & Roles", icon: Users, show: !isSuperAdmin && isCompanyAdmin },
+    { to: "/app/company", label: "Company", icon: Settings, show: !isSuperAdmin && isCompanyAdmin },
   ];
 
   const adminItems = isSuperAdmin
@@ -68,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="px-6 py-5 border-b border-sidebar-border">
-          <Link to="/app" className="flex items-center gap-2">
+          <Link to={isSuperAdmin ? "/admin" : "/app"} className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-accent)" }}>
               <Cog className="h-5 w-5 text-accent-foreground" />
             </div>
