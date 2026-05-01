@@ -22,6 +22,7 @@ import { Route as AuthenticatedAppCompanyRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
+import { Route as AuthenticatedAppSalesCustomersRouteImport } from './routes/_authenticated.app.sales.customers'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -88,6 +89,12 @@ const AuthenticatedAppSalesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAppSalesRoute,
   } as any)
+const AuthenticatedAppSalesCustomersRoute =
+  AuthenticatedAppSalesCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedAppSalesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -112,6 +120,7 @@ export interface FileRoutesByTo {
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
 }
 export interface FileRoutesById {
@@ -128,6 +137,7 @@ export interface FileRoutesById {
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
 }
 export interface FileRouteTypes {
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/admin/'
     | '/app/'
+    | '/app/sales/customers'
     | '/app/sales/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/admin'
     | '/app'
+    | '/app/sales/customers'
     | '/app/sales'
   id:
     | '__root__'
@@ -170,6 +182,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/users'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
+    | '/_authenticated/app/sales/customers'
     | '/_authenticated/app/sales/'
   fileRoutesById: FileRoutesById
 }
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSalesIndexRouteImport
       parentRoute: typeof AuthenticatedAppSalesRoute
     }
+    '/_authenticated/app/sales/customers': {
+      id: '/_authenticated/app/sales/customers'
+      path: '/customers'
+      fullPath: '/app/sales/customers'
+      preLoaderRoute: typeof AuthenticatedAppSalesCustomersRouteImport
+      parentRoute: typeof AuthenticatedAppSalesRoute
+    }
   }
 }
 
@@ -289,10 +309,12 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedAppSalesRouteChildren {
+  AuthenticatedAppSalesCustomersRoute: typeof AuthenticatedAppSalesCustomersRoute
   AuthenticatedAppSalesIndexRoute: typeof AuthenticatedAppSalesIndexRoute
 }
 
 const AuthenticatedAppSalesRouteChildren: AuthenticatedAppSalesRouteChildren = {
+  AuthenticatedAppSalesCustomersRoute: AuthenticatedAppSalesCustomersRoute,
   AuthenticatedAppSalesIndexRoute: AuthenticatedAppSalesIndexRoute,
 }
 
