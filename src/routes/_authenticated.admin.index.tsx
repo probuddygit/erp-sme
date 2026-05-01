@@ -42,7 +42,7 @@ function AdminCompanies() {
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("companies").insert({ name, slug, plan });
+    const { error } = await supabase.from("companies").insert({ name, slug, plan: plan as typeof PLANS[number] });
     if (error) return toast.error(error.message);
     toast.success("Company created");
     setName(""); setSlug(""); setPlan("trial"); setOpen(false); load();
