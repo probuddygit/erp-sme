@@ -51,6 +51,12 @@ function AllUsers() {
     if (error) return toast.error(error.message);
     toast.success("Granted super admin"); load();
   };
+  const makeCompanyAdmin = async (uid: string, cid: string | null) => {
+    if (!cid) return toast.error("Assign a company first");
+    const { error } = await supabase.from("user_roles").insert({ user_id: uid, role: "admin", company_id: cid });
+    if (error) return toast.error(error.message);
+    toast.success("Granted company admin"); load();
+  };
 
   return (
     <div className="space-y-6">
@@ -88,9 +94,18 @@ function AllUsers() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {!r.roles.includes("super_admin") && (
-                        <Button variant="outline" size="sm" onClick={() => makeSuperAdmin(r.id)}>Make super admin</Button>
-                      )}
+                      <div className="flex flex-wrap gap-2 justify-end">
+                        {r.company_id && !r.roles.includes("admin") && (
+                          <Button variant="outline" size="sm" onClick={() => makeCompanyAdmin(r.id, r.company_id)}>
+                            Make company admin
+                          </Button>
+                        )}
+                        {!r.roles.includes("super_admin") && (
+                          <Button variant="outline" size="sm" onClick={() => makeSuperAdmin(r.id)}>
+                            Make super admin
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
