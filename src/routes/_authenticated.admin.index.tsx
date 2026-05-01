@@ -48,7 +48,7 @@ function AdminCompanies() {
     setName(""); setSlug(""); setPlan("trial"); setOpen(false); load();
   };
   const updatePlan = async (id: string, p: string) => {
-    const { error } = await supabase.from("companies").update({ plan: p }).eq("id", id);
+    const { error } = await supabase.from("companies").update({ plan: p as typeof PLANS[number] }).eq("id", id);
     if (error) return toast.error(error.message);
     load();
   };
