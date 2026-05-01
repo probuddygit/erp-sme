@@ -13,7 +13,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { user, signIn, signUp, loading } = useAuth();
+  const { user, signIn, signUp, loading, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,8 +21,8 @@ function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/app" });
-  }, [user, loading, navigate]);
+    if (!loading && user) navigate({ to: isSuperAdmin ? "/admin" : "/app" });
+  }, [user, loading, isSuperAdmin, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +30,7 @@ function LoginPage() {
     const { error } = await signIn(email, password);
     setSubmitting(false);
     if (error) toast.error(error);
-    else navigate({ to: "/app" });
+    // Navigation handled by effect once roles load
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -42,7 +42,7 @@ function LoginPage() {
     else {
       toast.success("Account created. Signing you in…");
       await signIn(email, password);
-      navigate({ to: "/app" });
+      // Navigation handled by effect once roles load
     }
   };
 
