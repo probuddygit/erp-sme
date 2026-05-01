@@ -35,19 +35,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   const navItems: { to: string; label: string; icon: typeof LayoutDashboard; show: boolean }[] = [
-    { to: "/app", label: "Dashboard", icon: LayoutDashboard, show: true },
+    { to: "/app", label: "Dashboard", icon: LayoutDashboard, show: !isSuperAdmin },
     ...MODULES.map((m) => ({
       to: m.path,
       label: m.label,
       icon: m.icon,
-      show: canAccessModule(m.key),
+      show: !isSuperAdmin && canAccessModule(m.key),
     })),
-    { to: "/app/users", label: "Users & Roles", icon: Users, show: isCompanyAdmin || isSuperAdmin },
-    { to: "/app/company", label: "Company", icon: Settings, show: isCompanyAdmin || isSuperAdmin },
+    { to: "/app/users", label: "Users & Roles", icon: Users, show: !isSuperAdmin && isCompanyAdmin },
+    { to: "/app/company", label: "Company", icon: Settings, show: !isSuperAdmin && isCompanyAdmin },
   ];
 
   const adminItems = isSuperAdmin
     ? [
+        { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { to: "/admin", label: "Companies", icon: Building2 },
         { to: "/admin/users", label: "All Users", icon: Users },
       ]
