@@ -61,11 +61,10 @@ function OrdersPage() {
   });
 
   const setStatus = async (id: string, status: SOStatus) => {
-    const patch: Record<string, unknown> = { status };
-    if (status === "approved") {
-      patch.approved_by = user?.id;
-      patch.approved_at = new Date().toISOString();
-    }
+    const patch =
+      status === "approved"
+        ? { status, approved_by: user?.id, approved_at: new Date().toISOString() }
+        : { status };
     const { error } = await supabase.from("sales_orders").update(patch).eq("id", id);
     if (error) toast.error(error.message);
     else {
