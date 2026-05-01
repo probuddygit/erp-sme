@@ -1,25 +1,16 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { useAuth, type AppModule } from "@/lib/auth-context";
+import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Users, Boxes, Activity, ShoppingCart, Truck, Factory, Wallet, UserCog, ArrowRight, Lock } from "lucide-react";
-const MODULE_META: Record<AppModule, { label: string; icon: typeof Boxes; path: string; desc: string }> = {
-  sales: { label: "Sales", icon: ShoppingCart, path: "/app/sales", desc: "Leads, quotations, orders, invoices" },
-  procurement: { label: "Procurement", icon: Truck, path: "/app/procurement", desc: "Vendors and purchase orders" },
-  inventory: { label: "Inventory", icon: Boxes, path: "/app/inventory", desc: "Stock, warehouses, movements" },
-  production: { label: "Production", icon: Factory, path: "/app/production", desc: "Work orders and BOM" },
-  finance: { label: "Finance", icon: Wallet, path: "/app/finance", desc: "Payments, ledgers, reports" },
-  hr: { label: "HR", icon: UserCog, path: "/app/hr", desc: "Employees and payroll" },
-};
-
+import { Building2, Users, Boxes, Activity } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   component: Dashboard,
 });
 
 function Dashboard() {
-  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, loading, canAccessModule } = useAuth();
+  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,60 +60,13 @@ function Dashboard() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Enabled modules</CardTitle>
-            <Badge variant="outline">{company?.enabled_modules?.length ?? 0} active</Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {!company?.enabled_modules?.length ? (
-            <p className="text-sm text-muted-foreground">No modules enabled yet. Ask your admin to enable modules in Company settings.</p>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {company.enabled_modules.map((m) => {
-                const meta = MODULE_META[m];
-                if (!meta) return null;
-                const allowed = canAccessModule(m);
-                const Icon = meta.icon;
-                const inner = (
-                  <div className={`group flex items-start gap-3 rounded-lg border border-border bg-card p-4 transition-colors ${allowed ? "hover:border-accent hover:bg-accent/5" : "opacity-60"}`}>
-                    <div className="h-10 w-10 rounded-md flex items-center justify-center shrink-0" style={{ background: "var(--gradient-accent)" }}>
-                      <Icon className="h-5 w-5 text-accent-foreground" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="font-medium truncate">{meta.label}</div>
-                        {allowed ? (
-                          <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors" />
-                        ) : (
-                          <Lock className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-0.5 truncate">{meta.desc}</div>
-                      {!allowed && <div className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">No role access</div>}
-                    </div>
-                  </div>
-                );
-                return allowed ? (
-                  <Link key={m} to={meta.path}>{inner}</Link>
-                ) : (
-                  <div key={m}>{inner}</div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Getting started</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           {isSuperAdmin && <p>• Open <span className="text-foreground font-medium">Companies</span> to provision a new tenant.</p>}
           {isCompanyAdmin && <p>• Invite teammates from <span className="text-foreground font-medium">Users & Roles</span>.</p>}
           {isCompanyAdmin && <p>• Toggle modules in <span className="text-foreground font-medium">Company settings</span>.</p>}
-          <p>• Pick a module from the sidebar to start working.</p>
+          <p>• Pick a module from the left sidebar to start working.</p>
         </CardContent>
       </Card>
     </div>
