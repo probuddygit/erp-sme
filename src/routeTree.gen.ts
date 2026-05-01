@@ -22,6 +22,7 @@ import { Route as AuthenticatedAppCompanyRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
+import { Route as AuthenticatedAppSalesPipelineRouteImport } from './routes/_authenticated.app.sales.pipeline'
 import { Route as AuthenticatedAppSalesCustomersRouteImport } from './routes/_authenticated.app.sales.customers'
 
 const LoginRoute = LoginRouteImport.update({
@@ -89,6 +90,12 @@ const AuthenticatedAppSalesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAppSalesRoute,
   } as any)
+const AuthenticatedAppSalesPipelineRoute =
+  AuthenticatedAppSalesPipelineRouteImport.update({
+    id: '/pipeline',
+    path: '/pipeline',
+    getParentRoute: () => AuthenticatedAppSalesRoute,
+  } as any)
 const AuthenticatedAppSalesCustomersRoute =
   AuthenticatedAppSalesCustomersRouteImport.update({
     id: '/customers',
@@ -109,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -121,6 +129,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
 }
 export interface FileRoutesById {
@@ -138,6 +147,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/_authenticated/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
 }
 export interface FileRouteTypes {
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/app/'
     | '/app/sales/customers'
+    | '/app/sales/pipeline'
     | '/app/sales/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/app/sales/customers'
+    | '/app/sales/pipeline'
     | '/app/sales'
   id:
     | '__root__'
@@ -183,6 +195,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/app/sales/customers'
+    | '/_authenticated/app/sales/pipeline'
     | '/_authenticated/app/sales/'
   fileRoutesById: FileRoutesById
 }
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSalesIndexRouteImport
       parentRoute: typeof AuthenticatedAppSalesRoute
     }
+    '/_authenticated/app/sales/pipeline': {
+      id: '/_authenticated/app/sales/pipeline'
+      path: '/pipeline'
+      fullPath: '/app/sales/pipeline'
+      preLoaderRoute: typeof AuthenticatedAppSalesPipelineRouteImport
+      parentRoute: typeof AuthenticatedAppSalesRoute
+    }
     '/_authenticated/app/sales/customers': {
       id: '/_authenticated/app/sales/customers'
       path: '/customers'
@@ -310,11 +330,13 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedAppSalesRouteChildren {
   AuthenticatedAppSalesCustomersRoute: typeof AuthenticatedAppSalesCustomersRoute
+  AuthenticatedAppSalesPipelineRoute: typeof AuthenticatedAppSalesPipelineRoute
   AuthenticatedAppSalesIndexRoute: typeof AuthenticatedAppSalesIndexRoute
 }
 
 const AuthenticatedAppSalesRouteChildren: AuthenticatedAppSalesRouteChildren = {
   AuthenticatedAppSalesCustomersRoute: AuthenticatedAppSalesCustomersRoute,
+  AuthenticatedAppSalesPipelineRoute: AuthenticatedAppSalesPipelineRoute,
   AuthenticatedAppSalesIndexRoute: AuthenticatedAppSalesIndexRoute,
 }
 
