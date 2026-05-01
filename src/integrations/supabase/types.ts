@@ -14,16 +14,142 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      companies: {
+        Row: {
+          created_at: string
+          enabled_modules: Database["public"]["Enums"]["app_module"][]
+          id: string
+          is_active: boolean
+          name: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled_modules?: Database["public"]["Enums"]["app_module"][]
+          id?: string
+          is_active?: boolean
+          name: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled_modules?: Database["public"]["Enums"]["app_module"][]
+          id?: string
+          is_active?: boolean
+          name?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_company: { Args: { _user_id: string }; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_company_admin: {
+        Args: { _company_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_module:
+        | "sales"
+        | "procurement"
+        | "inventory"
+        | "production"
+        | "finance"
+        | "hr"
+      app_role:
+        | "super_admin"
+        | "admin"
+        | "sales"
+        | "procurement"
+        | "production"
+        | "finance"
+        | "hr"
+      subscription_plan: "trial" | "starter" | "pro" | "enterprise"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +276,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_module: [
+        "sales",
+        "procurement",
+        "inventory",
+        "production",
+        "finance",
+        "hr",
+      ],
+      app_role: [
+        "super_admin",
+        "admin",
+        "sales",
+        "procurement",
+        "production",
+        "finance",
+        "hr",
+      ],
+      subscription_plan: ["trial", "starter", "pro", "enterprise"],
+    },
   },
 } as const
