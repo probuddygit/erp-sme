@@ -58,7 +58,7 @@ function SalesLayout() {
             return (
               <Link
                 key={t.to}
-                to={t.to}
+                to={t.to as string}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors",
                   active
