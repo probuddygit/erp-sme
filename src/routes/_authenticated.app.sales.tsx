@@ -25,7 +25,7 @@ function SalesLayout() {
   if (!hasModule("sales")) {
     return (
       <Empty title="Sales is disabled" text={`This module isn't enabled for ${company?.name ?? "your company"}.`}>
-        <Button asChild><Link to="/app/company">Open company settings</Link></Button>
+        <Button asChild><Link to="/app">Back to dashboard</Link></Button>
       </Empty>
     );
   }
