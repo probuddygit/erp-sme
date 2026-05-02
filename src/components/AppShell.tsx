@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Building2,
   Users,
-  Settings,
   ShoppingCart,
   Truck,
   Boxes,
@@ -43,7 +42,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       show: !isSuperAdmin && canAccessModule(m.key),
     })),
     { to: "/app/users", label: "Users & Roles", icon: Users, show: !isSuperAdmin && isCompanyAdmin },
-    { to: "/app/company", label: "Company", icon: Settings, show: !isSuperAdmin && isCompanyAdmin },
   ];
 
   const adminItems = isSuperAdmin

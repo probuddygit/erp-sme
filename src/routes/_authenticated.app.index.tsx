@@ -1,16 +1,25 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type AppModule } from "@/lib/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Users, Boxes, Activity } from "lucide-react";
+import { Building2, Users, Boxes, Activity, ShoppingCart, Truck, Factory, Wallet, UserCog, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   component: Dashboard,
 });
 
+const MODULE_META: Record<AppModule, { label: string; icon: typeof ShoppingCart; path: string }> = {
+  sales: { label: "Sales", icon: ShoppingCart, path: "/app/sales" },
+  procurement: { label: "Procurement", icon: Truck, path: "/app/procurement" },
+  inventory: { label: "Inventory", icon: Boxes, path: "/app/inventory" },
+  production: { label: "Production", icon: Factory, path: "/app/production" },
+  finance: { label: "Finance", icon: Wallet, path: "/app/finance" },
+  hr: { label: "HR", icon: UserCog, path: "/app/hr" },
+};
+
 function Dashboard() {
-  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, loading } = useAuth();
+  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, canAccessModule, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,6 +67,51 @@ function Dashboard() {
         <StatCard label="Your roles" value={String(roles.length)} icon={Users} />
       </div>
 
+      {company?.enabled_modules && company.enabled_modules.length > 0 && (
+        <div>
+          <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Enabled modules</div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {company.enabled_modules.map((m) => {
+              const meta = MODULE_META[m];
+              if (!meta) return null;
+              const allowed = canAccessModule(m);
+              const Icon = meta.icon;
+              if (allowed) {
+                return (
+                  <Link
+                    key={m}
+                    to={meta.path}
+                    className="group rounded-lg border border-border bg-card p-4 hover:border-accent hover:shadow-sm transition-all flex items-center gap-3"
+                  >
+                    <div className="h-10 w-10 rounded-md bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                      <Icon className="h-5 w-5 text-accent" />
+                    </div>
+                    <div>
+                      <div className="font-medium">{meta.label}</div>
+                      <div className="text-xs text-muted-foreground">Open module</div>
+                    </div>
+                  </Link>
+                );
+              }
+              return (
+                <div
+                  key={m}
+                  className="rounded-lg border border-border bg-muted/30 p-4 opacity-60 flex items-center gap-3"
+                >
+                  <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center">
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <div className="font-medium">{meta.label}</div>
+                    <div className="text-xs text-muted-foreground">No role access</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Getting started</CardTitle>
@@ -65,7 +119,6 @@ function Dashboard() {
         <CardContent className="text-sm text-muted-foreground space-y-2">
           {isSuperAdmin && <p>• Open <span className="text-foreground font-medium">Companies</span> to provision a new tenant.</p>}
           {isCompanyAdmin && <p>• Invite teammates from <span className="text-foreground font-medium">Users & Roles</span>.</p>}
-          {isCompanyAdmin && <p>• Toggle modules in <span className="text-foreground font-medium">Company settings</span>.</p>}
           <p>• Pick a module from the left sidebar to start working.</p>
         </CardContent>
       </Card>
