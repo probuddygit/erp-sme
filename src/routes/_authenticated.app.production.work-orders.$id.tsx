@@ -103,7 +103,7 @@ function WorkOrderDetailPage() {
     enabled: !!company?.id && !!wo?.bom_id,
     queryKey: ["wo-required", id, wo?.bom_id, wo?.planned_quantity],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("explode_bom", { _bom_id: wo!.bom_id, _qty: wo!.planned_quantity });
+    const { data, error } = await supabase.rpc("explode_bom", { _bom_id: wo!.bom_id!, _qty: wo!.planned_quantity });
       if (error) throw error;
       return data as { material_name: string; material_code: string | null; unit: string; total_quantity: number; total_cost: number }[];
     },
@@ -117,14 +117,14 @@ function WorkOrderDetailPage() {
     if (toStatus === "completed") updates.actual_end = new Date().toISOString();
     const { error: e1 } = await supabase.from("work_orders").update(updates).eq("id", id);
     if (e1) { toast.error(e1.message); return; }
-    await supabase.from("production_logs").insert({
+    await supabase.from("production_logs").insert([{
       company_id: company!.id,
       work_order_id: id,
-      event,
+      event: event as "released" | "started" | "completed" | "cancelled" | "paused" | "resumed" | "note" | "created",
       from_status: wo.status,
       to_status: toStatus,
       created_by: u.user?.id ?? null,
-    });
+    }]);
     toast.success(`Work order ${event}`);
     qc.invalidateQueries({ queryKey: ["wo", id] });
     qc.invalidateQueries({ queryKey: ["wo-logs", id] });
