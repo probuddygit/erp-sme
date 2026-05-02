@@ -14,6 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
+      bills_of_materials: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          output_quantity: number
+          output_unit: string
+          product_code: string | null
+          product_name: string
+          status: Database["public"]["Enums"]["bom_status"]
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          output_quantity?: number
+          output_unit?: string
+          product_code?: string | null
+          product_name: string
+          status?: Database["public"]["Enums"]["bom_status"]
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          output_quantity?: number
+          output_unit?: string
+          product_code?: string | null
+          product_name?: string
+          status?: Database["public"]["Enums"]["bom_status"]
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      bom_components: {
+        Row: {
+          bom_id: string
+          company_id: string
+          component_code: string | null
+          component_name: string
+          created_at: string
+          id: string
+          notes: string | null
+          position: number
+          quantity: number
+          sub_bom_id: string | null
+          unit: string
+          unit_cost: number
+        }
+        Insert: {
+          bom_id: string
+          company_id: string
+          component_code?: string | null
+          component_name: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          position?: number
+          quantity?: number
+          sub_bom_id?: string | null
+          unit?: string
+          unit_cost?: number
+        }
+        Update: {
+          bom_id?: string
+          company_id?: string
+          component_code?: string | null
+          component_name?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          position?: number
+          quantity?: number
+          sub_bom_id?: string | null
+          unit?: string
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bom_components_bom_id_fkey"
+            columns: ["bom_id"]
+            isOneToOne: false
+            referencedRelation: "bills_of_materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bom_components_sub_bom_id_fkey"
+            columns: ["sub_bom_id"]
+            isOneToOne: false
+            referencedRelation: "bills_of_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           created_at: string
@@ -368,6 +473,62 @@ export type Database = {
           },
         ]
       }
+      material_consumption: {
+        Row: {
+          company_id: string
+          consumed_at: string
+          created_at: string
+          created_by: string | null
+          id: string
+          material_code: string | null
+          material_name: string
+          notes: string | null
+          quantity: number
+          total_cost: number
+          unit: string
+          unit_cost: number
+          work_order_id: string
+        }
+        Insert: {
+          company_id: string
+          consumed_at?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          material_code?: string | null
+          material_name: string
+          notes?: string | null
+          quantity: number
+          total_cost?: number
+          unit?: string
+          unit_cost?: number
+          work_order_id: string
+        }
+        Update: {
+          company_id?: string
+          consumed_at?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          material_code?: string | null
+          material_name?: string
+          notes?: string | null
+          quantity?: number
+          total_cost?: number
+          unit?: string
+          unit_cost?: number
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "material_consumption_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -411,6 +572,100 @@ export type Database = {
             columns: ["invoice_id"]
             isOneToOne: false
             referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      production_logs: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          event: Database["public"]["Enums"]["production_log_event"]
+          from_status: Database["public"]["Enums"]["work_order_status"] | null
+          id: string
+          notes: string | null
+          to_status: Database["public"]["Enums"]["work_order_status"] | null
+          work_order_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          event: Database["public"]["Enums"]["production_log_event"]
+          from_status?: Database["public"]["Enums"]["work_order_status"] | null
+          id?: string
+          notes?: string | null
+          to_status?: Database["public"]["Enums"]["work_order_status"] | null
+          work_order_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          event?: Database["public"]["Enums"]["production_log_event"]
+          from_status?: Database["public"]["Enums"]["work_order_status"] | null
+          id?: string
+          notes?: string | null
+          to_status?: Database["public"]["Enums"]["work_order_status"] | null
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_logs_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      production_output: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_scrap: boolean
+          notes: string | null
+          produced_at: string
+          product_name: string
+          quantity: number
+          unit: string
+          work_order_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_scrap?: boolean
+          notes?: string | null
+          produced_at?: string
+          product_name: string
+          quantity: number
+          unit?: string
+          work_order_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_scrap?: boolean
+          notes?: string | null
+          produced_at?: string
+          product_name?: string
+          quantity?: number
+          unit?: string
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_output_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -741,11 +996,105 @@ export type Database = {
           },
         ]
       }
+      work_orders: {
+        Row: {
+          actual_end: string | null
+          actual_start: string | null
+          auto_triggered: boolean
+          bom_id: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          planned_quantity: number
+          priority: number
+          produced_quantity: number
+          product_name: string
+          sales_order_id: string | null
+          scheduled_end: string | null
+          scheduled_start: string | null
+          status: Database["public"]["Enums"]["work_order_status"]
+          unit: string
+          updated_at: string
+          wo_number: string
+        }
+        Insert: {
+          actual_end?: string | null
+          actual_start?: string | null
+          auto_triggered?: boolean
+          bom_id?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          planned_quantity?: number
+          priority?: number
+          produced_quantity?: number
+          product_name: string
+          sales_order_id?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          status?: Database["public"]["Enums"]["work_order_status"]
+          unit?: string
+          updated_at?: string
+          wo_number: string
+        }
+        Update: {
+          actual_end?: string | null
+          actual_start?: string | null
+          auto_triggered?: boolean
+          bom_id?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          planned_quantity?: number
+          priority?: number
+          produced_quantity?: number
+          product_name?: string
+          sales_order_id?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          status?: Database["public"]["Enums"]["work_order_status"]
+          unit?: string
+          updated_at?: string
+          wo_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_orders_bom_id_fkey"
+            columns: ["bom_id"]
+            isOneToOne: false
+            referencedRelation: "bills_of_materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_sales_order_id_fkey"
+            columns: ["sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      explode_bom: {
+        Args: { _bom_id: string; _qty: number }
+        Returns: {
+          material_code: string
+          material_name: string
+          total_cost: number
+          total_quantity: number
+          unit: string
+        }[]
+      }
       get_user_company: { Args: { _user_id: string }; Returns: string }
       has_company_role: {
         Args: {
@@ -771,6 +1120,7 @@ export type Database = {
         Args: { _company_id: string; _prefix: string }
         Returns: string
       }
+      next_wo_number: { Args: { _company_id: string }; Returns: string }
     }
     Enums: {
       app_module:
@@ -788,6 +1138,7 @@ export type Database = {
         | "production"
         | "finance"
         | "hr"
+      bom_status: "draft" | "active" | "archived"
       invoice_status:
         | "draft"
         | "sent"
@@ -817,6 +1168,15 @@ export type Database = {
         | "upi"
         | "card"
         | "other"
+      production_log_event:
+        | "created"
+        | "released"
+        | "started"
+        | "paused"
+        | "resumed"
+        | "completed"
+        | "cancelled"
+        | "note"
       quotation_status: "draft" | "sent" | "accepted" | "rejected" | "expired"
       sales_order_status:
         | "draft"
@@ -827,6 +1187,12 @@ export type Database = {
         | "cancelled"
       subscription_plan: "trial" | "starter" | "pro" | "enterprise"
       tax_type: "intra_state" | "inter_state" | "exempt"
+      work_order_status:
+        | "planned"
+        | "released"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -971,6 +1337,7 @@ export const Constants = {
         "finance",
         "hr",
       ],
+      bom_status: ["draft", "active", "archived"],
       invoice_status: [
         "draft",
         "sent",
@@ -1004,6 +1371,16 @@ export const Constants = {
         "card",
         "other",
       ],
+      production_log_event: [
+        "created",
+        "released",
+        "started",
+        "paused",
+        "resumed",
+        "completed",
+        "cancelled",
+        "note",
+      ],
       quotation_status: ["draft", "sent", "accepted", "rejected", "expired"],
       sales_order_status: [
         "draft",
@@ -1015,6 +1392,13 @@ export const Constants = {
       ],
       subscription_plan: ["trial", "starter", "pro", "enterprise"],
       tax_type: ["intra_state", "inter_state", "exempt"],
+      work_order_status: [
+        "planned",
+        "released",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
     },
   },
 } as const

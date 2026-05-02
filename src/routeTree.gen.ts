@@ -18,14 +18,21 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
 import { Route as AuthenticatedAppUsersRouteImport } from './routes/_authenticated.app.users'
 import { Route as AuthenticatedAppSalesRouteImport } from './routes/_authenticated.app.sales'
+import { Route as AuthenticatedAppProductionRouteImport } from './routes/_authenticated.app.production'
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
+import { Route as AuthenticatedAppProductionIndexRouteImport } from './routes/_authenticated.app.production.index'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
 import { Route as AuthenticatedAppSalesPipelineRouteImport } from './routes/_authenticated.app.sales.pipeline'
 import { Route as AuthenticatedAppSalesOrdersRouteImport } from './routes/_authenticated.app.sales.orders'
 import { Route as AuthenticatedAppSalesInvoicesRouteImport } from './routes/_authenticated.app.sales.invoices'
 import { Route as AuthenticatedAppSalesCustomersRouteImport } from './routes/_authenticated.app.sales.customers'
+import { Route as AuthenticatedAppProductionWorkOrdersRouteImport } from './routes/_authenticated.app.production.work-orders'
+import { Route as AuthenticatedAppProductionTimelineRouteImport } from './routes/_authenticated.app.production.timeline'
+import { Route as AuthenticatedAppProductionBomsRouteImport } from './routes/_authenticated.app.production.boms'
+import { Route as AuthenticatedAppProductionWorkOrdersIdRouteImport } from './routes/_authenticated.app.production.work-orders.$id'
+import { Route as AuthenticatedAppProductionBomsIdRouteImport } from './routes/_authenticated.app.production.boms.$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -71,6 +78,12 @@ const AuthenticatedAppSalesRoute = AuthenticatedAppSalesRouteImport.update({
   path: '/sales',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppProductionRoute =
+  AuthenticatedAppProductionRouteImport.update({
+    id: '/production',
+    path: '/production',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppModuleRoute = AuthenticatedAppModuleRouteImport.update({
   id: '/$module',
   path: '/$module',
@@ -86,6 +99,12 @@ const AuthenticatedAppSalesIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedAppSalesRoute,
+  } as any)
+const AuthenticatedAppProductionIndexRoute =
+  AuthenticatedAppProductionIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppProductionRoute,
   } as any)
 const AuthenticatedAppSalesQuotationsRoute =
   AuthenticatedAppSalesQuotationsRouteImport.update({
@@ -117,6 +136,36 @@ const AuthenticatedAppSalesCustomersRoute =
     path: '/customers',
     getParentRoute: () => AuthenticatedAppSalesRoute,
   } as any)
+const AuthenticatedAppProductionWorkOrdersRoute =
+  AuthenticatedAppProductionWorkOrdersRouteImport.update({
+    id: '/work-orders',
+    path: '/work-orders',
+    getParentRoute: () => AuthenticatedAppProductionRoute,
+  } as any)
+const AuthenticatedAppProductionTimelineRoute =
+  AuthenticatedAppProductionTimelineRouteImport.update({
+    id: '/timeline',
+    path: '/timeline',
+    getParentRoute: () => AuthenticatedAppProductionRoute,
+  } as any)
+const AuthenticatedAppProductionBomsRoute =
+  AuthenticatedAppProductionBomsRouteImport.update({
+    id: '/boms',
+    path: '/boms',
+    getParentRoute: () => AuthenticatedAppProductionRoute,
+  } as any)
+const AuthenticatedAppProductionWorkOrdersIdRoute =
+  AuthenticatedAppProductionWorkOrdersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAppProductionWorkOrdersRoute,
+  } as any)
+const AuthenticatedAppProductionBomsIdRoute =
+  AuthenticatedAppProductionBomsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAppProductionBomsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -125,16 +174,23 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
+  '/app/production': typeof AuthenticatedAppProductionRouteWithChildren
   '/app/sales': typeof AuthenticatedAppSalesRouteWithChildren
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
+  '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
+  '/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/app/production/': typeof AuthenticatedAppProductionIndexRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
+  '/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -144,12 +200,18 @@ export interface FileRoutesByTo {
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
+  '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
+  '/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/app/production': typeof AuthenticatedAppProductionIndexRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
+  '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
+  '/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -160,16 +222,23 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
+  '/_authenticated/app/production': typeof AuthenticatedAppProductionRouteWithChildren
   '/_authenticated/app/sales': typeof AuthenticatedAppSalesRouteWithChildren
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
+  '/_authenticated/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
+  '/_authenticated/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
   '/_authenticated/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/_authenticated/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/_authenticated/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/_authenticated/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/_authenticated/app/production/': typeof AuthenticatedAppProductionIndexRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/_authenticated/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
+  '/_authenticated/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -180,16 +249,23 @@ export interface FileRouteTypes {
     | '/app'
     | '/admin/users'
     | '/app/$module'
+    | '/app/production'
     | '/app/sales'
     | '/app/users'
     | '/admin/'
     | '/app/'
+    | '/app/production/boms'
+    | '/app/production/timeline'
+    | '/app/production/work-orders'
     | '/app/sales/customers'
     | '/app/sales/invoices'
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
+    | '/app/production/'
     | '/app/sales/'
+    | '/app/production/boms/$id'
+    | '/app/production/work-orders/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,12 +275,18 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/admin'
     | '/app'
+    | '/app/production/boms'
+    | '/app/production/timeline'
+    | '/app/production/work-orders'
     | '/app/sales/customers'
     | '/app/sales/invoices'
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
+    | '/app/production'
     | '/app/sales'
+    | '/app/production/boms/$id'
+    | '/app/production/work-orders/$id'
   id:
     | '__root__'
     | '/'
@@ -214,16 +296,23 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/admin/users'
     | '/_authenticated/app/$module'
+    | '/_authenticated/app/production'
     | '/_authenticated/app/sales'
     | '/_authenticated/app/users'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
+    | '/_authenticated/app/production/boms'
+    | '/_authenticated/app/production/timeline'
+    | '/_authenticated/app/production/work-orders'
     | '/_authenticated/app/sales/customers'
     | '/_authenticated/app/sales/invoices'
     | '/_authenticated/app/sales/orders'
     | '/_authenticated/app/sales/pipeline'
     | '/_authenticated/app/sales/quotations'
+    | '/_authenticated/app/production/'
     | '/_authenticated/app/sales/'
+    | '/_authenticated/app/production/boms/$id'
+    | '/_authenticated/app/production/work-orders/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -297,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSalesRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/production': {
+      id: '/_authenticated/app/production'
+      path: '/production'
+      fullPath: '/app/production'
+      preLoaderRoute: typeof AuthenticatedAppProductionRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/$module': {
       id: '/_authenticated/app/$module'
       path: '/$module'
@@ -317,6 +413,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/sales/'
       preLoaderRoute: typeof AuthenticatedAppSalesIndexRouteImport
       parentRoute: typeof AuthenticatedAppSalesRoute
+    }
+    '/_authenticated/app/production/': {
+      id: '/_authenticated/app/production/'
+      path: '/'
+      fullPath: '/app/production/'
+      preLoaderRoute: typeof AuthenticatedAppProductionIndexRouteImport
+      parentRoute: typeof AuthenticatedAppProductionRoute
     }
     '/_authenticated/app/sales/quotations': {
       id: '/_authenticated/app/sales/quotations'
@@ -353,6 +456,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSalesCustomersRouteImport
       parentRoute: typeof AuthenticatedAppSalesRoute
     }
+    '/_authenticated/app/production/work-orders': {
+      id: '/_authenticated/app/production/work-orders'
+      path: '/work-orders'
+      fullPath: '/app/production/work-orders'
+      preLoaderRoute: typeof AuthenticatedAppProductionWorkOrdersRouteImport
+      parentRoute: typeof AuthenticatedAppProductionRoute
+    }
+    '/_authenticated/app/production/timeline': {
+      id: '/_authenticated/app/production/timeline'
+      path: '/timeline'
+      fullPath: '/app/production/timeline'
+      preLoaderRoute: typeof AuthenticatedAppProductionTimelineRouteImport
+      parentRoute: typeof AuthenticatedAppProductionRoute
+    }
+    '/_authenticated/app/production/boms': {
+      id: '/_authenticated/app/production/boms'
+      path: '/boms'
+      fullPath: '/app/production/boms'
+      preLoaderRoute: typeof AuthenticatedAppProductionBomsRouteImport
+      parentRoute: typeof AuthenticatedAppProductionRoute
+    }
+    '/_authenticated/app/production/work-orders/$id': {
+      id: '/_authenticated/app/production/work-orders/$id'
+      path: '/$id'
+      fullPath: '/app/production/work-orders/$id'
+      preLoaderRoute: typeof AuthenticatedAppProductionWorkOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedAppProductionWorkOrdersRoute
+    }
+    '/_authenticated/app/production/boms/$id': {
+      id: '/_authenticated/app/production/boms/$id'
+      path: '/$id'
+      fullPath: '/app/production/boms/$id'
+      preLoaderRoute: typeof AuthenticatedAppProductionBomsIdRouteImport
+      parentRoute: typeof AuthenticatedAppProductionBomsRoute
+    }
   }
 }
 
@@ -368,6 +506,59 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedAppProductionBomsRouteChildren {
+  AuthenticatedAppProductionBomsIdRoute: typeof AuthenticatedAppProductionBomsIdRoute
+}
+
+const AuthenticatedAppProductionBomsRouteChildren: AuthenticatedAppProductionBomsRouteChildren =
+  {
+    AuthenticatedAppProductionBomsIdRoute:
+      AuthenticatedAppProductionBomsIdRoute,
+  }
+
+const AuthenticatedAppProductionBomsRouteWithChildren =
+  AuthenticatedAppProductionBomsRoute._addFileChildren(
+    AuthenticatedAppProductionBomsRouteChildren,
+  )
+
+interface AuthenticatedAppProductionWorkOrdersRouteChildren {
+  AuthenticatedAppProductionWorkOrdersIdRoute: typeof AuthenticatedAppProductionWorkOrdersIdRoute
+}
+
+const AuthenticatedAppProductionWorkOrdersRouteChildren: AuthenticatedAppProductionWorkOrdersRouteChildren =
+  {
+    AuthenticatedAppProductionWorkOrdersIdRoute:
+      AuthenticatedAppProductionWorkOrdersIdRoute,
+  }
+
+const AuthenticatedAppProductionWorkOrdersRouteWithChildren =
+  AuthenticatedAppProductionWorkOrdersRoute._addFileChildren(
+    AuthenticatedAppProductionWorkOrdersRouteChildren,
+  )
+
+interface AuthenticatedAppProductionRouteChildren {
+  AuthenticatedAppProductionBomsRoute: typeof AuthenticatedAppProductionBomsRouteWithChildren
+  AuthenticatedAppProductionTimelineRoute: typeof AuthenticatedAppProductionTimelineRoute
+  AuthenticatedAppProductionWorkOrdersRoute: typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
+  AuthenticatedAppProductionIndexRoute: typeof AuthenticatedAppProductionIndexRoute
+}
+
+const AuthenticatedAppProductionRouteChildren: AuthenticatedAppProductionRouteChildren =
+  {
+    AuthenticatedAppProductionBomsRoute:
+      AuthenticatedAppProductionBomsRouteWithChildren,
+    AuthenticatedAppProductionTimelineRoute:
+      AuthenticatedAppProductionTimelineRoute,
+    AuthenticatedAppProductionWorkOrdersRoute:
+      AuthenticatedAppProductionWorkOrdersRouteWithChildren,
+    AuthenticatedAppProductionIndexRoute: AuthenticatedAppProductionIndexRoute,
+  }
+
+const AuthenticatedAppProductionRouteWithChildren =
+  AuthenticatedAppProductionRoute._addFileChildren(
+    AuthenticatedAppProductionRouteChildren,
+  )
 
 interface AuthenticatedAppSalesRouteChildren {
   AuthenticatedAppSalesCustomersRoute: typeof AuthenticatedAppSalesCustomersRoute
@@ -394,6 +585,7 @@ const AuthenticatedAppSalesRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppModuleRoute: typeof AuthenticatedAppModuleRoute
+  AuthenticatedAppProductionRoute: typeof AuthenticatedAppProductionRouteWithChildren
   AuthenticatedAppSalesRoute: typeof AuthenticatedAppSalesRouteWithChildren
   AuthenticatedAppUsersRoute: typeof AuthenticatedAppUsersRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
@@ -401,6 +593,7 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppModuleRoute: AuthenticatedAppModuleRoute,
+  AuthenticatedAppProductionRoute: AuthenticatedAppProductionRouteWithChildren,
   AuthenticatedAppSalesRoute: AuthenticatedAppSalesRouteWithChildren,
   AuthenticatedAppUsersRoute: AuthenticatedAppUsersRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,

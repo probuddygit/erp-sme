@@ -1,36 +1,34 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
-import { Lock, ShoppingCart, LayoutDashboard, Users2, FileText, ClipboardList, Receipt, Kanban } from "lucide-react";
+import { Lock, Factory, LayoutDashboard, ListChecks, GitBranch, CalendarRange } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/_authenticated/app/sales")({
-  component: SalesLayout,
+export const Route = createFileRoute("/_authenticated/app/production")({
+  component: ProductionLayout,
 });
 
 type Tab = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
 const TABS: Tab[] = [
-  { to: "/app/sales", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/app/sales/pipeline", label: "Pipeline", icon: Kanban },
-  { to: "/app/sales/customers", label: "Customers", icon: Users2 },
-  { to: "/app/sales/quotations", label: "Quotations", icon: FileText },
-  { to: "/app/sales/orders", label: "Sales Orders", icon: ClipboardList },
-  { to: "/app/sales/invoices", label: "Invoices", icon: Receipt },
+  { to: "/app/production", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/app/production/work-orders", label: "Work Orders", icon: ListChecks },
+  { to: "/app/production/timeline", label: "Timeline", icon: CalendarRange },
+  { to: "/app/production/boms", label: "Bills of Materials", icon: GitBranch },
 ];
 
-function SalesLayout() {
+function ProductionLayout() {
   const { canAccessModule, hasModule, company } = useAuth();
   const path = useRouterState({ select: (s) => s.location.pathname });
 
-  if (!hasModule("sales")) {
+  if (!hasModule("production")) {
     return (
-      <Empty title="Sales is disabled" text={`This module isn't enabled for ${company?.name ?? "your company"}.`}>
+      <Empty title="Production is disabled" text={`This module isn't enabled for ${company?.name ?? "your company"}.`}>
         <Button asChild><Link to="/app">Back to dashboard</Link></Button>
       </Empty>
     );
   }
-  if (!canAccessModule("sales")) {
-    return <Empty title="Access denied" text="Your role doesn't include the Sales module." />;
+  if (!canAccessModule("production")) {
+    return <Empty title="Access denied" text="Your role doesn't include the Production module." />;
   }
 
   return (
@@ -40,13 +38,13 @@ function SalesLayout() {
           className="h-12 w-12 rounded-md flex items-center justify-center"
           style={{ background: "var(--gradient-accent)" }}
         >
-          <ShoppingCart className="h-6 w-6 text-accent-foreground" />
+          <Factory className="h-6 w-6 text-accent-foreground" />
         </div>
         <div>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Module</div>
-          <h1 className="text-3xl font-bold tracking-tight">Sales &amp; CRM</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Production &amp; Planning</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Leads, quotations, sales orders, GST invoices &amp; payments.
+            BOMs, work orders, scheduling, material consumption &amp; output tracking.
           </p>
         </div>
       </div>
@@ -58,7 +56,7 @@ function SalesLayout() {
             return (
               <Link
                 key={t.to}
-                to={t.to as string}
+                to={t.to}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors",
                   active
