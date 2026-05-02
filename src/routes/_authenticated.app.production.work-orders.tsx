@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, ListChecks, Eye, Sparkles } from "lucide-react";
+import { Plus, Search, ListChecks, Eye, Sparkles, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { StatusBadge } from "./_authenticated.app.production.index";
 
@@ -139,6 +139,51 @@ function WorkOrdersPage() {
     qc.invalidateQueries({ queryKey: ["work-orders"] });
   };
 
+  // Auto-trigger: create work orders for every line in a sales order that has a matching active BOM
+  const autoTriggerFromSO = async (soId: string) => {
+    // Fetch SO items
+    const { data: items, error: itemsErr } = await supabase
+      .from("sales_order_items")
+      .select("product_name, quantity")
+      .eq("sales_order_id", soId);
+    if (itemsErr) { toast.error(itemsErr.message); return; }
+    if (!items || items.length === 0) { toast.info("Sales order has no line items"); return; }
+
+    // Match products to active BOMs by name
+    const { data: activeBoms } = await supabase
+      .from("bills_of_materials")
+      .select("id, product_name, output_unit")
+      .eq("company_id", company!.id)
+      .eq("status", "active");
+    const bomByName = new Map((activeBoms ?? []).map((b) => [b.product_name.toLowerCase(), b]));
+
+    let created = 0;
+    let skipped = 0;
+    const { data: u } = await supabase.auth.getUser();
+    for (const it of items) {
+      const bom = bomByName.get(it.product_name.toLowerCase());
+      if (!bom) { skipped++; continue; }
+      const { data: numData } = await supabase.rpc("next_wo_number", { _company_id: company!.id });
+      const { error } = await supabase.from("work_orders").insert({
+        company_id: company!.id,
+        wo_number: numData as string,
+        bom_id: bom.id,
+        sales_order_id: soId,
+        product_name: it.product_name,
+        planned_quantity: Number(it.quantity),
+        unit: bom.output_unit,
+        auto_triggered: true,
+        created_by: u.user?.id ?? null,
+      });
+      if (!error) created++;
+    }
+    toast.success(`Created ${created} work order(s)${skipped > 0 ? ` · ${skipped} item(s) had no active BOM` : ""}`);
+    qc.invalidateQueries({ queryKey: ["work-orders"] });
+  };
+
+  const [autoOpen, setAutoOpen] = useState(false);
+  const [autoSO, setAutoSO] = useState<string>("");
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3 justify-between">
@@ -160,6 +205,30 @@ function WorkOrdersPage() {
           </Select>
         </div>
         {canEdit && (
+          <>
+          <Dialog open={autoOpen} onOpenChange={setAutoOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline"><Zap className="h-4 w-4 mr-1" />Auto-trigger from SO</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Generate work orders from a sales order</DialogTitle></DialogHeader>
+              <p className="text-sm text-muted-foreground">
+                For each line item in the selected sales order whose product matches an <strong>active BOM</strong>, a work order will be created automatically.
+              </p>
+              <Select value={autoSO} onValueChange={setAutoSO}>
+                <SelectTrigger><SelectValue placeholder="Pick a sales order" /></SelectTrigger>
+                <SelectContent>
+                  {salesOrders?.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.order_number}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setAutoOpen(false)}>Cancel</Button>
+                <Button disabled={!autoSO} onClick={async () => { await autoTriggerFromSO(autoSO); setAutoOpen(false); setAutoSO(""); }}>Generate</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button><Plus className="h-4 w-4 mr-1" />New work order</Button>
@@ -230,6 +299,7 @@ function WorkOrdersPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </>
         )}
       </div>
 
