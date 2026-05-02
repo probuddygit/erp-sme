@@ -29,6 +29,7 @@ import { Route as AuthenticatedAppSalesOrdersRouteImport } from './routes/_authe
 import { Route as AuthenticatedAppSalesInvoicesRouteImport } from './routes/_authenticated.app.sales.invoices'
 import { Route as AuthenticatedAppSalesCustomersRouteImport } from './routes/_authenticated.app.sales.customers'
 import { Route as AuthenticatedAppProductionBomsRouteImport } from './routes/_authenticated.app.production.boms'
+import { Route as AuthenticatedAppProductionBomsIdRouteImport } from './routes/_authenticated.app.production.boms.$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -138,6 +139,12 @@ const AuthenticatedAppProductionBomsRoute =
     path: '/boms',
     getParentRoute: () => AuthenticatedAppProductionRoute,
   } as any)
+const AuthenticatedAppProductionBomsIdRoute =
+  AuthenticatedAppProductionBomsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAppProductionBomsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -151,7 +158,7 @@ export interface FileRoutesByFullPath {
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
-  '/app/production/boms': typeof AuthenticatedAppProductionBomsRoute
+  '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/production/': typeof AuthenticatedAppProductionIndexRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -168,7 +176,7 @@ export interface FileRoutesByTo {
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
-  '/app/production/boms': typeof AuthenticatedAppProductionBomsRoute
+  '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
@@ -176,6 +184,7 @@ export interface FileRoutesByTo {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/production': typeof AuthenticatedAppProductionIndexRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
+  '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -191,7 +200,7 @@ export interface FileRoutesById {
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
-  '/_authenticated/app/production/boms': typeof AuthenticatedAppProductionBomsRoute
+  '/_authenticated/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/_authenticated/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
   '/_authenticated/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/_authenticated/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
@@ -199,6 +208,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/_authenticated/app/production/': typeof AuthenticatedAppProductionIndexRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/_authenticated/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/production/'
     | '/app/sales/'
+    | '/app/production/boms/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/production'
     | '/app/sales'
+    | '/app/production/boms/$id'
   id:
     | '__root__'
     | '/'
@@ -261,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/quotations'
     | '/_authenticated/app/production/'
     | '/_authenticated/app/sales/'
+    | '/_authenticated/app/production/boms/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -411,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppProductionBomsRouteImport
       parentRoute: typeof AuthenticatedAppProductionRoute
     }
+    '/_authenticated/app/production/boms/$id': {
+      id: '/_authenticated/app/production/boms/$id'
+      path: '/$id'
+      fullPath: '/app/production/boms/$id'
+      preLoaderRoute: typeof AuthenticatedAppProductionBomsIdRouteImport
+      parentRoute: typeof AuthenticatedAppProductionBomsRoute
+    }
   }
 }
 
@@ -427,14 +447,30 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedAppProductionBomsRouteChildren {
+  AuthenticatedAppProductionBomsIdRoute: typeof AuthenticatedAppProductionBomsIdRoute
+}
+
+const AuthenticatedAppProductionBomsRouteChildren: AuthenticatedAppProductionBomsRouteChildren =
+  {
+    AuthenticatedAppProductionBomsIdRoute:
+      AuthenticatedAppProductionBomsIdRoute,
+  }
+
+const AuthenticatedAppProductionBomsRouteWithChildren =
+  AuthenticatedAppProductionBomsRoute._addFileChildren(
+    AuthenticatedAppProductionBomsRouteChildren,
+  )
+
 interface AuthenticatedAppProductionRouteChildren {
-  AuthenticatedAppProductionBomsRoute: typeof AuthenticatedAppProductionBomsRoute
+  AuthenticatedAppProductionBomsRoute: typeof AuthenticatedAppProductionBomsRouteWithChildren
   AuthenticatedAppProductionIndexRoute: typeof AuthenticatedAppProductionIndexRoute
 }
 
 const AuthenticatedAppProductionRouteChildren: AuthenticatedAppProductionRouteChildren =
   {
-    AuthenticatedAppProductionBomsRoute: AuthenticatedAppProductionBomsRoute,
+    AuthenticatedAppProductionBomsRoute:
+      AuthenticatedAppProductionBomsRouteWithChildren,
     AuthenticatedAppProductionIndexRoute: AuthenticatedAppProductionIndexRoute,
   }
 
