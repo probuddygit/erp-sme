@@ -8,12 +8,13 @@ export const Route = createFileRoute("/_authenticated/app/inventory")({
   component: InventoryLayout,
 });
 
-const TABS = [
+type Tab = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const TABS: Tab[] = [
   { to: "/app/inventory", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/app/inventory/items", label: "Items", icon: Package },
   { to: "/app/inventory/warehouses", label: "Warehouses", icon: Warehouse },
   { to: "/app/inventory/movements", label: "Movements", icon: ArrowLeftRight },
-] as const;
+];
 
 function InventoryLayout() {
   const { canAccessModule, hasModule, company } = useAuth();
@@ -52,7 +53,7 @@ function InventoryLayout() {
             return (
               <Link
                 key={t.to}
-                to={t.to}
+                to={t.to as string}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors",
                   active ? "border-accent text-foreground" : "border-transparent text-muted-foreground hover:text-foreground hover:border-border",
