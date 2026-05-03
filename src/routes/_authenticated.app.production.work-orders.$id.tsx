@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, PlayCircle, CheckCircle2, XCircle, Send, Package, Boxes, Activity, Calculator } from "lucide-react";
 import { toast } from "sonner";
@@ -44,8 +45,25 @@ function WorkOrderDetailPage() {
   const canEdit = isCompanyAdmin || hasRole("production");
   const [matOpen, setMatOpen] = useState(false);
   const [outOpen, setOutOpen] = useState(false);
-  const [matForm, setMatForm] = useState({ material_name: "", material_code: "", quantity: "1", unit: "pcs", unit_cost: "0" });
-  const [outForm, setOutForm] = useState({ quantity: "1", is_scrap: false, notes: "" });
+  const [matForm, setMatForm] = useState({ material_name: "", material_code: "", quantity: "1", unit: "pcs", unit_cost: "0", item_id: "", warehouse_id: "" });
+  const [outForm, setOutForm] = useState({ quantity: "1", is_scrap: false, notes: "", item_id: "", warehouse_id: "", unit_cost: "0" });
+
+  const { data: invItems } = useQuery({
+    enabled: !!company?.id,
+    queryKey: ["wo-inv-items", company?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("items").select("id, sku, name, unit").eq("company_id", company!.id).order("name");
+      return (data ?? []) as { id: string; sku: string; name: string; unit: string }[];
+    },
+  });
+  const { data: invWhs } = useQuery({
+    enabled: !!company?.id,
+    queryKey: ["wo-inv-whs", company?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("warehouses").select("id, name").eq("company_id", company!.id).order("name");
+      return (data ?? []) as { id: string; name: string }[];
+    },
+  });
 
   const { data: wo } = useQuery({
     enabled: !!company?.id,
@@ -146,11 +164,13 @@ function WorkOrderDetailPage() {
       unit_cost: unitCost,
       total_cost: qty * unitCost,
       created_by: u.user?.id ?? null,
+      item_id: matForm.item_id || null,
+      warehouse_id: matForm.warehouse_id || null,
     });
     if (error) { toast.error(error.message); return; }
-    toast.success("Material consumption recorded");
+    toast.success(matForm.item_id && matForm.warehouse_id ? "Consumption recorded & stock issued" : "Material consumption recorded");
     setMatOpen(false);
-    setMatForm({ material_name: "", material_code: "", quantity: "1", unit: "pcs", unit_cost: "0" });
+    setMatForm({ material_name: "", material_code: "", quantity: "1", unit: "pcs", unit_cost: "0", item_id: "", warehouse_id: "" });
     qc.invalidateQueries({ queryKey: ["wo-materials", id] });
   };
 
@@ -166,6 +186,9 @@ function WorkOrderDetailPage() {
       is_scrap: outForm.is_scrap,
       notes: outForm.notes.trim() || null,
       created_by: u.user?.id ?? null,
+      item_id: outForm.item_id || null,
+      warehouse_id: outForm.warehouse_id || null,
+      unit_cost: Number(outForm.unit_cost) || 0,
     });
     if (error) { toast.error(error.message); return; }
     if (!outForm.is_scrap) {
@@ -177,7 +200,7 @@ function WorkOrderDetailPage() {
     }
     toast.success("Output recorded");
     setOutOpen(false);
-    setOutForm({ quantity: "1", is_scrap: false, notes: "" });
+    setOutForm({ quantity: "1", is_scrap: false, notes: "", item_id: "", warehouse_id: "", unit_cost: "0" });
     qc.invalidateQueries({ queryKey: ["wo", id] });
     qc.invalidateQueries({ queryKey: ["wo-outputs", id] });
   };
