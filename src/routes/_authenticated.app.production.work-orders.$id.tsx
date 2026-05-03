@@ -290,6 +290,27 @@ function WorkOrderDetailPage() {
                       <div><Label>Unit</Label><Input value={matForm.unit} onChange={(e) => setMatForm({ ...matForm, unit: e.target.value })} /></div>
                       <div><Label>Unit cost (₹)</Label><Input type="number" step="0.01" value={matForm.unit_cost} onChange={(e) => setMatForm({ ...matForm, unit_cost: e.target.value })} /></div>
                     </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Inventory item (optional)</Label>
+                        <Select value={matForm.item_id} onValueChange={(v) => setMatForm({ ...matForm, item_id: v })}>
+                          <SelectTrigger><SelectValue placeholder="Link to issue stock" /></SelectTrigger>
+                          <SelectContent>
+                            {(invItems ?? []).map((i) => <SelectItem key={i.id} value={i.id}>{i.name} ({i.sku})</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Warehouse</Label>
+                        <Select value={matForm.warehouse_id} onValueChange={(v) => setMatForm({ ...matForm, warehouse_id: v })}>
+                          <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                          <SelectContent>
+                            {(invWhs ?? []).map((w) => <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Linking an item + warehouse will auto-issue stock via FIFO.</p>
                   </div>
                   <DialogFooter><Button variant="outline" onClick={() => setMatOpen(false)}>Cancel</Button><Button onClick={recordMaterial}>Save</Button></DialogFooter>
                 </DialogContent>
@@ -330,6 +351,27 @@ function WorkOrderDetailPage() {
                       <input type="checkbox" checked={outForm.is_scrap} onChange={(e) => setOutForm({ ...outForm, is_scrap: e.target.checked })} />
                       Mark as scrap (won't count toward produced)
                     </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Finished good (optional)</Label>
+                        <Select value={outForm.item_id} onValueChange={(v) => setOutForm({ ...outForm, item_id: v })}>
+                          <SelectTrigger><SelectValue placeholder="Link to receive stock" /></SelectTrigger>
+                          <SelectContent>
+                            {(invItems ?? []).map((i) => <SelectItem key={i.id} value={i.id}>{i.name} ({i.sku})</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Warehouse</Label>
+                        <Select value={outForm.warehouse_id} onValueChange={(v) => setOutForm({ ...outForm, warehouse_id: v })}>
+                          <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                          <SelectContent>
+                            {(invWhs ?? []).map((w) => <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div><Label>Unit cost (₹)</Label><Input type="number" step="0.01" value={outForm.unit_cost} onChange={(e) => setOutForm({ ...outForm, unit_cost: e.target.value })} /></div>
                     <div><Label>Notes</Label><Textarea value={outForm.notes} onChange={(e) => setOutForm({ ...outForm, notes: e.target.value })} /></div>
                   </div>
                   <DialogFooter><Button variant="outline" onClick={() => setOutOpen(false)}>Cancel</Button><Button onClick={recordOutput}>Save</Button></DialogFooter>
