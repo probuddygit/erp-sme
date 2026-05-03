@@ -402,6 +402,63 @@ export type Database = {
           },
         ]
       }
+      items: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          hsn_code: string | null
+          id: string
+          is_active: boolean
+          item_type: Database["public"]["Enums"]["item_type"]
+          min_stock: number
+          name: string
+          reorder_qty: number
+          sku: string
+          standard_cost: number
+          unit: string
+          updated_at: string
+          valuation_method: Database["public"]["Enums"]["valuation_method"]
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          hsn_code?: string | null
+          id?: string
+          is_active?: boolean
+          item_type?: Database["public"]["Enums"]["item_type"]
+          min_stock?: number
+          name: string
+          reorder_qty?: number
+          sku: string
+          standard_cost?: number
+          unit?: string
+          updated_at?: string
+          valuation_method?: Database["public"]["Enums"]["valuation_method"]
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          hsn_code?: string | null
+          id?: string
+          is_active?: boolean
+          item_type?: Database["public"]["Enums"]["item_type"]
+          min_stock?: number
+          name?: string
+          reorder_qty?: number
+          sku?: string
+          standard_cost?: number
+          unit?: string
+          updated_at?: string
+          valuation_method?: Database["public"]["Enums"]["valuation_method"]
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           company_id: string
@@ -480,6 +537,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          item_id: string | null
           material_code: string | null
           material_name: string
           notes: string | null
@@ -487,6 +545,7 @@ export type Database = {
           total_cost: number
           unit: string
           unit_cost: number
+          warehouse_id: string | null
           work_order_id: string
         }
         Insert: {
@@ -495,6 +554,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          item_id?: string | null
           material_code?: string | null
           material_name: string
           notes?: string | null
@@ -502,6 +562,7 @@ export type Database = {
           total_cost?: number
           unit?: string
           unit_cost?: number
+          warehouse_id?: string | null
           work_order_id: string
         }
         Update: {
@@ -510,6 +571,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          item_id?: string | null
           material_code?: string | null
           material_name?: string
           notes?: string | null
@@ -517,6 +579,7 @@ export type Database = {
           total_cost?: number
           unit?: string
           unit_cost?: number
+          warehouse_id?: string | null
           work_order_id?: string
         }
         Relationships: [
@@ -627,11 +690,14 @@ export type Database = {
           created_by: string | null
           id: string
           is_scrap: boolean
+          item_id: string | null
           notes: string | null
           produced_at: string
           product_name: string
           quantity: number
           unit: string
+          unit_cost: number
+          warehouse_id: string | null
           work_order_id: string
         }
         Insert: {
@@ -640,11 +706,14 @@ export type Database = {
           created_by?: string | null
           id?: string
           is_scrap?: boolean
+          item_id?: string | null
           notes?: string | null
           produced_at?: string
           product_name: string
           quantity: number
           unit?: string
+          unit_cost?: number
+          warehouse_id?: string | null
           work_order_id: string
         }
         Update: {
@@ -653,11 +722,14 @@ export type Database = {
           created_by?: string | null
           id?: string
           is_scrap?: boolean
+          item_id?: string | null
           notes?: string | null
           produced_at?: string
           product_name?: string
           quantity?: number
           unit?: string
+          unit_cost?: number
+          warehouse_id?: string | null
           work_order_id?: string
         }
         Relationships: [
@@ -964,6 +1036,114 @@ export type Database = {
           },
         ]
       }
+      stock_batches: {
+        Row: {
+          batch_no: string
+          company_id: string
+          created_at: string
+          expiry_date: string | null
+          id: string
+          item_id: string
+          landed_cost_per_unit: number
+          qty_received: number
+          qty_remaining: number
+          received_at: string
+          unit_cost: number
+          warehouse_id: string
+        }
+        Insert: {
+          batch_no: string
+          company_id: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          item_id: string
+          landed_cost_per_unit?: number
+          qty_received?: number
+          qty_remaining?: number
+          received_at?: string
+          unit_cost?: number
+          warehouse_id: string
+        }
+        Update: {
+          batch_no?: string
+          company_id?: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          item_id?: string
+          landed_cost_per_unit?: number
+          qty_received?: number
+          qty_remaining?: number
+          received_at?: string
+          unit_cost?: number
+          warehouse_id?: string
+        }
+        Relationships: []
+      }
+      stock_transactions: {
+        Row: {
+          batch_id: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          duty: number
+          freight: number
+          id: string
+          item_id: string
+          notes: string | null
+          occurred_at: string
+          other_landed: number
+          quantity: number
+          reference_id: string | null
+          reference_type: string | null
+          total_value: number
+          txn_type: Database["public"]["Enums"]["stock_txn_type"]
+          unit_cost: number
+          warehouse_id: string
+        }
+        Insert: {
+          batch_id?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          duty?: number
+          freight?: number
+          id?: string
+          item_id: string
+          notes?: string | null
+          occurred_at?: string
+          other_landed?: number
+          quantity: number
+          reference_id?: string | null
+          reference_type?: string | null
+          total_value?: number
+          txn_type: Database["public"]["Enums"]["stock_txn_type"]
+          unit_cost?: number
+          warehouse_id: string
+        }
+        Update: {
+          batch_id?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          duty?: number
+          freight?: number
+          id?: string
+          item_id?: string
+          notes?: string | null
+          occurred_at?: string
+          other_landed?: number
+          quantity?: number
+          reference_id?: string | null
+          reference_type?: string | null
+          total_value?: number
+          txn_type?: Database["public"]["Enums"]["stock_txn_type"]
+          unit_cost?: number
+          warehouse_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           company_id: string | null
@@ -995,6 +1175,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      warehouses: {
+        Row: {
+          address: string | null
+          code: string
+          company_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          code: string
+          company_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          code?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       work_orders: {
         Row: {
@@ -1116,11 +1329,51 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      item_stock_levels: {
+        Args: { _company_id: string }
+        Returns: {
+          item_id: string
+          on_hand: number
+          value: number
+          warehouse_id: string
+        }[]
+      }
       next_doc_number: {
         Args: { _company_id: string; _prefix: string }
         Returns: string
       }
       next_wo_number: { Args: { _company_id: string }; Returns: string }
+      post_stock_issue: {
+        Args: {
+          _company_id: string
+          _item_id: string
+          _notes?: string
+          _quantity: number
+          _ref_id?: string
+          _ref_type?: string
+          _txn_type?: Database["public"]["Enums"]["stock_txn_type"]
+          _warehouse_id: string
+        }
+        Returns: number
+      }
+      post_stock_receipt: {
+        Args: {
+          _batch_no: string
+          _company_id: string
+          _duty?: number
+          _expiry?: string
+          _freight?: number
+          _item_id: string
+          _notes?: string
+          _other?: number
+          _quantity: number
+          _ref_id?: string
+          _ref_type?: string
+          _unit_cost: number
+          _warehouse_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_module:
@@ -1146,6 +1399,12 @@ export type Database = {
         | "paid"
         | "overdue"
         | "cancelled"
+      item_type:
+        | "raw_material"
+        | "wip"
+        | "finished_good"
+        | "consumable"
+        | "service"
       lead_source:
         | "website"
         | "referral"
@@ -1185,8 +1444,18 @@ export type Database = {
         | "rejected"
         | "fulfilled"
         | "cancelled"
+      stock_txn_type:
+        | "receipt"
+        | "issue"
+        | "transfer_in"
+        | "transfer_out"
+        | "adjustment"
+        | "production_in"
+        | "production_out"
+        | "opening"
       subscription_plan: "trial" | "starter" | "pro" | "enterprise"
       tax_type: "intra_state" | "inter_state" | "exempt"
+      valuation_method: "fifo" | "weighted_average"
       work_order_status:
         | "planned"
         | "released"
@@ -1346,6 +1615,13 @@ export const Constants = {
         "overdue",
         "cancelled",
       ],
+      item_type: [
+        "raw_material",
+        "wip",
+        "finished_good",
+        "consumable",
+        "service",
+      ],
       lead_source: [
         "website",
         "referral",
@@ -1390,8 +1666,19 @@ export const Constants = {
         "fulfilled",
         "cancelled",
       ],
+      stock_txn_type: [
+        "receipt",
+        "issue",
+        "transfer_in",
+        "transfer_out",
+        "adjustment",
+        "production_in",
+        "production_out",
+        "opening",
+      ],
       subscription_plan: ["trial", "starter", "pro", "enterprise"],
       tax_type: ["intra_state", "inter_state", "exempt"],
+      valuation_method: ["fifo", "weighted_average"],
       work_order_status: [
         "planned",
         "released",
