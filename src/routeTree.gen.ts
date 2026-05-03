@@ -24,6 +24,7 @@ import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
 import { Route as AuthenticatedAppProductionIndexRouteImport } from './routes/_authenticated.app.production.index'
+import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_authenticated.app.inventory.index'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
 import { Route as AuthenticatedAppSalesPipelineRouteImport } from './routes/_authenticated.app.sales.pipeline'
 import { Route as AuthenticatedAppSalesOrdersRouteImport } from './routes/_authenticated.app.sales.orders'
@@ -113,6 +114,12 @@ const AuthenticatedAppProductionIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAppProductionRoute,
   } as any)
+const AuthenticatedAppInventoryIndexRoute =
+  AuthenticatedAppInventoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppInventoryRoute,
+  } as any)
 const AuthenticatedAppSalesQuotationsRoute =
   AuthenticatedAppSalesQuotationsRouteImport.update({
     id: '/quotations',
@@ -181,7 +188,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
-  '/app/inventory': typeof AuthenticatedAppInventoryRoute
+  '/app/inventory': typeof AuthenticatedAppInventoryRouteWithChildren
   '/app/production': typeof AuthenticatedAppProductionRouteWithChildren
   '/app/sales': typeof AuthenticatedAppSalesRouteWithChildren
   '/app/users': typeof AuthenticatedAppUsersRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
   '/app/production/': typeof AuthenticatedAppProductionIndexRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
   '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
@@ -205,7 +213,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
-  '/app/inventory': typeof AuthenticatedAppInventoryRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/app/inventory': typeof AuthenticatedAppInventoryIndexRoute
   '/app/production': typeof AuthenticatedAppProductionIndexRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
   '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
@@ -231,7 +239,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
-  '/_authenticated/app/inventory': typeof AuthenticatedAppInventoryRoute
+  '/_authenticated/app/inventory': typeof AuthenticatedAppInventoryRouteWithChildren
   '/_authenticated/app/production': typeof AuthenticatedAppProductionRouteWithChildren
   '/_authenticated/app/sales': typeof AuthenticatedAppSalesRouteWithChildren
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/_authenticated/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/_authenticated/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
   '/_authenticated/app/production/': typeof AuthenticatedAppProductionIndexRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
   '/_authenticated/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
+    | '/app/inventory/'
     | '/app/production/'
     | '/app/sales/'
     | '/app/production/boms/$id'
@@ -283,7 +293,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/users'
     | '/app/$module'
-    | '/app/inventory'
     | '/app/users'
     | '/admin'
     | '/app'
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
+    | '/app/inventory'
     | '/app/production'
     | '/app/sales'
     | '/app/production/boms/$id'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/orders'
     | '/_authenticated/app/sales/pipeline'
     | '/_authenticated/app/sales/quotations'
+    | '/_authenticated/app/inventory/'
     | '/_authenticated/app/production/'
     | '/_authenticated/app/sales/'
     | '/_authenticated/app/production/boms/$id'
@@ -441,6 +452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppProductionIndexRouteImport
       parentRoute: typeof AuthenticatedAppProductionRoute
     }
+    '/_authenticated/app/inventory/': {
+      id: '/_authenticated/app/inventory/'
+      path: '/'
+      fullPath: '/app/inventory/'
+      preLoaderRoute: typeof AuthenticatedAppInventoryIndexRouteImport
+      parentRoute: typeof AuthenticatedAppInventoryRoute
+    }
     '/_authenticated/app/sales/quotations': {
       id: '/_authenticated/app/sales/quotations'
       path: '/quotations'
@@ -527,6 +545,20 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedAppInventoryRouteChildren {
+  AuthenticatedAppInventoryIndexRoute: typeof AuthenticatedAppInventoryIndexRoute
+}
+
+const AuthenticatedAppInventoryRouteChildren: AuthenticatedAppInventoryRouteChildren =
+  {
+    AuthenticatedAppInventoryIndexRoute: AuthenticatedAppInventoryIndexRoute,
+  }
+
+const AuthenticatedAppInventoryRouteWithChildren =
+  AuthenticatedAppInventoryRoute._addFileChildren(
+    AuthenticatedAppInventoryRouteChildren,
+  )
+
 interface AuthenticatedAppProductionBomsRouteChildren {
   AuthenticatedAppProductionBomsIdRoute: typeof AuthenticatedAppProductionBomsIdRoute
 }
@@ -605,7 +637,7 @@ const AuthenticatedAppSalesRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppModuleRoute: typeof AuthenticatedAppModuleRoute
-  AuthenticatedAppInventoryRoute: typeof AuthenticatedAppInventoryRoute
+  AuthenticatedAppInventoryRoute: typeof AuthenticatedAppInventoryRouteWithChildren
   AuthenticatedAppProductionRoute: typeof AuthenticatedAppProductionRouteWithChildren
   AuthenticatedAppSalesRoute: typeof AuthenticatedAppSalesRouteWithChildren
   AuthenticatedAppUsersRoute: typeof AuthenticatedAppUsersRoute
@@ -614,7 +646,7 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppModuleRoute: AuthenticatedAppModuleRoute,
-  AuthenticatedAppInventoryRoute: AuthenticatedAppInventoryRoute,
+  AuthenticatedAppInventoryRoute: AuthenticatedAppInventoryRouteWithChildren,
   AuthenticatedAppProductionRoute: AuthenticatedAppProductionRouteWithChildren,
   AuthenticatedAppSalesRoute: AuthenticatedAppSalesRouteWithChildren,
   AuthenticatedAppUsersRoute: AuthenticatedAppUsersRoute,
