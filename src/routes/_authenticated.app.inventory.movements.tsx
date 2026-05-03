@@ -87,14 +87,14 @@ function MovementsPage() {
           _quantity: qty, _unit_cost: Number(form.unit_cost) || 0,
           _batch_no: form.batch_no.trim() || `B-${Date.now()}`,
           _freight: Number(form.freight) || 0, _duty: Number(form.duty) || 0, _other: Number(form.other) || 0,
-          _expiry: null, _ref_type: "manual", _ref_id: null, _notes: form.notes.trim() || null,
+          _expiry: undefined, _ref_type: "manual", _ref_id: undefined, _notes: form.notes.trim() || undefined,
         });
         if (error) throw error;
       } else if (mode === "issue") {
         const { error } = await supabase.rpc("post_stock_issue", {
           _company_id: company!.id, _item_id: form.item_id, _warehouse_id: form.warehouse_id,
-          _quantity: qty, _ref_type: "manual", _ref_id: null,
-          _notes: form.notes.trim() || null, _txn_type: "issue",
+          _quantity: qty, _ref_type: "manual", _ref_id: undefined,
+          _notes: form.notes.trim() || undefined, _txn_type: "issue",
         });
         if (error) throw error;
       } else if (mode === "transfer") {
@@ -104,8 +104,8 @@ function MovementsPage() {
         // FIFO take from source then receipt at destination at avg cost
         const { data: cost, error: e1 } = await supabase.rpc("post_stock_issue", {
           _company_id: company!.id, _item_id: form.item_id, _warehouse_id: form.warehouse_id,
-          _quantity: qty, _ref_type: "transfer", _ref_id: null,
-          _notes: form.notes.trim() || null, _txn_type: "transfer_out",
+          _quantity: qty, _ref_type: "transfer", _ref_id: undefined,
+          _notes: form.notes.trim() || undefined, _txn_type: "transfer_out",
         });
         if (e1) throw e1;
         const unitCost = qty > 0 ? (Number(cost) || 0) / qty : 0;
@@ -114,7 +114,7 @@ function MovementsPage() {
           _quantity: qty, _unit_cost: unitCost,
           _batch_no: form.batch_no.trim() || `XFER-${Date.now()}`,
           _freight: 0, _duty: 0, _other: 0,
-          _expiry: null, _ref_type: "transfer", _ref_id: null, _notes: form.notes.trim() || null,
+          _expiry: undefined, _ref_type: "transfer", _ref_id: undefined, _notes: form.notes.trim() || undefined,
         });
         if (e2) throw e2;
       } else {
@@ -126,14 +126,14 @@ function MovementsPage() {
             _quantity: signed, _unit_cost: Number(form.unit_cost) || 0,
             _batch_no: form.batch_no.trim() || `ADJ-${Date.now()}`,
             _freight: 0, _duty: 0, _other: 0,
-            _expiry: null, _ref_type: "adjustment", _ref_id: null, _notes: form.notes.trim() || null,
+            _expiry: undefined, _ref_type: "adjustment", _ref_id: undefined, _notes: form.notes.trim() || undefined,
           });
           if (error) throw error;
         } else {
           const { error } = await supabase.rpc("post_stock_issue", {
             _company_id: company!.id, _item_id: form.item_id, _warehouse_id: form.warehouse_id,
-            _quantity: Math.abs(signed), _ref_type: "adjustment", _ref_id: null,
-            _notes: form.notes.trim() || null, _txn_type: "adjustment",
+            _quantity: Math.abs(signed), _ref_type: "adjustment", _ref_id: undefined,
+            _notes: form.notes.trim() || undefined, _txn_type: "adjustment",
           });
           if (error) throw error;
         }
