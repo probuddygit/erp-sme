@@ -36,6 +36,7 @@ import { Route as AuthenticatedAppProductionWorkOrdersRouteImport } from './rout
 import { Route as AuthenticatedAppProductionTimelineRouteImport } from './routes/_authenticated.app.production.timeline'
 import { Route as AuthenticatedAppProductionBomsRouteImport } from './routes/_authenticated.app.production.boms'
 import { Route as AuthenticatedAppProcurementSuppliersRouteImport } from './routes/_authenticated.app.procurement.suppliers'
+import { Route as AuthenticatedAppProcurementIndentsRouteImport } from './routes/_authenticated.app.procurement.indents'
 import { Route as AuthenticatedAppInventoryWarehousesRouteImport } from './routes/_authenticated.app.inventory.warehouses'
 import { Route as AuthenticatedAppInventoryMovementsRouteImport } from './routes/_authenticated.app.inventory.movements'
 import { Route as AuthenticatedAppInventoryItemsRouteImport } from './routes/_authenticated.app.inventory.items'
@@ -192,6 +193,12 @@ const AuthenticatedAppProcurementSuppliersRoute =
     path: '/suppliers',
     getParentRoute: () => AuthenticatedAppProcurementRoute,
   } as any)
+const AuthenticatedAppProcurementIndentsRoute =
+  AuthenticatedAppProcurementIndentsRouteImport.update({
+    id: '/indents',
+    path: '/indents',
+    getParentRoute: () => AuthenticatedAppProcurementRoute,
+  } as any)
 const AuthenticatedAppInventoryWarehousesRoute =
   AuthenticatedAppInventoryWarehousesRouteImport.update({
     id: '/warehouses',
@@ -240,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
+  '/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
   '/app/procurement/suppliers': typeof AuthenticatedAppProcurementSuppliersRoute
   '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
@@ -267,6 +275,7 @@ export interface FileRoutesByTo {
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
+  '/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
   '/app/procurement/suppliers': typeof AuthenticatedAppProcurementSuppliersRoute
   '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
@@ -302,6 +311,7 @@ export interface FileRoutesById {
   '/_authenticated/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/_authenticated/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/_authenticated/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
+  '/_authenticated/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
   '/_authenticated/app/procurement/suppliers': typeof AuthenticatedAppProcurementSuppliersRoute
   '/_authenticated/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/_authenticated/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
@@ -337,6 +347,7 @@ export interface FileRouteTypes {
     | '/app/inventory/items'
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
+    | '/app/procurement/indents'
     | '/app/procurement/suppliers'
     | '/app/production/boms'
     | '/app/production/timeline'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/app/inventory/items'
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
+    | '/app/procurement/indents'
     | '/app/procurement/suppliers'
     | '/app/production/boms'
     | '/app/production/timeline'
@@ -398,6 +410,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/inventory/items'
     | '/_authenticated/app/inventory/movements'
     | '/_authenticated/app/inventory/warehouses'
+    | '/_authenticated/app/procurement/indents'
     | '/_authenticated/app/procurement/suppliers'
     | '/_authenticated/app/production/boms'
     | '/_authenticated/app/production/timeline'
@@ -612,6 +625,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppProcurementSuppliersRouteImport
       parentRoute: typeof AuthenticatedAppProcurementRoute
     }
+    '/_authenticated/app/procurement/indents': {
+      id: '/_authenticated/app/procurement/indents'
+      path: '/indents'
+      fullPath: '/app/procurement/indents'
+      preLoaderRoute: typeof AuthenticatedAppProcurementIndentsRouteImport
+      parentRoute: typeof AuthenticatedAppProcurementRoute
+    }
     '/_authenticated/app/inventory/warehouses': {
       id: '/_authenticated/app/inventory/warehouses'
       path: '/warehouses'
@@ -686,12 +706,15 @@ const AuthenticatedAppInventoryRouteWithChildren =
   )
 
 interface AuthenticatedAppProcurementRouteChildren {
+  AuthenticatedAppProcurementIndentsRoute: typeof AuthenticatedAppProcurementIndentsRoute
   AuthenticatedAppProcurementSuppliersRoute: typeof AuthenticatedAppProcurementSuppliersRoute
   AuthenticatedAppProcurementIndexRoute: typeof AuthenticatedAppProcurementIndexRoute
 }
 
 const AuthenticatedAppProcurementRouteChildren: AuthenticatedAppProcurementRouteChildren =
   {
+    AuthenticatedAppProcurementIndentsRoute:
+      AuthenticatedAppProcurementIndentsRoute,
     AuthenticatedAppProcurementSuppliersRoute:
       AuthenticatedAppProcurementSuppliersRoute,
     AuthenticatedAppProcurementIndexRoute:
