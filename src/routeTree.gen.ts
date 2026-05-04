@@ -36,6 +36,8 @@ import { Route as AuthenticatedAppProductionWorkOrdersRouteImport } from './rout
 import { Route as AuthenticatedAppProductionTimelineRouteImport } from './routes/_authenticated.app.production.timeline'
 import { Route as AuthenticatedAppProductionBomsRouteImport } from './routes/_authenticated.app.production.boms'
 import { Route as AuthenticatedAppProcurementSuppliersRouteImport } from './routes/_authenticated.app.procurement.suppliers'
+import { Route as AuthenticatedAppProcurementRfqsRouteImport } from './routes/_authenticated.app.procurement.rfqs'
+import { Route as AuthenticatedAppProcurementPurchaseOrdersRouteImport } from './routes/_authenticated.app.procurement.purchase-orders'
 import { Route as AuthenticatedAppProcurementIndentsRouteImport } from './routes/_authenticated.app.procurement.indents'
 import { Route as AuthenticatedAppInventoryWarehousesRouteImport } from './routes/_authenticated.app.inventory.warehouses'
 import { Route as AuthenticatedAppInventoryMovementsRouteImport } from './routes/_authenticated.app.inventory.movements'
@@ -193,6 +195,18 @@ const AuthenticatedAppProcurementSuppliersRoute =
     path: '/suppliers',
     getParentRoute: () => AuthenticatedAppProcurementRoute,
   } as any)
+const AuthenticatedAppProcurementRfqsRoute =
+  AuthenticatedAppProcurementRfqsRouteImport.update({
+    id: '/rfqs',
+    path: '/rfqs',
+    getParentRoute: () => AuthenticatedAppProcurementRoute,
+  } as any)
+const AuthenticatedAppProcurementPurchaseOrdersRoute =
+  AuthenticatedAppProcurementPurchaseOrdersRouteImport.update({
+    id: '/purchase-orders',
+    path: '/purchase-orders',
+    getParentRoute: () => AuthenticatedAppProcurementRoute,
+  } as any)
 const AuthenticatedAppProcurementIndentsRoute =
   AuthenticatedAppProcurementIndentsRouteImport.update({
     id: '/indents',
@@ -248,6 +262,8 @@ export interface FileRoutesByFullPath {
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
   '/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
+  '/app/procurement/purchase-orders': typeof AuthenticatedAppProcurementPurchaseOrdersRoute
+  '/app/procurement/rfqs': typeof AuthenticatedAppProcurementRfqsRoute
   '/app/procurement/suppliers': typeof AuthenticatedAppProcurementSuppliersRoute
   '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
@@ -276,6 +292,8 @@ export interface FileRoutesByTo {
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
   '/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
+  '/app/procurement/purchase-orders': typeof AuthenticatedAppProcurementPurchaseOrdersRoute
+  '/app/procurement/rfqs': typeof AuthenticatedAppProcurementRfqsRoute
   '/app/procurement/suppliers': typeof AuthenticatedAppProcurementSuppliersRoute
   '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
@@ -312,6 +330,8 @@ export interface FileRoutesById {
   '/_authenticated/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/_authenticated/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
   '/_authenticated/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
+  '/_authenticated/app/procurement/purchase-orders': typeof AuthenticatedAppProcurementPurchaseOrdersRoute
+  '/_authenticated/app/procurement/rfqs': typeof AuthenticatedAppProcurementRfqsRoute
   '/_authenticated/app/procurement/suppliers': typeof AuthenticatedAppProcurementSuppliersRoute
   '/_authenticated/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/_authenticated/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
@@ -348,6 +368,8 @@ export interface FileRouteTypes {
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
     | '/app/procurement/indents'
+    | '/app/procurement/purchase-orders'
+    | '/app/procurement/rfqs'
     | '/app/procurement/suppliers'
     | '/app/production/boms'
     | '/app/production/timeline'
@@ -376,6 +398,8 @@ export interface FileRouteTypes {
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
     | '/app/procurement/indents'
+    | '/app/procurement/purchase-orders'
+    | '/app/procurement/rfqs'
     | '/app/procurement/suppliers'
     | '/app/production/boms'
     | '/app/production/timeline'
@@ -411,6 +435,8 @@ export interface FileRouteTypes {
     | '/_authenticated/app/inventory/movements'
     | '/_authenticated/app/inventory/warehouses'
     | '/_authenticated/app/procurement/indents'
+    | '/_authenticated/app/procurement/purchase-orders'
+    | '/_authenticated/app/procurement/rfqs'
     | '/_authenticated/app/procurement/suppliers'
     | '/_authenticated/app/production/boms'
     | '/_authenticated/app/production/timeline'
@@ -625,6 +651,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppProcurementSuppliersRouteImport
       parentRoute: typeof AuthenticatedAppProcurementRoute
     }
+    '/_authenticated/app/procurement/rfqs': {
+      id: '/_authenticated/app/procurement/rfqs'
+      path: '/rfqs'
+      fullPath: '/app/procurement/rfqs'
+      preLoaderRoute: typeof AuthenticatedAppProcurementRfqsRouteImport
+      parentRoute: typeof AuthenticatedAppProcurementRoute
+    }
+    '/_authenticated/app/procurement/purchase-orders': {
+      id: '/_authenticated/app/procurement/purchase-orders'
+      path: '/purchase-orders'
+      fullPath: '/app/procurement/purchase-orders'
+      preLoaderRoute: typeof AuthenticatedAppProcurementPurchaseOrdersRouteImport
+      parentRoute: typeof AuthenticatedAppProcurementRoute
+    }
     '/_authenticated/app/procurement/indents': {
       id: '/_authenticated/app/procurement/indents'
       path: '/indents'
@@ -707,6 +747,8 @@ const AuthenticatedAppInventoryRouteWithChildren =
 
 interface AuthenticatedAppProcurementRouteChildren {
   AuthenticatedAppProcurementIndentsRoute: typeof AuthenticatedAppProcurementIndentsRoute
+  AuthenticatedAppProcurementPurchaseOrdersRoute: typeof AuthenticatedAppProcurementPurchaseOrdersRoute
+  AuthenticatedAppProcurementRfqsRoute: typeof AuthenticatedAppProcurementRfqsRoute
   AuthenticatedAppProcurementSuppliersRoute: typeof AuthenticatedAppProcurementSuppliersRoute
   AuthenticatedAppProcurementIndexRoute: typeof AuthenticatedAppProcurementIndexRoute
 }
@@ -715,6 +757,9 @@ const AuthenticatedAppProcurementRouteChildren: AuthenticatedAppProcurementRoute
   {
     AuthenticatedAppProcurementIndentsRoute:
       AuthenticatedAppProcurementIndentsRoute,
+    AuthenticatedAppProcurementPurchaseOrdersRoute:
+      AuthenticatedAppProcurementPurchaseOrdersRoute,
+    AuthenticatedAppProcurementRfqsRoute: AuthenticatedAppProcurementRfqsRoute,
     AuthenticatedAppProcurementSuppliersRoute:
       AuthenticatedAppProcurementSuppliersRoute,
     AuthenticatedAppProcurementIndexRoute:
