@@ -119,6 +119,51 @@ export type Database = {
           },
         ]
       }
+      chart_of_accounts: {
+        Row: {
+          code: string
+          company_id: string
+          created_at: string
+          currency: string
+          gst_rate: number | null
+          id: string
+          is_active: boolean
+          is_system: boolean
+          name: string
+          parent_id: string | null
+          type: Database["public"]["Enums"]["account_type"]
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          company_id: string
+          created_at?: string
+          currency?: string
+          gst_rate?: number | null
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          name: string
+          parent_id?: string | null
+          type: Database["public"]["Enums"]["account_type"]
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          company_id?: string
+          created_at?: string
+          currency?: string
+          gst_rate?: number | null
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          name?: string
+          parent_id?: string | null
+          type?: Database["public"]["Enums"]["account_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           created_at: string
@@ -355,6 +400,62 @@ export type Database = {
         }
         Relationships: []
       }
+      gst_ledger: {
+        Row: {
+          cgst: number
+          company_id: string
+          created_at: string
+          entry_id: string | null
+          id: string
+          igst: number
+          kind: Database["public"]["Enums"]["gst_kind"]
+          rate: number
+          sgst: number
+          source_id: string | null
+          source_module: string | null
+          taxable_value: number
+          txn_date: string
+        }
+        Insert: {
+          cgst?: number
+          company_id: string
+          created_at?: string
+          entry_id?: string | null
+          id?: string
+          igst?: number
+          kind: Database["public"]["Enums"]["gst_kind"]
+          rate?: number
+          sgst?: number
+          source_id?: string | null
+          source_module?: string | null
+          taxable_value?: number
+          txn_date?: string
+        }
+        Update: {
+          cgst?: number
+          company_id?: string
+          created_at?: string
+          entry_id?: string | null
+          id?: string
+          igst?: number
+          kind?: Database["public"]["Enums"]["gst_kind"]
+          rate?: number
+          sgst?: number
+          source_id?: string | null
+          source_module?: string | null
+          taxable_value?: number
+          txn_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gst_ledger_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           cgst_amount: number
@@ -563,6 +664,101 @@ export type Database = {
           valuation_method?: Database["public"]["Enums"]["valuation_method"]
         }
         Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          entry_date: string
+          entry_number: string
+          id: string
+          narration: string | null
+          source_id: string | null
+          source_module: string | null
+          source_type: string | null
+          status: Database["public"]["Enums"]["je_status"]
+          total_credit: number
+          total_debit: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          entry_date?: string
+          entry_number: string
+          id?: string
+          narration?: string | null
+          source_id?: string | null
+          source_module?: string | null
+          source_type?: string | null
+          status?: Database["public"]["Enums"]["je_status"]
+          total_credit?: number
+          total_debit?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          entry_date?: string
+          entry_number?: string
+          id?: string
+          narration?: string | null
+          source_id?: string | null
+          source_module?: string | null
+          source_type?: string | null
+          status?: Database["public"]["Enums"]["je_status"]
+          total_credit?: number
+          total_debit?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      journal_lines: {
+        Row: {
+          account_id: string
+          company_id: string
+          created_at: string
+          credit: number
+          debit: number
+          description: string | null
+          entry_id: string
+          id: string
+          position: number
+        }
+        Insert: {
+          account_id: string
+          company_id: string
+          created_at?: string
+          credit?: number
+          debit?: number
+          description?: string | null
+          entry_id: string
+          id?: string
+          position?: number
+        }
+        Update: {
+          account_id?: string
+          company_id?: string
+          created_at?: string
+          credit?: number
+          debit?: number
+          description?: string | null
+          entry_id?: string
+          id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_lines_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leads: {
         Row: {
@@ -1937,6 +2133,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      account_balances: {
+        Args: { _company_id: string; _from?: string; _to?: string }
+        Returns: {
+          account_id: string
+          balance: number
+          code: string
+          credit: number
+          debit: number
+          name: string
+          type: Database["public"]["Enums"]["account_type"]
+        }[]
+      }
+      acct: { Args: { _code: string; _company_id: string }; Returns: string }
       explode_bom: {
         Args: { _bom_id: string; _qty: number }
         Returns: {
@@ -1981,11 +2190,24 @@ export type Database = {
         Args: { _company_id: string; _prefix: string }
         Returns: string
       }
+      next_je_number: { Args: { _company_id: string }; Returns: string }
       next_proc_number: {
         Args: { _company_id: string; _prefix: string }
         Returns: string
       }
       next_wo_number: { Args: { _company_id: string }; Returns: string }
+      post_journal: {
+        Args: {
+          _company_id: string
+          _date: string
+          _lines: Json
+          _module: string
+          _narration: string
+          _src_id: string
+          _src_type: string
+        }
+        Returns: string
+      }
       post_stock_issue: {
         Args: {
           _company_id: string
@@ -2017,8 +2239,13 @@ export type Database = {
         }
         Returns: string
       }
+      seed_chart_of_accounts: {
+        Args: { _company_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
+      account_type: "asset" | "liability" | "equity" | "revenue" | "expense"
       app_module:
         | "sales"
         | "procurement"
@@ -2036,6 +2263,7 @@ export type Database = {
         | "hr"
       bom_status: "draft" | "active" | "archived"
       grn_status: "draft" | "posted" | "cancelled"
+      gst_kind: "output" | "input"
       indent_status:
         | "draft"
         | "submitted"
@@ -2056,6 +2284,7 @@ export type Database = {
         | "finished_good"
         | "consumable"
         | "service"
+      je_status: "draft" | "posted" | "reversed"
       lead_source:
         | "website"
         | "referral"
@@ -2259,6 +2488,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_type: ["asset", "liability", "equity", "revenue", "expense"],
       app_module: [
         "sales",
         "procurement",
@@ -2278,6 +2508,7 @@ export const Constants = {
       ],
       bom_status: ["draft", "active", "archived"],
       grn_status: ["draft", "posted", "cancelled"],
+      gst_kind: ["output", "input"],
       indent_status: [
         "draft",
         "submitted",
@@ -2301,6 +2532,7 @@ export const Constants = {
         "consumable",
         "service",
       ],
+      je_status: ["draft", "posted", "reversed"],
       lead_source: [
         "website",
         "referral",
