@@ -48,6 +48,7 @@ import { Route as AuthenticatedAppInventoryMovementsRouteImport } from './routes
 import { Route as AuthenticatedAppInventoryItemsRouteImport } from './routes/_authenticated.app.inventory.items'
 import { Route as AuthenticatedAppFinanceReportsRouteImport } from './routes/_authenticated.app.finance.reports'
 import { Route as AuthenticatedAppFinanceLedgerRouteImport } from './routes/_authenticated.app.finance.ledger'
+import { Route as AuthenticatedAppFinanceGstRouteImport } from './routes/_authenticated.app.finance.gst'
 import { Route as AuthenticatedAppFinanceAccountsRouteImport } from './routes/_authenticated.app.finance.accounts'
 import { Route as AuthenticatedAppProductionWorkOrdersIdRouteImport } from './routes/_authenticated.app.production.work-orders.$id'
 import { Route as AuthenticatedAppProductionBomsIdRouteImport } from './routes/_authenticated.app.production.boms.$id'
@@ -274,6 +275,12 @@ const AuthenticatedAppFinanceLedgerRoute =
     path: '/ledger',
     getParentRoute: () => AuthenticatedAppFinanceRoute,
   } as any)
+const AuthenticatedAppFinanceGstRoute =
+  AuthenticatedAppFinanceGstRouteImport.update({
+    id: '/gst',
+    path: '/gst',
+    getParentRoute: () => AuthenticatedAppFinanceRoute,
+  } as any)
 const AuthenticatedAppFinanceAccountsRoute =
   AuthenticatedAppFinanceAccountsRouteImport.update({
     id: '/accounts',
@@ -315,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
+  '/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
@@ -352,6 +360,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
+  '/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
@@ -398,6 +407,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
+  '/_authenticated/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/_authenticated/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/_authenticated/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
   '/_authenticated/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
@@ -444,6 +454,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/app/'
     | '/app/finance/accounts'
+    | '/app/finance/gst'
     | '/app/finance/ledger'
     | '/app/finance/reports'
     | '/app/inventory/items'
@@ -481,6 +492,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/app/finance/accounts'
+    | '/app/finance/gst'
     | '/app/finance/ledger'
     | '/app/finance/reports'
     | '/app/inventory/items'
@@ -526,6 +538,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/app/finance/accounts'
+    | '/_authenticated/app/finance/gst'
     | '/_authenticated/app/finance/ledger'
     | '/_authenticated/app/finance/reports'
     | '/_authenticated/app/inventory/items'
@@ -836,6 +849,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppFinanceLedgerRouteImport
       parentRoute: typeof AuthenticatedAppFinanceRoute
     }
+    '/_authenticated/app/finance/gst': {
+      id: '/_authenticated/app/finance/gst'
+      path: '/gst'
+      fullPath: '/app/finance/gst'
+      preLoaderRoute: typeof AuthenticatedAppFinanceGstRouteImport
+      parentRoute: typeof AuthenticatedAppFinanceRoute
+    }
     '/_authenticated/app/finance/accounts': {
       id: '/_authenticated/app/finance/accounts'
       path: '/accounts'
@@ -882,6 +902,7 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedAppFinanceRouteChildren {
   AuthenticatedAppFinanceAccountsRoute: typeof AuthenticatedAppFinanceAccountsRoute
+  AuthenticatedAppFinanceGstRoute: typeof AuthenticatedAppFinanceGstRoute
   AuthenticatedAppFinanceLedgerRoute: typeof AuthenticatedAppFinanceLedgerRoute
   AuthenticatedAppFinanceReportsRoute: typeof AuthenticatedAppFinanceReportsRoute
   AuthenticatedAppFinanceIndexRoute: typeof AuthenticatedAppFinanceIndexRoute
@@ -890,6 +911,7 @@ interface AuthenticatedAppFinanceRouteChildren {
 const AuthenticatedAppFinanceRouteChildren: AuthenticatedAppFinanceRouteChildren =
   {
     AuthenticatedAppFinanceAccountsRoute: AuthenticatedAppFinanceAccountsRoute,
+    AuthenticatedAppFinanceGstRoute: AuthenticatedAppFinanceGstRoute,
     AuthenticatedAppFinanceLedgerRoute: AuthenticatedAppFinanceLedgerRoute,
     AuthenticatedAppFinanceReportsRoute: AuthenticatedAppFinanceReportsRoute,
     AuthenticatedAppFinanceIndexRoute: AuthenticatedAppFinanceIndexRoute,
