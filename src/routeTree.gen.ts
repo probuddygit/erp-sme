@@ -21,6 +21,7 @@ import { Route as AuthenticatedAppSalesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppProductionRouteImport } from './routes/_authenticated.app.production'
 import { Route as AuthenticatedAppProcurementRouteImport } from './routes/_authenticated.app.procurement'
 import { Route as AuthenticatedAppInventoryRouteImport } from './routes/_authenticated.app.inventory'
+import { Route as AuthenticatedAppFinanceRouteImport } from './routes/_authenticated.app.finance'
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
@@ -110,6 +111,11 @@ const AuthenticatedAppInventoryRoute =
     path: '/inventory',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppFinanceRoute = AuthenticatedAppFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppModuleRoute = AuthenticatedAppModuleRouteImport.update({
   id: '/$module',
   path: '/$module',
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
+  '/app/finance': typeof AuthenticatedAppFinanceRoute
   '/app/inventory': typeof AuthenticatedAppInventoryRouteWithChildren
   '/app/procurement': typeof AuthenticatedAppProcurementRouteWithChildren
   '/app/production': typeof AuthenticatedAppProductionRouteWithChildren
@@ -309,6 +316,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
+  '/app/finance': typeof AuthenticatedAppFinanceRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -346,6 +354,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
+  '/_authenticated/app/finance': typeof AuthenticatedAppFinanceRoute
   '/_authenticated/app/inventory': typeof AuthenticatedAppInventoryRouteWithChildren
   '/_authenticated/app/procurement': typeof AuthenticatedAppProcurementRouteWithChildren
   '/_authenticated/app/production': typeof AuthenticatedAppProductionRouteWithChildren
@@ -387,6 +396,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/admin/users'
     | '/app/$module'
+    | '/app/finance'
     | '/app/inventory'
     | '/app/procurement'
     | '/app/production'
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/users'
     | '/app/$module'
+    | '/app/finance'
     | '/app/users'
     | '/admin'
     | '/app'
@@ -460,6 +471,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/admin/users'
     | '/_authenticated/app/$module'
+    | '/_authenticated/app/finance'
     | '/_authenticated/app/inventory'
     | '/_authenticated/app/procurement'
     | '/_authenticated/app/production'
@@ -583,6 +595,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/app/inventory'
       preLoaderRoute: typeof AuthenticatedAppInventoryRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/finance': {
+      id: '/_authenticated/app/finance'
+      path: '/finance'
+      fullPath: '/app/finance'
+      preLoaderRoute: typeof AuthenticatedAppFinanceRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/$module': {
@@ -929,6 +948,7 @@ const AuthenticatedAppSalesRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppModuleRoute: typeof AuthenticatedAppModuleRoute
+  AuthenticatedAppFinanceRoute: typeof AuthenticatedAppFinanceRoute
   AuthenticatedAppInventoryRoute: typeof AuthenticatedAppInventoryRouteWithChildren
   AuthenticatedAppProcurementRoute: typeof AuthenticatedAppProcurementRouteWithChildren
   AuthenticatedAppProductionRoute: typeof AuthenticatedAppProductionRouteWithChildren
@@ -939,6 +959,7 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppModuleRoute: AuthenticatedAppModuleRoute,
+  AuthenticatedAppFinanceRoute: AuthenticatedAppFinanceRoute,
   AuthenticatedAppInventoryRoute: AuthenticatedAppInventoryRouteWithChildren,
   AuthenticatedAppProcurementRoute:
     AuthenticatedAppProcurementRouteWithChildren,
@@ -973,3 +994,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
