@@ -22,7 +22,7 @@ function ReportsPage() {
   const { data: bal } = useQuery({
     enabled: !!company?.id,
     queryKey: ["bal", company?.id, from, to],
-    queryFn: async () => (await supabase.rpc("account_balances", { _company_id: company!.id, _from: from || null, _to: to || null })).data ?? [],
+    queryFn: async () => (await supabase.rpc("account_balances", { _company_id: company!.id, _from: from || undefined, _to: to || undefined })).data ?? [],
   });
 
   const rows = (bal ?? []) as any[];

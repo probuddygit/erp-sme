@@ -46,6 +46,7 @@ import { Route as AuthenticatedAppProcurementGrnsRouteImport } from './routes/_a
 import { Route as AuthenticatedAppInventoryWarehousesRouteImport } from './routes/_authenticated.app.inventory.warehouses'
 import { Route as AuthenticatedAppInventoryMovementsRouteImport } from './routes/_authenticated.app.inventory.movements'
 import { Route as AuthenticatedAppInventoryItemsRouteImport } from './routes/_authenticated.app.inventory.items'
+import { Route as AuthenticatedAppFinanceReportsRouteImport } from './routes/_authenticated.app.finance.reports'
 import { Route as AuthenticatedAppFinanceLedgerRouteImport } from './routes/_authenticated.app.finance.ledger'
 import { Route as AuthenticatedAppFinanceAccountsRouteImport } from './routes/_authenticated.app.finance.accounts'
 import { Route as AuthenticatedAppProductionWorkOrdersIdRouteImport } from './routes/_authenticated.app.production.work-orders.$id'
@@ -261,6 +262,12 @@ const AuthenticatedAppInventoryItemsRoute =
     path: '/items',
     getParentRoute: () => AuthenticatedAppInventoryRoute,
   } as any)
+const AuthenticatedAppFinanceReportsRoute =
+  AuthenticatedAppFinanceReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAppFinanceRoute,
+  } as any)
 const AuthenticatedAppFinanceLedgerRoute =
   AuthenticatedAppFinanceLedgerRouteImport.update({
     id: '/ledger',
@@ -309,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
+  '/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
@@ -345,6 +353,7 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
+  '/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
@@ -390,6 +399,7 @@ export interface FileRoutesById {
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
   '/_authenticated/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
+  '/_authenticated/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
   '/_authenticated/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/_authenticated/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/_authenticated/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
@@ -435,6 +445,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/finance/accounts'
     | '/app/finance/ledger'
+    | '/app/finance/reports'
     | '/app/inventory/items'
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
@@ -471,6 +482,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/finance/accounts'
     | '/app/finance/ledger'
+    | '/app/finance/reports'
     | '/app/inventory/items'
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
@@ -515,6 +527,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/'
     | '/_authenticated/app/finance/accounts'
     | '/_authenticated/app/finance/ledger'
+    | '/_authenticated/app/finance/reports'
     | '/_authenticated/app/inventory/items'
     | '/_authenticated/app/inventory/movements'
     | '/_authenticated/app/inventory/warehouses'
@@ -809,6 +822,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppInventoryItemsRouteImport
       parentRoute: typeof AuthenticatedAppInventoryRoute
     }
+    '/_authenticated/app/finance/reports': {
+      id: '/_authenticated/app/finance/reports'
+      path: '/reports'
+      fullPath: '/app/finance/reports'
+      preLoaderRoute: typeof AuthenticatedAppFinanceReportsRouteImport
+      parentRoute: typeof AuthenticatedAppFinanceRoute
+    }
     '/_authenticated/app/finance/ledger': {
       id: '/_authenticated/app/finance/ledger'
       path: '/ledger'
@@ -863,6 +883,7 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedAppFinanceRouteChildren {
   AuthenticatedAppFinanceAccountsRoute: typeof AuthenticatedAppFinanceAccountsRoute
   AuthenticatedAppFinanceLedgerRoute: typeof AuthenticatedAppFinanceLedgerRoute
+  AuthenticatedAppFinanceReportsRoute: typeof AuthenticatedAppFinanceReportsRoute
   AuthenticatedAppFinanceIndexRoute: typeof AuthenticatedAppFinanceIndexRoute
 }
 
@@ -870,6 +891,7 @@ const AuthenticatedAppFinanceRouteChildren: AuthenticatedAppFinanceRouteChildren
   {
     AuthenticatedAppFinanceAccountsRoute: AuthenticatedAppFinanceAccountsRoute,
     AuthenticatedAppFinanceLedgerRoute: AuthenticatedAppFinanceLedgerRoute,
+    AuthenticatedAppFinanceReportsRoute: AuthenticatedAppFinanceReportsRoute,
     AuthenticatedAppFinanceIndexRoute: AuthenticatedAppFinanceIndexRoute,
   }
 
