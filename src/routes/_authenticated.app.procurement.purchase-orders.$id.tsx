@@ -43,7 +43,7 @@ function PoDetailPage() {
 
   const setStatus = async (status: string, extra: Record<string, unknown> = {}) => {
     const { data: u } = await supabase.auth.getUser();
-    const patch: Record<string, unknown> = { status, ...extra };
+    const patch: any = { status, ...extra };
     if (status === "approved") { patch.approved_by = u.user?.id; patch.approved_at = new Date().toISOString(); patch.approval_notes = notes || null; }
     if (status === "rejected") { patch.approval_notes = notes || null; }
     const { error } = await supabase.from("purchase_orders").update(patch).eq("id", id);
