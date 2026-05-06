@@ -22,6 +22,7 @@ import { Route as AuthenticatedAppSalesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppProductionRouteImport } from './routes/_authenticated.app.production'
 import { Route as AuthenticatedAppProcurementRouteImport } from './routes/_authenticated.app.procurement'
 import { Route as AuthenticatedAppInventoryRouteImport } from './routes/_authenticated.app.inventory'
+import { Route as AuthenticatedAppHrRouteImport } from './routes/_authenticated.app.hr'
 import { Route as AuthenticatedAppFinanceRouteImport } from './routes/_authenticated.app.finance'
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
@@ -29,6 +30,7 @@ import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppProductionIndexRouteImport } from './routes/_authenticated.app.production.index'
 import { Route as AuthenticatedAppProcurementIndexRouteImport } from './routes/_authenticated.app.procurement.index'
 import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_authenticated.app.inventory.index'
+import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
 import { Route as AuthenticatedAppSalesPipelineRouteImport } from './routes/_authenticated.app.sales.pipeline'
@@ -47,6 +49,9 @@ import { Route as AuthenticatedAppProcurementGrnsRouteImport } from './routes/_a
 import { Route as AuthenticatedAppInventoryWarehousesRouteImport } from './routes/_authenticated.app.inventory.warehouses'
 import { Route as AuthenticatedAppInventoryMovementsRouteImport } from './routes/_authenticated.app.inventory.movements'
 import { Route as AuthenticatedAppInventoryItemsRouteImport } from './routes/_authenticated.app.inventory.items'
+import { Route as AuthenticatedAppHrPayrollRouteImport } from './routes/_authenticated.app.hr.payroll'
+import { Route as AuthenticatedAppHrEmployeesRouteImport } from './routes/_authenticated.app.hr.employees'
+import { Route as AuthenticatedAppHrAttendanceRouteImport } from './routes/_authenticated.app.hr.attendance'
 import { Route as AuthenticatedAppFinanceReportsRouteImport } from './routes/_authenticated.app.finance.reports'
 import { Route as AuthenticatedAppFinanceLedgerRouteImport } from './routes/_authenticated.app.finance.ledger'
 import { Route as AuthenticatedAppFinanceGstRouteImport } from './routes/_authenticated.app.finance.gst'
@@ -123,6 +128,11 @@ const AuthenticatedAppInventoryRoute =
     path: '/inventory',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppHrRoute = AuthenticatedAppHrRouteImport.update({
+  id: '/hr',
+  path: '/hr',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppFinanceRoute = AuthenticatedAppFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -162,6 +172,11 @@ const AuthenticatedAppInventoryIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAppInventoryRoute,
   } as any)
+const AuthenticatedAppHrIndexRoute = AuthenticatedAppHrIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppHrRoute,
+} as any)
 const AuthenticatedAppFinanceIndexRoute =
   AuthenticatedAppFinanceIndexRouteImport.update({
     id: '/',
@@ -270,6 +285,24 @@ const AuthenticatedAppInventoryItemsRoute =
     path: '/items',
     getParentRoute: () => AuthenticatedAppInventoryRoute,
   } as any)
+const AuthenticatedAppHrPayrollRoute =
+  AuthenticatedAppHrPayrollRouteImport.update({
+    id: '/payroll',
+    path: '/payroll',
+    getParentRoute: () => AuthenticatedAppHrRoute,
+  } as any)
+const AuthenticatedAppHrEmployeesRoute =
+  AuthenticatedAppHrEmployeesRouteImport.update({
+    id: '/employees',
+    path: '/employees',
+    getParentRoute: () => AuthenticatedAppHrRoute,
+  } as any)
+const AuthenticatedAppHrAttendanceRoute =
+  AuthenticatedAppHrAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedAppHrRoute,
+  } as any)
 const AuthenticatedAppFinanceReportsRoute =
   AuthenticatedAppFinanceReportsRouteImport.update({
     id: '/reports',
@@ -321,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
   '/app/finance': typeof AuthenticatedAppFinanceRouteWithChildren
+  '/app/hr': typeof AuthenticatedAppHrRouteWithChildren
   '/app/inventory': typeof AuthenticatedAppInventoryRouteWithChildren
   '/app/procurement': typeof AuthenticatedAppProcurementRouteWithChildren
   '/app/production': typeof AuthenticatedAppProductionRouteWithChildren
@@ -333,6 +367,9 @@ export interface FileRoutesByFullPath {
   '/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
+  '/app/hr/attendance': typeof AuthenticatedAppHrAttendanceRoute
+  '/app/hr/employees': typeof AuthenticatedAppHrEmployeesRoute
+  '/app/hr/payroll': typeof AuthenticatedAppHrPayrollRoute
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
@@ -351,6 +388,7 @@ export interface FileRoutesByFullPath {
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
+  '/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
   '/app/procurement/': typeof AuthenticatedAppProcurementIndexRoute
   '/app/production/': typeof AuthenticatedAppProductionIndexRoute
@@ -372,6 +410,9 @@ export interface FileRoutesByTo {
   '/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
+  '/app/hr/attendance': typeof AuthenticatedAppHrAttendanceRoute
+  '/app/hr/employees': typeof AuthenticatedAppHrEmployeesRoute
+  '/app/hr/payroll': typeof AuthenticatedAppHrPayrollRoute
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
@@ -390,6 +431,7 @@ export interface FileRoutesByTo {
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
+  '/app/hr': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory': typeof AuthenticatedAppInventoryIndexRoute
   '/app/procurement': typeof AuthenticatedAppProcurementIndexRoute
   '/app/production': typeof AuthenticatedAppProductionIndexRoute
@@ -408,6 +450,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
   '/_authenticated/app/finance': typeof AuthenticatedAppFinanceRouteWithChildren
+  '/_authenticated/app/hr': typeof AuthenticatedAppHrRouteWithChildren
   '/_authenticated/app/inventory': typeof AuthenticatedAppInventoryRouteWithChildren
   '/_authenticated/app/procurement': typeof AuthenticatedAppProcurementRouteWithChildren
   '/_authenticated/app/production': typeof AuthenticatedAppProductionRouteWithChildren
@@ -420,6 +463,9 @@ export interface FileRoutesById {
   '/_authenticated/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/_authenticated/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/_authenticated/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
+  '/_authenticated/app/hr/attendance': typeof AuthenticatedAppHrAttendanceRoute
+  '/_authenticated/app/hr/employees': typeof AuthenticatedAppHrEmployeesRoute
+  '/_authenticated/app/hr/payroll': typeof AuthenticatedAppHrPayrollRoute
   '/_authenticated/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/_authenticated/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/_authenticated/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
@@ -438,6 +484,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
+  '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/_authenticated/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
   '/_authenticated/app/procurement/': typeof AuthenticatedAppProcurementIndexRoute
   '/_authenticated/app/production/': typeof AuthenticatedAppProductionIndexRoute
@@ -456,6 +503,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/app/$module'
     | '/app/finance'
+    | '/app/hr'
     | '/app/inventory'
     | '/app/procurement'
     | '/app/production'
@@ -468,6 +516,9 @@ export interface FileRouteTypes {
     | '/app/finance/gst'
     | '/app/finance/ledger'
     | '/app/finance/reports'
+    | '/app/hr/attendance'
+    | '/app/hr/employees'
+    | '/app/hr/payroll'
     | '/app/inventory/items'
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
@@ -486,6 +537,7 @@ export interface FileRouteTypes {
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
     | '/app/finance/'
+    | '/app/hr/'
     | '/app/inventory/'
     | '/app/procurement/'
     | '/app/production/'
@@ -507,6 +559,9 @@ export interface FileRouteTypes {
     | '/app/finance/gst'
     | '/app/finance/ledger'
     | '/app/finance/reports'
+    | '/app/hr/attendance'
+    | '/app/hr/employees'
+    | '/app/hr/payroll'
     | '/app/inventory/items'
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
@@ -525,6 +580,7 @@ export interface FileRouteTypes {
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
     | '/app/finance'
+    | '/app/hr'
     | '/app/inventory'
     | '/app/procurement'
     | '/app/production'
@@ -542,6 +598,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/app/$module'
     | '/_authenticated/app/finance'
+    | '/_authenticated/app/hr'
     | '/_authenticated/app/inventory'
     | '/_authenticated/app/procurement'
     | '/_authenticated/app/production'
@@ -554,6 +611,9 @@ export interface FileRouteTypes {
     | '/_authenticated/app/finance/gst'
     | '/_authenticated/app/finance/ledger'
     | '/_authenticated/app/finance/reports'
+    | '/_authenticated/app/hr/attendance'
+    | '/_authenticated/app/hr/employees'
+    | '/_authenticated/app/hr/payroll'
     | '/_authenticated/app/inventory/items'
     | '/_authenticated/app/inventory/movements'
     | '/_authenticated/app/inventory/warehouses'
@@ -572,6 +632,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/pipeline'
     | '/_authenticated/app/sales/quotations'
     | '/_authenticated/app/finance/'
+    | '/_authenticated/app/hr/'
     | '/_authenticated/app/inventory/'
     | '/_authenticated/app/procurement/'
     | '/_authenticated/app/production/'
@@ -680,6 +741,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppInventoryRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/hr': {
+      id: '/_authenticated/app/hr'
+      path: '/hr'
+      fullPath: '/app/hr'
+      preLoaderRoute: typeof AuthenticatedAppHrRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/finance': {
       id: '/_authenticated/app/finance'
       path: '/finance'
@@ -728,6 +796,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/inventory/'
       preLoaderRoute: typeof AuthenticatedAppInventoryIndexRouteImport
       parentRoute: typeof AuthenticatedAppInventoryRoute
+    }
+    '/_authenticated/app/hr/': {
+      id: '/_authenticated/app/hr/'
+      path: '/'
+      fullPath: '/app/hr/'
+      preLoaderRoute: typeof AuthenticatedAppHrIndexRouteImport
+      parentRoute: typeof AuthenticatedAppHrRoute
     }
     '/_authenticated/app/finance/': {
       id: '/_authenticated/app/finance/'
@@ -855,6 +930,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppInventoryItemsRouteImport
       parentRoute: typeof AuthenticatedAppInventoryRoute
     }
+    '/_authenticated/app/hr/payroll': {
+      id: '/_authenticated/app/hr/payroll'
+      path: '/payroll'
+      fullPath: '/app/hr/payroll'
+      preLoaderRoute: typeof AuthenticatedAppHrPayrollRouteImport
+      parentRoute: typeof AuthenticatedAppHrRoute
+    }
+    '/_authenticated/app/hr/employees': {
+      id: '/_authenticated/app/hr/employees'
+      path: '/employees'
+      fullPath: '/app/hr/employees'
+      preLoaderRoute: typeof AuthenticatedAppHrEmployeesRouteImport
+      parentRoute: typeof AuthenticatedAppHrRoute
+    }
+    '/_authenticated/app/hr/attendance': {
+      id: '/_authenticated/app/hr/attendance'
+      path: '/attendance'
+      fullPath: '/app/hr/attendance'
+      preLoaderRoute: typeof AuthenticatedAppHrAttendanceRouteImport
+      parentRoute: typeof AuthenticatedAppHrRoute
+    }
     '/_authenticated/app/finance/reports': {
       id: '/_authenticated/app/finance/reports'
       path: '/reports'
@@ -941,6 +1037,23 @@ const AuthenticatedAppFinanceRouteWithChildren =
   AuthenticatedAppFinanceRoute._addFileChildren(
     AuthenticatedAppFinanceRouteChildren,
   )
+
+interface AuthenticatedAppHrRouteChildren {
+  AuthenticatedAppHrAttendanceRoute: typeof AuthenticatedAppHrAttendanceRoute
+  AuthenticatedAppHrEmployeesRoute: typeof AuthenticatedAppHrEmployeesRoute
+  AuthenticatedAppHrPayrollRoute: typeof AuthenticatedAppHrPayrollRoute
+  AuthenticatedAppHrIndexRoute: typeof AuthenticatedAppHrIndexRoute
+}
+
+const AuthenticatedAppHrRouteChildren: AuthenticatedAppHrRouteChildren = {
+  AuthenticatedAppHrAttendanceRoute: AuthenticatedAppHrAttendanceRoute,
+  AuthenticatedAppHrEmployeesRoute: AuthenticatedAppHrEmployeesRoute,
+  AuthenticatedAppHrPayrollRoute: AuthenticatedAppHrPayrollRoute,
+  AuthenticatedAppHrIndexRoute: AuthenticatedAppHrIndexRoute,
+}
+
+const AuthenticatedAppHrRouteWithChildren =
+  AuthenticatedAppHrRoute._addFileChildren(AuthenticatedAppHrRouteChildren)
 
 interface AuthenticatedAppInventoryRouteChildren {
   AuthenticatedAppInventoryItemsRoute: typeof AuthenticatedAppInventoryItemsRoute
@@ -1089,6 +1202,7 @@ const AuthenticatedAppSalesRouteWithChildren =
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppModuleRoute: typeof AuthenticatedAppModuleRoute
   AuthenticatedAppFinanceRoute: typeof AuthenticatedAppFinanceRouteWithChildren
+  AuthenticatedAppHrRoute: typeof AuthenticatedAppHrRouteWithChildren
   AuthenticatedAppInventoryRoute: typeof AuthenticatedAppInventoryRouteWithChildren
   AuthenticatedAppProcurementRoute: typeof AuthenticatedAppProcurementRouteWithChildren
   AuthenticatedAppProductionRoute: typeof AuthenticatedAppProductionRouteWithChildren
@@ -1101,6 +1215,7 @@ interface AuthenticatedAppRouteChildren {
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppModuleRoute: AuthenticatedAppModuleRoute,
   AuthenticatedAppFinanceRoute: AuthenticatedAppFinanceRouteWithChildren,
+  AuthenticatedAppHrRoute: AuthenticatedAppHrRouteWithChildren,
   AuthenticatedAppInventoryRoute: AuthenticatedAppInventoryRouteWithChildren,
   AuthenticatedAppProcurementRoute:
     AuthenticatedAppProcurementRouteWithChildren,
