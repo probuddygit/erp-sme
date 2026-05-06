@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   Cog,
+  Settings,
 } from "lucide-react";
 import { useAuth, type AppModule } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       show: !isSuperAdmin && canAccessModule(m.key),
     })),
     { to: "/app/users", label: "Users & Roles", icon: Users, show: !isSuperAdmin && isCompanyAdmin },
+    { to: "/app/settings", label: "Settings", icon: Settings, show: !isSuperAdmin },
   ];
 
   const adminItems = isSuperAdmin
