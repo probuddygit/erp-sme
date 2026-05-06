@@ -50,6 +50,7 @@ import { Route as AuthenticatedAppInventoryWarehousesRouteImport } from './route
 import { Route as AuthenticatedAppInventoryMovementsRouteImport } from './routes/_authenticated.app.inventory.movements'
 import { Route as AuthenticatedAppInventoryItemsRouteImport } from './routes/_authenticated.app.inventory.items'
 import { Route as AuthenticatedAppHrEmployeesRouteImport } from './routes/_authenticated.app.hr.employees'
+import { Route as AuthenticatedAppHrAttendanceRouteImport } from './routes/_authenticated.app.hr.attendance'
 import { Route as AuthenticatedAppFinanceReportsRouteImport } from './routes/_authenticated.app.finance.reports'
 import { Route as AuthenticatedAppFinanceLedgerRouteImport } from './routes/_authenticated.app.finance.ledger'
 import { Route as AuthenticatedAppFinanceGstRouteImport } from './routes/_authenticated.app.finance.gst'
@@ -289,6 +290,12 @@ const AuthenticatedAppHrEmployeesRoute =
     path: '/employees',
     getParentRoute: () => AuthenticatedAppHrRoute,
   } as any)
+const AuthenticatedAppHrAttendanceRoute =
+  AuthenticatedAppHrAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedAppHrRoute,
+  } as any)
 const AuthenticatedAppFinanceReportsRoute =
   AuthenticatedAppFinanceReportsRouteImport.update({
     id: '/reports',
@@ -353,6 +360,7 @@ export interface FileRoutesByFullPath {
   '/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
+  '/app/hr/attendance': typeof AuthenticatedAppHrAttendanceRoute
   '/app/hr/employees': typeof AuthenticatedAppHrEmployeesRoute
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
@@ -394,6 +402,7 @@ export interface FileRoutesByTo {
   '/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
+  '/app/hr/attendance': typeof AuthenticatedAppHrAttendanceRoute
   '/app/hr/employees': typeof AuthenticatedAppHrEmployeesRoute
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
@@ -445,6 +454,7 @@ export interface FileRoutesById {
   '/_authenticated/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/_authenticated/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
   '/_authenticated/app/finance/reports': typeof AuthenticatedAppFinanceReportsRoute
+  '/_authenticated/app/hr/attendance': typeof AuthenticatedAppHrAttendanceRoute
   '/_authenticated/app/hr/employees': typeof AuthenticatedAppHrEmployeesRoute
   '/_authenticated/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/_authenticated/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
@@ -496,6 +506,7 @@ export interface FileRouteTypes {
     | '/app/finance/gst'
     | '/app/finance/ledger'
     | '/app/finance/reports'
+    | '/app/hr/attendance'
     | '/app/hr/employees'
     | '/app/inventory/items'
     | '/app/inventory/movements'
@@ -537,6 +548,7 @@ export interface FileRouteTypes {
     | '/app/finance/gst'
     | '/app/finance/ledger'
     | '/app/finance/reports'
+    | '/app/hr/attendance'
     | '/app/hr/employees'
     | '/app/inventory/items'
     | '/app/inventory/movements'
@@ -587,6 +599,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/finance/gst'
     | '/_authenticated/app/finance/ledger'
     | '/_authenticated/app/finance/reports'
+    | '/_authenticated/app/hr/attendance'
     | '/_authenticated/app/hr/employees'
     | '/_authenticated/app/inventory/items'
     | '/_authenticated/app/inventory/movements'
@@ -911,6 +924,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppHrEmployeesRouteImport
       parentRoute: typeof AuthenticatedAppHrRoute
     }
+    '/_authenticated/app/hr/attendance': {
+      id: '/_authenticated/app/hr/attendance'
+      path: '/attendance'
+      fullPath: '/app/hr/attendance'
+      preLoaderRoute: typeof AuthenticatedAppHrAttendanceRouteImport
+      parentRoute: typeof AuthenticatedAppHrRoute
+    }
     '/_authenticated/app/finance/reports': {
       id: '/_authenticated/app/finance/reports'
       path: '/reports'
@@ -999,11 +1019,13 @@ const AuthenticatedAppFinanceRouteWithChildren =
   )
 
 interface AuthenticatedAppHrRouteChildren {
+  AuthenticatedAppHrAttendanceRoute: typeof AuthenticatedAppHrAttendanceRoute
   AuthenticatedAppHrEmployeesRoute: typeof AuthenticatedAppHrEmployeesRoute
   AuthenticatedAppHrIndexRoute: typeof AuthenticatedAppHrIndexRoute
 }
 
 const AuthenticatedAppHrRouteChildren: AuthenticatedAppHrRouteChildren = {
+  AuthenticatedAppHrAttendanceRoute: AuthenticatedAppHrAttendanceRoute,
   AuthenticatedAppHrEmployeesRoute: AuthenticatedAppHrEmployeesRoute,
   AuthenticatedAppHrIndexRoute: AuthenticatedAppHrIndexRoute,
 }
