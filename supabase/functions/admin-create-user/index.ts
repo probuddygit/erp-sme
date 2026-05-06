@@ -10,6 +10,7 @@ type AppRole = "super_admin" | "admin" | "sales" | "procurement" | "production" 
 
 interface Body {
   email: string;
+  username?: string;
   password: string;
   full_name?: string;
   company_id: string;
@@ -66,7 +67,16 @@ Deno.serve(async (req) => {
     // Profile is auto-created via trigger handle_new_user. Update company_id.
     const { error: profErr } = await admin
       .from("profiles")
-      .upsert({ id: newUserId, email: body.email, full_name: body.full_name ?? "", company_id: body.company_id }, { onConflict: "id" });
+      .upsert(
+        {
+          id: newUserId,
+          email: body.email,
+          username: body.username ?? null,
+          full_name: body.full_name ?? "",
+          company_id: body.company_id,
+        },
+        { onConflict: "id" },
+      );
     if (profErr) {
       return new Response(JSON.stringify({ error: profErr.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
