@@ -31,6 +31,11 @@ function AdminCompanies() {
   const [slug, setSlug] = useState("");
   const [plan, setPlan] = useState<typeof PLANS[number]>("trial");
   const [open, setOpen] = useState(false);
+  const [adminFullName, setAdminFullName] = useState("");
+  const [adminUsername, setAdminUsername] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -42,10 +47,37 @@ function AdminCompanies() {
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("companies").insert({ name, slug, plan: plan as typeof PLANS[number] });
-    if (error) return toast.error(error.message);
-    toast.success("Company created");
-    setName(""); setSlug(""); setPlan("trial"); setOpen(false); load();
+    if (adminPassword.length < 8) return toast.error("Password must be at least 8 characters");
+    setSubmitting(true);
+    const { data: co, error } = await supabase
+      .from("companies")
+      .insert({ name, slug, plan: plan as typeof PLANS[number] })
+      .select("id")
+      .single();
+    if (error || !co) {
+      setSubmitting(false);
+      return toast.error(error?.message ?? "Failed to create company");
+    }
+    const { data: fnRes, error: fnErr } = await supabase.functions.invoke("admin-create-user", {
+      body: {
+        email: adminEmail,
+        username: adminUsername || null,
+        password: adminPassword,
+        full_name: adminFullName,
+        company_id: co.id,
+        roles: ["admin"],
+      },
+    });
+    setSubmitting(false);
+    const fnError = (fnRes as { error?: string })?.error ?? fnErr?.message;
+    if (fnError) {
+      toast.error(`Company created but admin user failed: ${fnError}`);
+    } else {
+      toast.success("Company and admin user created");
+    }
+    setName(""); setSlug(""); setPlan("trial");
+    setAdminFullName(""); setAdminUsername(""); setAdminEmail(""); setAdminPassword("");
+    setOpen(false); load();
   };
   const updatePlan = async (id: string, p: string) => {
     const { error } = await supabase.from("companies").update({ plan: p as typeof PLANS[number] }).eq("id", id);
@@ -85,7 +117,21 @@ function AdminCompanies() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>{PLANS.map((p) => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent>
                 </Select></div>
-              <Button type="submit" className="w-full">Create</Button>
+              <div className="pt-2 border-t border-border">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Company Admin</div>
+                <div className="space-y-3">
+                  <div className="space-y-2"><Label>Full name</Label>
+                    <Input value={adminFullName} onChange={(e) => setAdminFullName(e.target.value)} required /></div>
+                  <div className="space-y-2"><Label>Username</Label>
+                    <Input value={adminUsername} onChange={(e) => setAdminUsername(e.target.value)} placeholder="optional" /></div>
+                  <div className="space-y-2"><Label>Email</Label>
+                    <Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} required /></div>
+                  <div className="space-y-2"><Label>Password</Label>
+                    <Input type="text" minLength={8} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} required /></div>
+                  <p className="text-xs text-muted-foreground">Role: <span className="font-medium text-foreground">admin</span> (full tenant administration)</p>
+                </div>
+              </div>
+              <Button type="submit" className="w-full" disabled={submitting}>{submitting ? "Creating…" : "Create company & admin"}</Button>
             </form>
           </DialogContent>
         </Dialog>
