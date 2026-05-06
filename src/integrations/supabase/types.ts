@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance: {
+        Row: {
+          attendance_date: string
+          check_in: string | null
+          check_out: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          hours_worked: number
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["attendance_status"]
+        }
+        Insert: {
+          attendance_date: string
+          check_in?: string | null
+          check_out?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          hours_worked?: number
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+        }
+        Update: {
+          attendance_date?: string
+          check_in?: string | null
+          check_out?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          hours_worked?: number
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+        }
+        Relationships: []
+      }
       bills_of_materials: {
         Row: {
           company_id: string
@@ -292,6 +334,84 @@ export type Database = {
           shipping_address?: string | null
           state_code?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      employees: {
+        Row: {
+          address: string | null
+          bank_account: string | null
+          bank_name: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          ctc_annual: number
+          date_of_birth: string | null
+          date_of_joining: string
+          department: string | null
+          designation: string | null
+          email: string | null
+          employee_code: string
+          esi_number: string | null
+          full_name: string
+          id: string
+          ifsc: string | null
+          pan: string | null
+          pf_number: string | null
+          phone: string | null
+          status: Database["public"]["Enums"]["employee_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          ctc_annual?: number
+          date_of_birth?: string | null
+          date_of_joining?: string
+          department?: string | null
+          designation?: string | null
+          email?: string | null
+          employee_code: string
+          esi_number?: string | null
+          full_name: string
+          id?: string
+          ifsc?: string | null
+          pan?: string | null
+          pf_number?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["employee_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          ctc_annual?: number
+          date_of_birth?: string | null
+          date_of_joining?: string
+          department?: string | null
+          designation?: string | null
+          email?: string | null
+          employee_code?: string
+          esi_number?: string | null
+          full_name?: string
+          id?: string
+          ifsc?: string | null
+          pan?: string | null
+          pf_number?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["employee_status"]
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -940,6 +1060,140 @@ export type Database = {
           },
         ]
       }
+      payroll_items: {
+        Row: {
+          allowances: number
+          basic: number
+          company_id: string
+          days_in_month: number
+          days_present: number
+          employee_id: string
+          esi_employee: number
+          esi_employer: number
+          gross: number
+          hra: number
+          id: string
+          net_pay: number
+          other_deductions: number
+          pf_employee: number
+          pf_employer: number
+          professional_tax: number
+          run_id: string
+          tds: number
+        }
+        Insert: {
+          allowances?: number
+          basic?: number
+          company_id: string
+          days_in_month?: number
+          days_present?: number
+          employee_id: string
+          esi_employee?: number
+          esi_employer?: number
+          gross?: number
+          hra?: number
+          id?: string
+          net_pay?: number
+          other_deductions?: number
+          pf_employee?: number
+          pf_employer?: number
+          professional_tax?: number
+          run_id: string
+          tds?: number
+        }
+        Update: {
+          allowances?: number
+          basic?: number
+          company_id?: string
+          days_in_month?: number
+          days_present?: number
+          employee_id?: string
+          esi_employee?: number
+          esi_employer?: number
+          gross?: number
+          hra?: number
+          id?: string
+          net_pay?: number
+          other_deductions?: number
+          pf_employee?: number
+          pf_employer?: number
+          professional_tax?: number
+          run_id?: string
+          tds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_items_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_runs: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          pay_date: string
+          period_month: number
+          period_year: number
+          run_number: string
+          status: Database["public"]["Enums"]["payroll_run_status"]
+          total_deductions: number
+          total_esi_employee: number
+          total_esi_employer: number
+          total_gross: number
+          total_net: number
+          total_pf_employee: number
+          total_pf_employer: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          pay_date?: string
+          period_month: number
+          period_year: number
+          run_number: string
+          status?: Database["public"]["Enums"]["payroll_run_status"]
+          total_deductions?: number
+          total_esi_employee?: number
+          total_esi_employer?: number
+          total_gross?: number
+          total_net?: number
+          total_pf_employee?: number
+          total_pf_employer?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          pay_date?: string
+          period_month?: number
+          period_year?: number
+          run_number?: string
+          status?: Database["public"]["Enums"]["payroll_run_status"]
+          total_deductions?: number
+          total_esi_employee?: number
+          total_esi_employer?: number
+          total_gross?: number
+          total_net?: number
+          total_pf_employee?: number
+          total_pf_employer?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       production_logs: {
         Row: {
           company_id: string
@@ -1517,6 +1771,66 @@ export type Database = {
           notes?: string | null
           rfq_number?: string
           status?: Database["public"]["Enums"]["rfq_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      salary_structures: {
+        Row: {
+          basic: number
+          company_id: string
+          conveyance: number
+          created_at: string
+          effective_from: string
+          employee_id: string
+          esi_employee_percent: number
+          esi_employer_percent: number
+          hra: number
+          id: string
+          notes: string | null
+          other_allowances: number
+          pf_employee_percent: number
+          pf_employer_percent: number
+          professional_tax: number
+          special_allowance: number
+          updated_at: string
+        }
+        Insert: {
+          basic?: number
+          company_id: string
+          conveyance?: number
+          created_at?: string
+          effective_from?: string
+          employee_id: string
+          esi_employee_percent?: number
+          esi_employer_percent?: number
+          hra?: number
+          id?: string
+          notes?: string | null
+          other_allowances?: number
+          pf_employee_percent?: number
+          pf_employer_percent?: number
+          professional_tax?: number
+          special_allowance?: number
+          updated_at?: string
+        }
+        Update: {
+          basic?: number
+          company_id?: string
+          conveyance?: number
+          created_at?: string
+          effective_from?: string
+          employee_id?: string
+          esi_employee_percent?: number
+          esi_employer_percent?: number
+          hra?: number
+          id?: string
+          notes?: string | null
+          other_allowances?: number
+          pf_employee_percent?: number
+          pf_employer_percent?: number
+          professional_tax?: number
+          special_allowance?: number
           updated_at?: string
         }
         Relationships: []
@@ -2194,6 +2508,7 @@ export type Database = {
         Returns: string
       }
       next_je_number: { Args: { _company_id: string }; Returns: string }
+      next_payroll_number: { Args: { _company_id: string }; Returns: string }
       next_proc_number: {
         Args: { _company_id: string; _prefix: string }
         Returns: string
@@ -2264,7 +2579,15 @@ export type Database = {
         | "production"
         | "finance"
         | "hr"
+      attendance_status:
+        | "present"
+        | "absent"
+        | "half_day"
+        | "leave"
+        | "holiday"
+        | "week_off"
       bom_status: "draft" | "active" | "archived"
+      employee_status: "active" | "on_leave" | "resigned" | "terminated"
       grn_status: "draft" | "posted" | "cancelled"
       gst_kind: "output" | "input"
       indent_status:
@@ -2310,6 +2633,7 @@ export type Database = {
         | "upi"
         | "card"
         | "other"
+      payroll_run_status: "draft" | "processed" | "posted"
       po_status:
         | "draft"
         | "pending_approval"
@@ -2509,7 +2833,16 @@ export const Constants = {
         "finance",
         "hr",
       ],
+      attendance_status: [
+        "present",
+        "absent",
+        "half_day",
+        "leave",
+        "holiday",
+        "week_off",
+      ],
       bom_status: ["draft", "active", "archived"],
+      employee_status: ["active", "on_leave", "resigned", "terminated"],
       grn_status: ["draft", "posted", "cancelled"],
       gst_kind: ["output", "input"],
       indent_status: [
@@ -2561,6 +2894,7 @@ export const Constants = {
         "card",
         "other",
       ],
+      payroll_run_status: ["draft", "processed", "posted"],
       po_status: [
         "draft",
         "pending_approval",
