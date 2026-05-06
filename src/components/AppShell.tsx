@@ -43,7 +43,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       show: !isSuperAdmin && canAccessModule(m.key),
     })),
     { to: "/app/users", label: "Users & Roles", icon: Users, show: !isSuperAdmin && isCompanyAdmin },
-    { to: "/app/settings", label: "Settings", icon: Settings, show: !isSuperAdmin },
+    { to: "/app/settings", label: "Settings", icon: Settings, show: true },
   ];
 
   const adminItems = isSuperAdmin
