@@ -13,6 +13,7 @@ import {
   Menu,
   Cog,
   Settings,
+  BarChart3,
 } from "lucide-react";
 import { useAuth, type AppModule } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       icon: m.icon,
       show: !isSuperAdmin && canAccessModule(m.key),
     })),
+    {
+      to: "/app/reports",
+      label: "Reports",
+      icon: BarChart3,
+      show: !isSuperAdmin && (isCompanyAdmin || roles.includes("finance") || roles.includes("sales") || roles.includes("procurement")),
+    },
     { to: "/app/users", label: "Users & Roles", icon: Users, show: !isSuperAdmin && isCompanyAdmin },
     { to: "/app/settings", label: "Settings", icon: Settings, show: true },
   ];
