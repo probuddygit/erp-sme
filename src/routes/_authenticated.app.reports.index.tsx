@@ -120,14 +120,13 @@ function ExecutiveDashboard() {
         if (l.code === "5100") labour += l.debit;
         if (l.code === "5200") overhead += l.debit;
       });
-      // Add direct material consumption if separate
-      const totalMat = mat + (mc.data ?? []).reduce((s: number, r: any) => s + Number(r.total_cost ?? 0), 0);
+      // include direct material consumption if recorded
+      const matWithMc = mat + (mc.data ?? []).reduce((s: number, r: any) => s + Number(r.total_cost ?? 0), 0);
       const costBreakdown = [
-        { name: "Material", value: Math.max(0, mat), color: "hsl(var(--chart-1, 220 70% 50%))" },
+        { name: "Material", value: Math.max(0, matWithMc), color: "hsl(var(--chart-1, 220 70% 50%))" },
         { name: "Labour", value: Math.max(0, labour), color: "hsl(var(--chart-2, 160 60% 45%))" },
         { name: "Overhead", value: Math.max(0, overhead), color: "hsl(var(--chart-3, 30 80% 55%))" },
       ].filter(c => c.value > 0);
-      const _unused = totalMat;
 
       return { revenue, cogs, opex, netProfit, cash, ar, ap, inventory, months, costBreakdown };
     },

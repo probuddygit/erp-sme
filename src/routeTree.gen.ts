@@ -41,6 +41,7 @@ import { Route as AuthenticatedAppSalesInvoicesRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppSalesCustomersRouteImport } from './routes/_authenticated.app.sales.customers'
 import { Route as AuthenticatedAppReportsSalesRouteImport } from './routes/_authenticated.app.reports.sales'
 import { Route as AuthenticatedAppReportsProcurementRouteImport } from './routes/_authenticated.app.reports.procurement'
+import { Route as AuthenticatedAppReportsInventoryRouteImport } from './routes/_authenticated.app.reports.inventory'
 import { Route as AuthenticatedAppProductionWorkOrdersRouteImport } from './routes/_authenticated.app.production.work-orders'
 import { Route as AuthenticatedAppProductionTimelineRouteImport } from './routes/_authenticated.app.production.timeline'
 import { Route as AuthenticatedAppProductionBomsRouteImport } from './routes/_authenticated.app.production.boms'
@@ -240,6 +241,12 @@ const AuthenticatedAppReportsProcurementRoute =
     path: '/procurement',
     getParentRoute: () => AuthenticatedAppReportsRoute,
   } as any)
+const AuthenticatedAppReportsInventoryRoute =
+  AuthenticatedAppReportsInventoryRouteImport.update({
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => AuthenticatedAppReportsRoute,
+  } as any)
 const AuthenticatedAppProductionWorkOrdersRoute =
   AuthenticatedAppProductionWorkOrdersRouteImport.update({
     id: '/work-orders',
@@ -410,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
   '/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
+  '/app/reports/inventory': typeof AuthenticatedAppReportsInventoryRoute
   '/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
@@ -456,6 +464,7 @@ export interface FileRoutesByTo {
   '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
   '/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
+  '/app/reports/inventory': typeof AuthenticatedAppReportsInventoryRoute
   '/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
@@ -513,6 +522,7 @@ export interface FileRoutesById {
   '/_authenticated/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/_authenticated/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
   '/_authenticated/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
+  '/_authenticated/app/reports/inventory': typeof AuthenticatedAppReportsInventoryRoute
   '/_authenticated/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/_authenticated/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
   '/_authenticated/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | '/app/production/boms'
     | '/app/production/timeline'
     | '/app/production/work-orders'
+    | '/app/reports/inventory'
     | '/app/reports/procurement'
     | '/app/reports/sales'
     | '/app/sales/customers'
@@ -616,6 +627,7 @@ export interface FileRouteTypes {
     | '/app/production/boms'
     | '/app/production/timeline'
     | '/app/production/work-orders'
+    | '/app/reports/inventory'
     | '/app/reports/procurement'
     | '/app/reports/sales'
     | '/app/sales/customers'
@@ -672,6 +684,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/production/boms'
     | '/_authenticated/app/production/timeline'
     | '/_authenticated/app/production/work-orders'
+    | '/_authenticated/app/reports/inventory'
     | '/_authenticated/app/reports/procurement'
     | '/_authenticated/app/reports/sales'
     | '/_authenticated/app/sales/customers'
@@ -921,6 +934,13 @@ declare module '@tanstack/react-router' {
       path: '/procurement'
       fullPath: '/app/reports/procurement'
       preLoaderRoute: typeof AuthenticatedAppReportsProcurementRouteImport
+      parentRoute: typeof AuthenticatedAppReportsRoute
+    }
+    '/_authenticated/app/reports/inventory': {
+      id: '/_authenticated/app/reports/inventory'
+      path: '/inventory'
+      fullPath: '/app/reports/inventory'
+      preLoaderRoute: typeof AuthenticatedAppReportsInventoryRouteImport
       parentRoute: typeof AuthenticatedAppReportsRoute
     }
     '/_authenticated/app/production/work-orders': {
@@ -1254,6 +1274,7 @@ const AuthenticatedAppProductionRouteWithChildren =
   )
 
 interface AuthenticatedAppReportsRouteChildren {
+  AuthenticatedAppReportsInventoryRoute: typeof AuthenticatedAppReportsInventoryRoute
   AuthenticatedAppReportsProcurementRoute: typeof AuthenticatedAppReportsProcurementRoute
   AuthenticatedAppReportsSalesRoute: typeof AuthenticatedAppReportsSalesRoute
   AuthenticatedAppReportsIndexRoute: typeof AuthenticatedAppReportsIndexRoute
@@ -1261,6 +1282,8 @@ interface AuthenticatedAppReportsRouteChildren {
 
 const AuthenticatedAppReportsRouteChildren: AuthenticatedAppReportsRouteChildren =
   {
+    AuthenticatedAppReportsInventoryRoute:
+      AuthenticatedAppReportsInventoryRoute,
     AuthenticatedAppReportsProcurementRoute:
       AuthenticatedAppReportsProcurementRoute,
     AuthenticatedAppReportsSalesRoute: AuthenticatedAppReportsSalesRoute,
