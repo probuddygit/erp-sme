@@ -48,13 +48,28 @@ function ExecutiveDashboard() {
       const monthStart = new Date(today.getFullYear(), today.getMonth() - 5, 1);
       const fromIso = monthStart.toISOString().slice(0, 10);
 
-      const [bal, invs, pos, cogsRows, mc] = await Promise.all([
+      const [bal, invs, pos, jeRows, jlRows, coaRows, mc] = await Promise.all([
         supabase.rpc("account_balances", { _company_id: cid }),
         supabase.from("invoices").select("invoice_date, grand_total, amount_paid, amount_due, status").eq("company_id", cid).gte("invoice_date", fromIso),
         supabase.from("purchase_orders").select("order_date, grand_total, status").eq("company_id", cid).gte("order_date", fromIso),
-        supabase.from("journal_lines").select("debit, credit, account_id, entry_id, chart_of_accounts!inner(code,type), journal_entries!inner(entry_date,company_id)").eq("company_id", cid).gte("journal_entries.entry_date", fromIso),
+        supabase.from("journal_entries").select("id, entry_date").eq("company_id", cid).gte("entry_date", fromIso),
+        supabase.from("journal_lines").select("entry_id, account_id, debit, credit").eq("company_id", cid),
+        supabase.from("chart_of_accounts").select("id, code, type").eq("company_id", cid),
         supabase.from("material_consumption").select("total_cost, consumed_at").eq("company_id", cid).gte("consumed_at", fromIso),
       ]);
+
+      const jeMap = new Map<string, string>();
+      (jeRows.data ?? []).forEach((j: any) => jeMap.set(j.id, j.entry_date));
+      const coaMap = new Map<string, { code: string; type: string }>();
+      (coaRows.data ?? []).forEach((a: any) => coaMap.set(a.id, { code: a.code, type: a.type }));
+      const cogsRows = (jlRows.data ?? [])
+        .map((l: any) => {
+          const date = jeMap.get(l.entry_id);
+          const acc = coaMap.get(l.account_id);
+          if (!date || !acc) return null;
+          return { debit: Number(l.debit ?? 0), code: acc.code, date };
+        })
+        .filter(Boolean) as { debit: number; code: string; date: string }[];
 
       const rows = (bal.data ?? []) as any[];
       const sumBal = (codes: string[], side: "debit" | "credit") =>
@@ -91,24 +106,19 @@ function ExecutiveDashboard() {
         const x = idx(p.order_date); if (x < 0) return;
         months[x].purchases += Number(p.grand_total ?? 0);
       });
-      (cogsRows.data ?? []).forEach((l: any) => {
-        const code = l.chart_of_accounts?.code;
-        const date = l.journal_entries?.entry_date;
-        const x = idx(date); if (x < 0) return;
-        const debit = Number(l.debit ?? 0);
-        if (code === "5000") months[x].cogs += debit;
-        if (code === "5100" || code === "5200") months[x].opex += debit;
+      cogsRows.forEach((l) => {
+        const x = idx(l.date); if (x < 0) return;
+        if (l.code === "5000") months[x].cogs += l.debit;
+        if (l.code === "5100" || l.code === "5200") months[x].opex += l.debit;
       });
       months.forEach(m => { m.profit = m.revenue - m.cogs - m.opex; });
 
       // Cost breakdown YTD
       let mat = 0, labour = 0, overhead = 0;
-      (cogsRows.data ?? []).forEach((l: any) => {
-        const code = l.chart_of_accounts?.code;
-        const debit = Number(l.debit ?? 0);
-        if (code === "5000") mat += debit;          // COGS proxy for material
-        if (code === "5100") labour += debit;        // Salaries / labour
-        if (code === "5200") overhead += debit;      // Operating expenses
+      cogsRows.forEach((l) => {
+        if (l.code === "5000") mat += l.debit;
+        if (l.code === "5100") labour += l.debit;
+        if (l.code === "5200") overhead += l.debit;
       });
       // Add direct material consumption if separate
       const totalMat = mat + (mc.data ?? []).reduce((s: number, r: any) => s + Number(r.total_cost ?? 0), 0);
