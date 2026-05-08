@@ -89,9 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (profileError) throw profileError;
     if (rolesError) throw rolesError;
 
-    setProfile(prof as Profile | null);
     const roleList = (rs ?? []).map((r: { role: AppRole }) => r.role);
-    setRoles(roleList);
+    let nextCompany: Company | null = null;
     if (prof?.company_id) {
       const { data: co, error: companyError } = await supabase
         .from("companies")
@@ -99,10 +98,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq("id", prof.company_id)
         .maybeSingle();
       if (companyError) throw companyError;
-      setCompany(co as Company | null);
-    } else {
-      setCompany(null);
+      nextCompany = co as Company | null;
     }
+    return { profile: prof as Profile | null, roles: roleList, company: nextCompany };
   }, []);
 
   const applySession = useCallback(async (nextSession: Session | null) => {
@@ -118,7 +116,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      await loadUserData(nextSession.user.id);
+      const nextUserData = await loadUserData(nextSession.user.id);
+      if (loadId !== sessionLoadRef.current) return;
+      setProfile(nextUserData.profile);
+      setRoles(nextUserData.roles);
+      setCompany(nextUserData.company);
     } catch (error) {
       console.error("Failed to load auth profile", error);
       if (loadId === sessionLoadRef.current) clearUserData();
@@ -156,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error.message };
     }
     if (data.session) await applySession(data.session);
-    return { error: error?.message ?? null };
+    return { error: null };
   };
 
   const signUp: AuthCtx["signUp"] = async (email, password, fullName) => {
@@ -185,7 +187,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     setLoading(true);
     try {
-      await loadUserData(user.id);
+      const nextUserData = await loadUserData(user.id);
+      setProfile(nextUserData.profile);
+      setRoles(nextUserData.roles);
+      setCompany(nextUserData.company);
     } finally {
       setLoading(false);
     }
