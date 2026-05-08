@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth, type AppModule } from "@/lib/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Users, Boxes, Activity, ShoppingCart, Truck, Factory, Wallet, UserCog, Lock } from "lucide-react";
+import { Building2, Users, Boxes, Activity, ShoppingCart, Truck, Factory, Wallet, UserCog, BarChart3, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   component: Dashboard,
@@ -16,6 +16,7 @@ const MODULE_META: Record<AppModule, { label: string; icon: typeof ShoppingCart;
   production: { label: "Production", icon: Factory, path: "/app/production" },
   finance: { label: "Finance", icon: Wallet, path: "/app/finance" },
   hr: { label: "HR", icon: UserCog, path: "/app/hr" },
+  reports: { label: "Reports", icon: BarChart3, path: "/app/reports" },
 };
 
 function Dashboard() {
