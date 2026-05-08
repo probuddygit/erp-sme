@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -73,50 +73,89 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [company, setCompany] = useState<Company | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const sessionLoadRef = useRef(0);
 
-  const loadUserData = async (uid: string) => {
-    const [{ data: prof }, { data: rs }] = await Promise.all([
+  const clearUserData = useCallback(() => {
+    setProfile(null);
+    setCompany(null);
+    setRoles([]);
+  }, []);
+
+  const loadUserData = useCallback(async (uid: string) => {
+    const [{ data: prof, error: profileError }, { data: rs, error: rolesError }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", uid),
     ]);
+    if (profileError) throw profileError;
+    if (rolesError) throw rolesError;
+
     setProfile(prof as Profile | null);
     const roleList = (rs ?? []).map((r: { role: AppRole }) => r.role);
     setRoles(roleList);
     if (prof?.company_id) {
-      const { data: co } = await supabase
+      const { data: co, error: companyError } = await supabase
         .from("companies")
         .select("*")
         .eq("id", prof.company_id)
         .maybeSingle();
+      if (companyError) throw companyError;
       setCompany(co as Company | null);
     } else {
       setCompany(null);
     }
-  };
-
-  useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) {
-        setTimeout(() => loadUserData(s.user.id), 0);
-      } else {
-        setProfile(null);
-        setCompany(null);
-        setRoles([]);
-      }
-    });
-    supabase.auth.getSession().then(async ({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user) await loadUserData(data.session.user.id);
-      setLoading(false);
-    });
-    return () => sub.subscription.unsubscribe();
   }, []);
 
+  const applySession = useCallback(async (nextSession: Session | null) => {
+    const loadId = ++sessionLoadRef.current;
+    setLoading(true);
+    setSession(nextSession);
+    setUser(nextSession?.user ?? null);
+
+    if (!nextSession?.user) {
+      clearUserData();
+      if (loadId === sessionLoadRef.current) setLoading(false);
+      return;
+    }
+
+    try {
+      await loadUserData(nextSession.user.id);
+    } catch (error) {
+      console.error("Failed to load auth profile", error);
+      if (loadId === sessionLoadRef.current) clearUserData();
+    } finally {
+      if (loadId === sessionLoadRef.current) setLoading(false);
+    }
+  }, [clearUserData, loadUserData]);
+
+  useEffect(() => {
+    let mounted = true;
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      if (!mounted) return;
+      void applySession(s);
+    });
+    supabase.auth.getSession()
+      .then(({ data }) => {
+        if (mounted) void applySession(data.session);
+      })
+      .catch((error) => {
+        console.error("Failed to restore auth session", error);
+        if (mounted) void applySession(null);
+      });
+    return () => {
+      mounted = false;
+      sessionLoadRef.current += 1;
+      sub.subscription.unsubscribe();
+    };
+  }, [applySession]);
+
   const signIn: AuthCtx["signIn"] = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setLoading(false);
+      return { error: error.message };
+    }
+    if (data.session) await applySession(data.session);
     return { error: error?.message ?? null };
   };
 
@@ -139,15 +178,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       console.warn("signOut error (ignored):", error.message);
     }
-    setSession(null);
-    setUser(null);
-    setProfile(null);
-    setCompany(null);
-    setRoles([]);
+    await applySession(null);
   };
 
   const refresh = async () => {
-    if (user) await loadUserData(user.id);
+    if (!user) return;
+    setLoading(true);
+    try {
+      await loadUserData(user.id);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isSuperAdmin = roles.includes("super_admin");
