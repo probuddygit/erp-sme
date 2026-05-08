@@ -17,7 +17,8 @@ export type AppModule =
   | "inventory"
   | "production"
   | "finance"
-  | "hr";
+  | "hr"
+  | "reports";
 
 export interface Company {
   id: string;
@@ -56,12 +57,12 @@ interface AuthCtx {
 const Ctx = createContext<AuthCtx | undefined>(undefined);
 
 const ROLE_MODULE_MAP: Record<AppRole, AppModule[]> = {
-  super_admin: ["sales", "procurement", "inventory", "production", "finance", "hr"],
-  admin: ["sales", "procurement", "inventory", "production", "finance", "hr"],
-  sales: ["sales", "inventory"],
-  procurement: ["procurement", "inventory"],
+  super_admin: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports"],
+  admin: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports"],
+  sales: ["sales", "inventory", "reports"],
+  procurement: ["procurement", "inventory", "reports"],
   production: ["production", "inventory"],
-  finance: ["finance"],
+  finance: ["finance", "reports"],
   hr: ["hr"],
 };
 
