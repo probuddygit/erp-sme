@@ -133,7 +133,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Use local scope to avoid 403 when the server-side session is already gone
+    // (e.g., expired, revoked, or invalidated). This still clears local storage.
+    const { error } = await supabase.auth.signOut({ scope: "local" });
+    if (error) {
+      console.warn("signOut error (ignored):", error.message);
+    }
+    setSession(null);
+    setUser(null);
+    setProfile(null);
+    setCompany(null);
+    setRoles([]);
   };
 
   const refresh = async () => {
