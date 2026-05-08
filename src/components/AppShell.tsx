@@ -30,7 +30,7 @@ const MODULES: { key: AppModule; label: string; icon: typeof ShoppingCart; path:
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, canAccessModule, signOut } = useAuth();
+  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, canAccessModule, hasModule, signOut } = useAuth();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       to: "/app/reports",
       label: "Reports",
       icon: BarChart3,
-      show: !isSuperAdmin && (isCompanyAdmin || roles.includes("finance") || roles.includes("sales") || roles.includes("procurement")),
+      show: !isSuperAdmin && hasModule("reports") && (isCompanyAdmin || roles.includes("finance") || roles.includes("sales") || roles.includes("procurement")),
     },
     { to: "/app/users", label: "Users & Roles", icon: Users, show: !isSuperAdmin && isCompanyAdmin },
     { to: "/app/settings", label: "Settings", icon: Settings, show: true },
