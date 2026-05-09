@@ -44,6 +44,7 @@ import { Route as AuthenticatedAppSalesCustomersRouteImport } from './routes/_au
 import { Route as AuthenticatedAppReportsSalesRouteImport } from './routes/_authenticated.app.reports.sales'
 import { Route as AuthenticatedAppReportsProcurementRouteImport } from './routes/_authenticated.app.reports.procurement'
 import { Route as AuthenticatedAppReportsInventoryRouteImport } from './routes/_authenticated.app.reports.inventory'
+import { Route as AuthenticatedAppQualityInspectionsRouteImport } from './routes/_authenticated.app.quality.inspections'
 import { Route as AuthenticatedAppProductionWorkOrdersRouteImport } from './routes/_authenticated.app.production.work-orders'
 import { Route as AuthenticatedAppProductionTimelineRouteImport } from './routes/_authenticated.app.production.timeline'
 import { Route as AuthenticatedAppProductionBomsRouteImport } from './routes/_authenticated.app.production.boms'
@@ -260,6 +261,12 @@ const AuthenticatedAppReportsInventoryRoute =
     path: '/inventory',
     getParentRoute: () => AuthenticatedAppReportsRoute,
   } as any)
+const AuthenticatedAppQualityInspectionsRoute =
+  AuthenticatedAppQualityInspectionsRouteImport.update({
+    id: '/inspections',
+    path: '/inspections',
+    getParentRoute: () => AuthenticatedAppQualityRoute,
+  } as any)
 const AuthenticatedAppProductionWorkOrdersRoute =
   AuthenticatedAppProductionWorkOrdersRouteImport.update({
     id: '/work-orders',
@@ -431,6 +438,7 @@ export interface FileRoutesByFullPath {
   '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
   '/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
+  '/app/quality/inspections': typeof AuthenticatedAppQualityInspectionsRoute
   '/app/reports/inventory': typeof AuthenticatedAppReportsInventoryRoute
   '/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
@@ -479,6 +487,7 @@ export interface FileRoutesByTo {
   '/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
   '/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
+  '/app/quality/inspections': typeof AuthenticatedAppQualityInspectionsRoute
   '/app/reports/inventory': typeof AuthenticatedAppReportsInventoryRoute
   '/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
@@ -539,6 +548,7 @@ export interface FileRoutesById {
   '/_authenticated/app/production/boms': typeof AuthenticatedAppProductionBomsRouteWithChildren
   '/_authenticated/app/production/timeline': typeof AuthenticatedAppProductionTimelineRoute
   '/_authenticated/app/production/work-orders': typeof AuthenticatedAppProductionWorkOrdersRouteWithChildren
+  '/_authenticated/app/quality/inspections': typeof AuthenticatedAppQualityInspectionsRoute
   '/_authenticated/app/reports/inventory': typeof AuthenticatedAppReportsInventoryRoute
   '/_authenticated/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/_authenticated/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
@@ -599,6 +609,7 @@ export interface FileRouteTypes {
     | '/app/production/boms'
     | '/app/production/timeline'
     | '/app/production/work-orders'
+    | '/app/quality/inspections'
     | '/app/reports/inventory'
     | '/app/reports/procurement'
     | '/app/reports/sales'
@@ -647,6 +658,7 @@ export interface FileRouteTypes {
     | '/app/production/boms'
     | '/app/production/timeline'
     | '/app/production/work-orders'
+    | '/app/quality/inspections'
     | '/app/reports/inventory'
     | '/app/reports/procurement'
     | '/app/reports/sales'
@@ -706,6 +718,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/production/boms'
     | '/_authenticated/app/production/timeline'
     | '/_authenticated/app/production/work-orders'
+    | '/_authenticated/app/quality/inspections'
     | '/_authenticated/app/reports/inventory'
     | '/_authenticated/app/reports/procurement'
     | '/_authenticated/app/reports/sales'
@@ -979,6 +992,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/reports/inventory'
       preLoaderRoute: typeof AuthenticatedAppReportsInventoryRouteImport
       parentRoute: typeof AuthenticatedAppReportsRoute
+    }
+    '/_authenticated/app/quality/inspections': {
+      id: '/_authenticated/app/quality/inspections'
+      path: '/inspections'
+      fullPath: '/app/quality/inspections'
+      preLoaderRoute: typeof AuthenticatedAppQualityInspectionsRouteImport
+      parentRoute: typeof AuthenticatedAppQualityRoute
     }
     '/_authenticated/app/production/work-orders': {
       id: '/_authenticated/app/production/work-orders'
@@ -1311,11 +1331,14 @@ const AuthenticatedAppProductionRouteWithChildren =
   )
 
 interface AuthenticatedAppQualityRouteChildren {
+  AuthenticatedAppQualityInspectionsRoute: typeof AuthenticatedAppQualityInspectionsRoute
   AuthenticatedAppQualityIndexRoute: typeof AuthenticatedAppQualityIndexRoute
 }
 
 const AuthenticatedAppQualityRouteChildren: AuthenticatedAppQualityRouteChildren =
   {
+    AuthenticatedAppQualityInspectionsRoute:
+      AuthenticatedAppQualityInspectionsRoute,
     AuthenticatedAppQualityIndexRoute: AuthenticatedAppQualityIndexRoute,
   }
 
