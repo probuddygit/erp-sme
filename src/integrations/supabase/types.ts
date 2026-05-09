@@ -2572,6 +2572,7 @@ export type Database = {
         | "finance"
         | "hr"
         | "reports"
+        | "quality"
       app_role:
         | "super_admin"
         | "admin"
@@ -2580,6 +2581,7 @@ export type Database = {
         | "production"
         | "finance"
         | "hr"
+        | "quality"
       attendance_status:
         | "present"
         | "absent"
@@ -2825,6 +2827,7 @@ export const Constants = {
         "finance",
         "hr",
         "reports",
+        "quality",
       ],
       app_role: [
         "super_admin",
@@ -2834,6 +2837,7 @@ export const Constants = {
         "production",
         "finance",
         "hr",
+        "quality",
       ],
       attendance_status: [
         "present",
