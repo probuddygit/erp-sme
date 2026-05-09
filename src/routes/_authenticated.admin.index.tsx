@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 });
 
 const PLANS = ["trial", "starter", "pro", "enterprise"] as const;
-const ALL_MODULES: AppModule[] = ["sales", "procurement", "inventory", "production", "finance", "hr", "reports"];
+const ALL_MODULES: AppModule[] = ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality"];
 
 interface Co {
   id: string; name: string; slug: string; plan: string; is_active: boolean; enabled_modules: AppModule[];

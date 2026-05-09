@@ -1013,6 +1013,98 @@ export type Database = {
           },
         ]
       }
+      ncr_records: {
+        Row: {
+          assigned_to: string | null
+          assigned_to_name: string | null
+          batch_no: string | null
+          company_id: string
+          corrective_action: string | null
+          created_at: string
+          created_by: string | null
+          defect_description: string
+          id: string
+          inspection_id: string | null
+          item_id: string | null
+          item_name: string | null
+          ncr_number: string
+          preventive_action: string | null
+          quantity: number
+          raised_date: string
+          reference_id: string | null
+          reference_number: string | null
+          reference_type: string | null
+          resolved_at: string | null
+          root_cause: string | null
+          severity: Database["public"]["Enums"]["ncr_severity"]
+          source_stage: Database["public"]["Enums"]["qc_stage"] | null
+          status: Database["public"]["Enums"]["ncr_status"]
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          batch_no?: string | null
+          company_id: string
+          corrective_action?: string | null
+          created_at?: string
+          created_by?: string | null
+          defect_description: string
+          id?: string
+          inspection_id?: string | null
+          item_id?: string | null
+          item_name?: string | null
+          ncr_number: string
+          preventive_action?: string | null
+          quantity?: number
+          raised_date?: string
+          reference_id?: string | null
+          reference_number?: string | null
+          reference_type?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          severity?: Database["public"]["Enums"]["ncr_severity"]
+          source_stage?: Database["public"]["Enums"]["qc_stage"] | null
+          status?: Database["public"]["Enums"]["ncr_status"]
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          batch_no?: string | null
+          company_id?: string
+          corrective_action?: string | null
+          created_at?: string
+          created_by?: string | null
+          defect_description?: string
+          id?: string
+          inspection_id?: string | null
+          item_id?: string | null
+          item_name?: string | null
+          ncr_number?: string
+          preventive_action?: string | null
+          quantity?: number
+          raised_date?: string
+          reference_id?: string | null
+          reference_number?: string | null
+          reference_type?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          severity?: Database["public"]["Enums"]["ncr_severity"]
+          source_stage?: Database["public"]["Enums"]["qc_stage"] | null
+          status?: Database["public"]["Enums"]["ncr_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ncr_records_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "qc_inspections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -1529,6 +1621,125 @@ export type Database = {
           subtotal?: number
           supplier_id?: string
           tax_total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      qc_inspection_items: {
+        Row: {
+          actual_value: string | null
+          company_id: string
+          created_at: string
+          expected_value: string | null
+          id: string
+          inspection_id: string
+          notes: string | null
+          parameter: string
+          passed: boolean
+          position: number
+        }
+        Insert: {
+          actual_value?: string | null
+          company_id: string
+          created_at?: string
+          expected_value?: string | null
+          id?: string
+          inspection_id: string
+          notes?: string | null
+          parameter: string
+          passed?: boolean
+          position?: number
+        }
+        Update: {
+          actual_value?: string | null
+          company_id?: string
+          created_at?: string
+          expected_value?: string | null
+          id?: string
+          inspection_id?: string
+          notes?: string | null
+          parameter?: string
+          passed?: boolean
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qc_inspection_items_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "qc_inspections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qc_inspections: {
+        Row: {
+          batch_no: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          inspection_date: string
+          inspection_number: string
+          inspector_id: string | null
+          inspector_name: string | null
+          item_id: string | null
+          item_name: string | null
+          quantity_accepted: number
+          quantity_inspected: number
+          quantity_rejected: number
+          reference_id: string | null
+          reference_number: string | null
+          reference_type: string | null
+          remarks: string | null
+          result: Database["public"]["Enums"]["qc_result"]
+          stage: Database["public"]["Enums"]["qc_stage"]
+          updated_at: string
+        }
+        Insert: {
+          batch_no?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inspection_date?: string
+          inspection_number: string
+          inspector_id?: string | null
+          inspector_name?: string | null
+          item_id?: string | null
+          item_name?: string | null
+          quantity_accepted?: number
+          quantity_inspected?: number
+          quantity_rejected?: number
+          reference_id?: string | null
+          reference_number?: string | null
+          reference_type?: string | null
+          remarks?: string | null
+          result?: Database["public"]["Enums"]["qc_result"]
+          stage: Database["public"]["Enums"]["qc_stage"]
+          updated_at?: string
+        }
+        Update: {
+          batch_no?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inspection_date?: string
+          inspection_number?: string
+          inspector_id?: string | null
+          inspector_name?: string | null
+          item_id?: string | null
+          item_name?: string | null
+          quantity_accepted?: number
+          quantity_inspected?: number
+          quantity_rejected?: number
+          reference_id?: string | null
+          reference_number?: string | null
+          reference_type?: string | null
+          remarks?: string | null
+          result?: Database["public"]["Enums"]["qc_result"]
+          stage?: Database["public"]["Enums"]["qc_stage"]
           updated_at?: string
         }
         Relationships: []
@@ -2572,6 +2783,7 @@ export type Database = {
         | "finance"
         | "hr"
         | "reports"
+        | "quality"
       app_role:
         | "super_admin"
         | "admin"
@@ -2580,6 +2792,7 @@ export type Database = {
         | "production"
         | "finance"
         | "hr"
+        | "quality"
       attendance_status:
         | "present"
         | "absent"
@@ -2627,6 +2840,8 @@ export type Database = {
         | "negotiation"
         | "won"
         | "lost"
+      ncr_severity: "minor" | "major" | "critical"
+      ncr_status: "open" | "investigating" | "resolved" | "closed"
       payment_method:
         | "cash"
         | "bank_transfer"
@@ -2654,6 +2869,8 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "note"
+      qc_result: "pending" | "accepted" | "rejected" | "accepted_with_deviation"
+      qc_stage: "incoming" | "in_process" | "finished"
       quotation_status: "draft" | "sent" | "accepted" | "rejected" | "expired"
       rfq_status: "draft" | "sent" | "quoted" | "closed" | "cancelled"
       sales_order_status:
@@ -2825,6 +3042,7 @@ export const Constants = {
         "finance",
         "hr",
         "reports",
+        "quality",
       ],
       app_role: [
         "super_admin",
@@ -2834,6 +3052,7 @@ export const Constants = {
         "production",
         "finance",
         "hr",
+        "quality",
       ],
       attendance_status: [
         "present",
@@ -2888,6 +3107,8 @@ export const Constants = {
         "won",
         "lost",
       ],
+      ncr_severity: ["minor", "major", "critical"],
+      ncr_status: ["open", "investigating", "resolved", "closed"],
       payment_method: [
         "cash",
         "bank_transfer",
@@ -2918,6 +3139,8 @@ export const Constants = {
         "cancelled",
         "note",
       ],
+      qc_result: ["pending", "accepted", "rejected", "accepted_with_deviation"],
+      qc_stage: ["incoming", "in_process", "finished"],
       quotation_status: ["draft", "sent", "accepted", "rejected", "expired"],
       rfq_status: ["draft", "sent", "quoted", "closed", "cancelled"],
       sales_order_status: [
