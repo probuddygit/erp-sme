@@ -68,7 +68,7 @@ function NcrPage() {
     if (editing) {
       const { error } = await supabase.from("ncr_records").update({
         raised_date: form.raised_date,
-        source_stage: form.source_stage as Severity, // typed loosely
+        source_stage: form.source_stage as "incoming" | "in_process" | "finished",
         item_name: form.item_name || null,
         batch_no: form.batch_no || null,
         quantity: Number(form.quantity),
