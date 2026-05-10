@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, AlertTriangle, ClipboardCheck } from "lucide-react";
+import { Plus, Trash2, AlertTriangle, ClipboardCheck, Pencil, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/app/quality/inspections")({
@@ -66,6 +66,9 @@ function InspectionsPage() {
   const [filterStage, setFilterStage] = useState<string>("all");
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [editing, setEditing] = useState<Inspection | null>(null);
+  const [viewing, setViewing] = useState<Inspection | null>(null);
+  const [viewChecks, setViewChecks] = useState<Array<{ parameter: string; expected_value: string | null; actual_value: string | null; passed: boolean; notes: string | null }>>([]);
 
   const [form, setForm] = useState({
     stage: "incoming" as Stage,
@@ -140,9 +143,31 @@ function InspectionsPage() {
     try {
       const item = items.find((x) => x.id === form.item_id);
       const ref = referenceOptions.find((r) => r.id === form.reference_id);
-      const number = `QC-${Date.now().toString().slice(-6)}`;
       const result = computedResult();
-      const { data: insp, error } = await supabase.from("qc_inspections").insert({
+      let inspId: string;
+      if (editing) {
+        const { error } = await supabase.from("qc_inspections").update({
+          stage: form.stage,
+          inspection_date: form.inspection_date,
+          reference_type: ref ? referenceType : null,
+          reference_id: ref?.id ?? null,
+          reference_number: ref?.label ?? null,
+          item_id: form.item_id || null,
+          item_name: item?.name ?? null,
+          batch_no: form.batch_no || null,
+          quantity_inspected: Number(form.quantity_inspected),
+          quantity_accepted: Number(form.quantity_accepted),
+          quantity_rejected: Number(form.quantity_rejected),
+          result,
+          inspector_name: form.inspector_name || null,
+          remarks: form.remarks || null,
+        }).eq("id", editing.id);
+        if (error) throw error;
+        inspId = editing.id;
+        await supabase.from("qc_inspection_items").delete().eq("inspection_id", inspId);
+      } else {
+        const number = `QC-${Date.now().toString().slice(-6)}`;
+        const { data: insp, error } = await supabase.from("qc_inspections").insert({
         company_id: company.id,
         inspection_number: number,
         stage: form.stage,
@@ -160,10 +185,12 @@ function InspectionsPage() {
         inspector_name: form.inspector_name || null,
         remarks: form.remarks || null,
       }).select().single();
-      if (error) throw error;
+        if (error) throw error;
+        inspId = insp.id;
+      }
       const rows = checks.filter((c) => c.parameter.trim()).map((c, i) => ({
         company_id: company.id,
-        inspection_id: insp.id,
+        inspection_id: inspId,
         position: i,
         parameter: c.parameter,
         expected_value: c.expected || null,
@@ -174,13 +201,13 @@ function InspectionsPage() {
       if (rows.length) await supabase.from("qc_inspection_items").insert(rows);
 
       // Auto-raise NCR on rejection
-      if (result === "rejected" || result === "accepted_with_deviation") {
+      if (!editing && (result === "rejected" || result === "accepted_with_deviation")) {
         const failed = checks.filter((c) => !c.passed).map((c) => c.parameter).join(", ");
         await supabase.from("ncr_records").insert({
           company_id: company.id,
           ncr_number: `NCR-${Date.now().toString().slice(-6)}`,
           raised_date: form.inspection_date,
-          inspection_id: insp.id,
+          inspection_id: inspId,
           source_stage: form.stage,
           reference_type: ref ? referenceType : null,
           reference_id: ref?.id ?? null,
@@ -195,9 +222,10 @@ function InspectionsPage() {
         });
         toast.success(`Inspection saved · NCR auto-raised`);
       } else {
-        toast.success("Inspection saved");
+        toast.success(editing ? "Inspection updated" : "Inspection saved");
       }
       setOpen(false);
+      setEditing(null);
       setForm({ ...form, item_id: "", batch_no: "", reference_id: "", quantity_inspected: 0, quantity_accepted: 0, quantity_rejected: 0, remarks: "", result: "pending" });
       setChecks(DEFAULT_CHECKS[form.stage].map((c) => ({ ...c })));
       load();
@@ -212,6 +240,40 @@ function InspectionsPage() {
     if (!confirm("Delete inspection?")) return;
     const { error } = await supabase.from("qc_inspections").delete().eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Deleted"); load(); }
+  };
+
+  const openEdit = async (r: Inspection) => {
+    setEditing(r);
+    setForm({
+      stage: r.stage,
+      inspection_date: r.inspection_date,
+      item_id: "",
+      batch_no: r.batch_no ?? "",
+      reference_id: "",
+      quantity_inspected: Number(r.quantity_inspected),
+      quantity_accepted: Number(r.quantity_accepted),
+      quantity_rejected: Number(r.quantity_rejected),
+      inspector_name: r.inspector_name ?? "",
+      remarks: r.remarks ?? "",
+      result: r.result,
+    });
+    const { data: full } = await supabase.from("qc_inspections").select("item_id,reference_id").eq("id", r.id).single();
+    const { data: items } = await supabase.from("qc_inspection_items").select("parameter,expected_value,actual_value,passed,notes").eq("inspection_id", r.id).order("position");
+    setForm((f) => ({ ...f, item_id: full?.item_id ?? "", reference_id: full?.reference_id ?? "" }));
+    setChecks((items ?? []).map((c) => ({
+      parameter: c.parameter,
+      expected: c.expected_value ?? "",
+      actual: c.actual_value ?? "",
+      passed: c.passed,
+      notes: c.notes ?? "",
+    })));
+    setOpen(true);
+  };
+
+  const openView = async (r: Inspection) => {
+    setViewing(r);
+    const { data } = await supabase.from("qc_inspection_items").select("parameter,expected_value,actual_value,passed,notes").eq("inspection_id", r.id).order("position");
+    setViewChecks(data ?? []);
   };
 
   return (
@@ -230,10 +292,10 @@ function InspectionsPage() {
               </SelectContent>
             </Select>
             {canManage && (
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" /> New inspection</Button></DialogTrigger>
+              <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
+                <DialogTrigger asChild><Button onClick={() => { setEditing(null); setForm({ ...form, item_id: "", batch_no: "", reference_id: "", quantity_inspected: 0, quantity_accepted: 0, quantity_rejected: 0, remarks: "", result: "pending" }); setChecks(DEFAULT_CHECKS[form.stage].map((c) => ({ ...c }))); }}><Plus className="h-4 w-4 mr-1" /> New inspection</Button></DialogTrigger>
                 <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader><DialogTitle>New QC inspection</DialogTitle></DialogHeader>
+                  <DialogHeader><DialogTitle>{editing ? `Edit ${editing.inspection_number}` : "New QC inspection"}</DialogTitle></DialogHeader>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="space-y-1.5">
                       <Label>Stage</Label>
@@ -353,8 +415,8 @@ function InspectionsPage() {
                     <AlertTriangle className="h-3 w-3" /> Rejected or deviated inspections automatically raise an NCR.
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button onClick={submit} disabled={submitting}>{submitting ? "Saving…" : "Save inspection"}</Button>
+                    <Button variant="outline" onClick={() => { setOpen(false); setEditing(null); }}>Cancel</Button>
+                    <Button onClick={submit} disabled={submitting}>{submitting ? "Saving…" : editing ? "Update" : "Save inspection"}</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -394,7 +456,13 @@ function InspectionsPage() {
                     </Badge>
                   </TableCell>
                   {canManage && (
-                    <TableCell><Button size="icon" variant="ghost" onClick={() => remove(r.id)}><Trash2 className="h-3 w-3" /></Button></TableCell>
+                    <TableCell>
+                      <div className="flex gap-1 justify-end">
+                        <Button size="icon" variant="ghost" title="View" onClick={() => openView(r)}><Eye className="h-3.5 w-3.5" /></Button>
+                        <Button size="icon" variant="ghost" title="Edit" onClick={() => openEdit(r)}><Pencil className="h-3.5 w-3.5" /></Button>
+                        <Button size="icon" variant="ghost" title="Delete" onClick={() => remove(r.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      </div>
+                    </TableCell>
                   )}
                 </TableRow>
               ))}
@@ -402,6 +470,45 @@ function InspectionsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={!!viewing} onOpenChange={(v) => { if (!v) { setViewing(null); setViewChecks([]); } }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{viewing?.inspection_number}</DialogTitle></DialogHeader>
+          {viewing && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div><div className="text-xs text-muted-foreground">Date</div><div>{viewing.inspection_date}</div></div>
+                <div><div className="text-xs text-muted-foreground">Stage</div><div className="capitalize">{viewing.stage.replace("_", " ")}</div></div>
+                <div><div className="text-xs text-muted-foreground">Item</div><div>{viewing.item_name ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Batch</div><div>{viewing.batch_no ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Reference</div><div>{viewing.reference_number ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Inspector</div><div>{viewing.inspector_name ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Inspected / Accepted / Rejected</div><div className="font-mono">{viewing.quantity_inspected} / {viewing.quantity_accepted} / {viewing.quantity_rejected}</div></div>
+                <div><div className="text-xs text-muted-foreground">Result</div><div><Badge variant={viewing.result === "accepted" ? "default" : viewing.result === "rejected" ? "destructive" : "secondary"}>{viewing.result.replace(/_/g, " ")}</Badge></div></div>
+              </div>
+              {viewing.remarks && <div><div className="text-xs text-muted-foreground">Remarks</div><div>{viewing.remarks}</div></div>}
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Checklist</div>
+                <Table>
+                  <TableHeader><TableRow><TableHead>Parameter</TableHead><TableHead>Expected</TableHead><TableHead>Actual</TableHead><TableHead className="w-20">Result</TableHead></TableRow></TableHeader>
+                  <TableBody>
+                    {viewChecks.length === 0 ? (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No checklist items.</TableCell></TableRow>
+                    ) : viewChecks.map((c, i) => (
+                      <TableRow key={i}>
+                        <TableCell>{c.parameter}</TableCell>
+                        <TableCell>{c.expected_value ?? "—"}</TableCell>
+                        <TableCell>{c.actual_value ?? "—"}</TableCell>
+                        <TableCell><Badge variant={c.passed ? "default" : "destructive"}>{c.passed ? "Pass" : "Fail"}</Badge></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
