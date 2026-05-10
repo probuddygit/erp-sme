@@ -456,7 +456,13 @@ function InspectionsPage() {
                     </Badge>
                   </TableCell>
                   {canManage && (
-                    <TableCell><Button size="icon" variant="ghost" onClick={() => remove(r.id)}><Trash2 className="h-3 w-3" /></Button></TableCell>
+                    <TableCell>
+                      <div className="flex gap-1 justify-end">
+                        <Button size="icon" variant="ghost" title="View" onClick={() => openView(r)}><Eye className="h-3.5 w-3.5" /></Button>
+                        <Button size="icon" variant="ghost" title="Edit" onClick={() => openEdit(r)}><Pencil className="h-3.5 w-3.5" /></Button>
+                        <Button size="icon" variant="ghost" title="Delete" onClick={() => remove(r.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      </div>
+                    </TableCell>
                   )}
                 </TableRow>
               ))}
@@ -464,6 +470,45 @@ function InspectionsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={!!viewing} onOpenChange={(v) => { if (!v) { setViewing(null); setViewChecks([]); } }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{viewing?.inspection_number}</DialogTitle></DialogHeader>
+          {viewing && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div><div className="text-xs text-muted-foreground">Date</div><div>{viewing.inspection_date}</div></div>
+                <div><div className="text-xs text-muted-foreground">Stage</div><div className="capitalize">{viewing.stage.replace("_", " ")}</div></div>
+                <div><div className="text-xs text-muted-foreground">Item</div><div>{viewing.item_name ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Batch</div><div>{viewing.batch_no ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Reference</div><div>{viewing.reference_number ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Inspector</div><div>{viewing.inspector_name ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Inspected / Accepted / Rejected</div><div className="font-mono">{viewing.quantity_inspected} / {viewing.quantity_accepted} / {viewing.quantity_rejected}</div></div>
+                <div><div className="text-xs text-muted-foreground">Result</div><div><Badge variant={viewing.result === "accepted" ? "default" : viewing.result === "rejected" ? "destructive" : "secondary"}>{viewing.result.replace(/_/g, " ")}</Badge></div></div>
+              </div>
+              {viewing.remarks && <div><div className="text-xs text-muted-foreground">Remarks</div><div>{viewing.remarks}</div></div>}
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Checklist</div>
+                <Table>
+                  <TableHeader><TableRow><TableHead>Parameter</TableHead><TableHead>Expected</TableHead><TableHead>Actual</TableHead><TableHead className="w-20">Result</TableHead></TableRow></TableHeader>
+                  <TableBody>
+                    {viewChecks.length === 0 ? (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No checklist items.</TableCell></TableRow>
+                    ) : viewChecks.map((c, i) => (
+                      <TableRow key={i}>
+                        <TableCell>{c.parameter}</TableCell>
+                        <TableCell>{c.expected_value ?? "—"}</TableCell>
+                        <TableCell>{c.actual_value ?? "—"}</TableCell>
+                        <TableCell><Badge variant={c.passed ? "default" : "destructive"}>{c.passed ? "Pass" : "Fail"}</Badge></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
