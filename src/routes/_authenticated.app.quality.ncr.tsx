@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, AlertTriangle, Trash2 } from "lucide-react";
+import { Plus, AlertTriangle, Trash2, Pencil, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/app/quality/ncr")({
@@ -38,6 +38,7 @@ function NcrPage() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Ncr | null>(null);
+  const [viewing, setViewing] = useState<Ncr | null>(null);
   const [form, setForm] = useState({
     raised_date: new Date().toISOString().slice(0, 10),
     source_stage: "incoming", item_name: "", batch_no: "",
@@ -243,9 +244,10 @@ function NcrPage() {
                   <TableCell><Badge variant={n.status === "open" ? "destructive" : n.status === "closed" ? "outline" : "default"}>{n.status}</Badge></TableCell>
                   {canManage && (
                     <TableCell>
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => openEdit(n)}>Edit</Button>
-                        <Button size="icon" variant="ghost" onClick={() => remove(n.id)}><Trash2 className="h-3 w-3" /></Button>
+                      <div className="flex gap-1 justify-end">
+                        <Button size="icon" variant="ghost" title="View" onClick={() => setViewing(n)}><Eye className="h-3.5 w-3.5" /></Button>
+                        <Button size="icon" variant="ghost" title="Edit" onClick={() => openEdit(n)}><Pencil className="h-3.5 w-3.5" /></Button>
+                        <Button size="icon" variant="ghost" title="Delete" onClick={() => remove(n.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                       </div>
                     </TableCell>
                   )}
@@ -255,6 +257,30 @@ function NcrPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={!!viewing} onOpenChange={(v) => { if (!v) setViewing(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{viewing?.ncr_number}</DialogTitle></DialogHeader>
+          {viewing && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div><div className="text-xs text-muted-foreground">Date</div><div>{viewing.raised_date}</div></div>
+                <div><div className="text-xs text-muted-foreground">Stage</div><div className="capitalize">{(viewing.source_stage ?? "—").replace("_", " ")}</div></div>
+                <div><div className="text-xs text-muted-foreground">Item</div><div>{viewing.item_name ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Batch</div><div>{viewing.batch_no ?? "—"}</div></div>
+                <div><div className="text-xs text-muted-foreground">Quantity</div><div>{viewing.quantity}</div></div>
+                <div><div className="text-xs text-muted-foreground">Severity</div><div><Badge variant={viewing.severity === "critical" ? "destructive" : viewing.severity === "major" ? "secondary" : "outline"}>{viewing.severity}</Badge></div></div>
+                <div><div className="text-xs text-muted-foreground">Status</div><div><Badge>{viewing.status}</Badge></div></div>
+                <div><div className="text-xs text-muted-foreground">Assigned to</div><div>{viewing.assigned_to_name ?? "—"}</div></div>
+              </div>
+              <div><div className="text-xs text-muted-foreground">Defect description</div><div className="whitespace-pre-wrap">{viewing.defect_description}</div></div>
+              {viewing.root_cause && <div><div className="text-xs text-muted-foreground">Root cause</div><div className="whitespace-pre-wrap">{viewing.root_cause}</div></div>}
+              {viewing.corrective_action && <div><div className="text-xs text-muted-foreground">Corrective action</div><div className="whitespace-pre-wrap">{viewing.corrective_action}</div></div>}
+              {viewing.preventive_action && <div><div className="text-xs text-muted-foreground">Preventive action</div><div className="whitespace-pre-wrap">{viewing.preventive_action}</div></div>}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
