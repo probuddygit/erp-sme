@@ -145,7 +145,7 @@ function UsersPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Temporary password</Label>
-                <Input id="password" type="text" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input id="password" type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
             </div>
             <div className="space-y-2">
