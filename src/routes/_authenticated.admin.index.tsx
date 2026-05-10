@@ -127,7 +127,7 @@ function AdminCompanies() {
                   <div className="space-y-2"><Label>Email</Label>
                     <Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} required /></div>
                   <div className="space-y-2"><Label>Password</Label>
-                    <Input type="text" minLength={8} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} required /></div>
+                    <Input type="password" minLength={8} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} required /></div>
                   <p className="text-xs text-muted-foreground">Role: <span className="font-medium text-foreground">admin</span> (full tenant administration)</p>
                 </div>
               </div>
