@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, PackageCheck, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 type Search = { po?: string };
 
@@ -153,11 +154,11 @@ function GrnsPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
-              <TableHead>GRN #</TableHead><TableHead>PO</TableHead><TableHead>Supplier</TableHead><TableHead>Status</TableHead><TableHead>Received</TableHead>
+              <TableHead>GRN #</TableHead><TableHead>PO</TableHead><TableHead>Supplier</TableHead><TableHead>Status</TableHead><TableHead>Received</TableHead><TableHead className="w-20"></TableHead>
             </TableRow></TableHeader>
             <TableBody>
               {(grns?.length ?? 0) === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-12"><PackageCheck className="h-8 w-8 mx-auto mb-2 opacity-50" />No goods receipts yet.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12"><PackageCheck className="h-8 w-8 mx-auto mb-2 opacity-50" />No goods receipts yet.</TableCell></TableRow>
               ) : grns!.map((g: any) => (
                 <TableRow key={g.id}>
                   <TableCell className="font-mono text-xs">{g.grn_number}</TableCell>
@@ -165,6 +166,17 @@ function GrnsPage() {
                   <TableCell>{g.suppliers?.name ?? "—"}</TableCell>
                   <TableCell><span className="text-xs px-2 py-0.5 rounded bg-muted">{g.status}</span></TableCell>
                   <TableCell className="text-xs text-muted-foreground">{g.received_date}</TableCell>
+                  <TableCell>{canEdit && g.status === "draft" && (
+                    <RowActions
+                      label={`GRN ${g.grn_number}`}
+                      invalidateKeys={[["grns", company?.id]]}
+                      onDelete={async () => {
+                        await supabase.from("grn_items").delete().eq("grn_id", g.id);
+                        const { error } = await supabase.from("grns").delete().eq("id", g.id);
+                        if (error) throw error;
+                      }}
+                    />
+                  )}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
