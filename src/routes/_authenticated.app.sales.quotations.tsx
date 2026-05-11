@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, FileText, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 import { computeTotals, inr } from "@/lib/sales-utils";
 import { LineItemsEditor, emptyLine, type EditableLine } from "@/components/sales/LineItemsEditor";
 import type { Database } from "@/integrations/supabase/types";
@@ -174,6 +175,17 @@ function QuotationsPage() {
                       <Button size="sm" variant="ghost" onClick={() => convertToOrder(q)}>
                         To Order <ArrowRight className="ml-1 h-3.5 w-3.5" />
                       </Button>
+                    )}
+                    {canEdit && (q.status === "draft" || q.status === "rejected" || q.status === "expired") && (
+                      <RowActions
+                        label={`quotation ${q.quotation_number}`}
+                        invalidateKeys={[["quotations", company?.id]]}
+                        onDelete={async () => {
+                          await supabase.from("quotation_items").delete().eq("quotation_id", q.id);
+                          const { error } = await supabase.from("quotations").delete().eq("id", q.id);
+                          if (error) throw error;
+                        }}
+                      />
                     )}
                   </TableCell>
                 </TableRow>

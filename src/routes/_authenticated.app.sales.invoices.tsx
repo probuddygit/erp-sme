@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Receipt, Wallet, Bell } from "lucide-react";
 import { toast } from "sonner";
 import { inr } from "@/lib/sales-utils";
+import { RowActions } from "@/components/RowActions";
 import type { Database } from "@/integrations/supabase/types";
 
 type IStatus = Database["public"]["Enums"]["invoice_status"];
@@ -131,6 +132,17 @@ function InvoicesPage() {
                             <Bell className="h-3.5 w-3.5 mr-1" />Remind
                           </Button>
                         </>
+                      )}
+                      {canPay && inv.status === "draft" && (
+                        <RowActions
+                          label={`invoice ${inv.invoice_number}`}
+                          invalidateKeys={[["invoices", company?.id]]}
+                          onDelete={async () => {
+                            await supabase.from("invoice_items").delete().eq("invoice_id", inv.id);
+                            const { error } = await supabase.from("invoices").delete().eq("id", inv.id);
+                            if (error) throw error;
+                          }}
+                        />
                       )}
                     </TableCell>
                   </TableRow>

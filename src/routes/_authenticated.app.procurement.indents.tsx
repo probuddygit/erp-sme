@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { ClipboardList, Sparkles, Plus, AlertTriangle, ArrowRight, FileQuestion } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/procurement/indents")({
   component: IndentsPage,
@@ -177,6 +178,17 @@ function IndentsPage() {
                   <TableCell className="text-xs text-muted-foreground">{new Date(i.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <Button asChild size="sm" variant="ghost"><Link to="/app/procurement/rfqs" search={{ from_indent: i.id } as any}><FileQuestion className="h-3.5 w-3.5 mr-1" />RFQ</Link></Button>
+                    {canEdit && (i.status === "draft" || i.status === "submitted" || i.status === "rejected") && (
+                      <RowActions
+                        label={`indent ${i.indent_number}`}
+                        invalidateKeys={[["indents", company?.id]]}
+                        onDelete={async () => {
+                          await supabase.from("purchase_indent_items").delete().eq("indent_id", i.id);
+                          const { error } = await supabase.from("purchase_indents").delete().eq("id", i.id);
+                          if (error) throw error;
+                        }}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

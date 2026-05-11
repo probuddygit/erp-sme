@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, GripVertical } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 import { LEAD_STAGES, inr } from "@/lib/sales-utils";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -23,11 +24,13 @@ interface Lead {
   contact_name: string | null;
   company_name: string | null;
   email: string | null;
+  phone: string | null;
   source: LeadSource;
   status: LeadStatus;
   expected_value: number;
   win_probability: number;
   expected_close_date: string | null;
+  notes: string | null;
 }
 
 export const Route = createFileRoute("/_authenticated/app/sales/pipeline")({
@@ -38,6 +41,7 @@ function PipelinePage() {
   const { company, hasRole, isCompanyAdmin } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Lead | null>(null);
   const canEdit = isCompanyAdmin || hasRole("sales");
 
   const { data: leads } = useQuery({
@@ -79,6 +83,19 @@ function PipelinePage() {
         )}
       </div>
 
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        {editing && (
+          <LeadDialog
+            initial={editing}
+            onClose={() => setEditing(null)}
+            onSaved={() => {
+              setEditing(null);
+              qc.invalidateQueries({ queryKey: ["leads", company?.id] });
+            }}
+          />
+        )}
+      </Dialog>
+
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 overflow-x-auto pb-4">
         {LEAD_STAGES.map((stage) => {
           const items = (leads ?? []).filter((l) => l.status === stage.key);
@@ -119,6 +136,17 @@ function PipelinePage() {
                           <span className="font-semibold">{inr(l.expected_value)}</span>
                           <span className="text-muted-foreground">{l.win_probability}%</span>
                         </div>
+                        {canEdit && (
+                          <div className="mt-1 flex justify-end" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                            <RowActions
+                              onEdit={() => setEditing(l)}
+                              table="leads"
+                              id={l.id}
+                              label={`lead "${l.title}"`}
+                              invalidateKeys={[["leads", company?.id]]}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -135,19 +163,19 @@ function PipelinePage() {
   );
 }
 
-function LeadDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+function LeadDialog({ onClose, onSaved, initial }: { onClose: () => void; onSaved: () => void; initial?: Lead }) {
   const { company, user } = useAuth();
   const [form, setForm] = useState({
-    title: "",
-    contact_name: "",
-    company_name: "",
-    email: "",
-    phone: "",
-    source: "website" as LeadSource,
-    expected_value: 0,
-    win_probability: 25,
-    expected_close_date: "",
-    notes: "",
+    title: initial?.title ?? "",
+    contact_name: initial?.contact_name ?? "",
+    company_name: initial?.company_name ?? "",
+    email: initial?.email ?? "",
+    phone: initial?.phone ?? "",
+    source: (initial?.source ?? "website") as LeadSource,
+    expected_value: Number(initial?.expected_value ?? 0),
+    win_probability: Number(initial?.win_probability ?? 25),
+    expected_close_date: initial?.expected_close_date ?? "",
+    notes: initial?.notes ?? "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -155,10 +183,7 @@ function LeadDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => 
     if (!form.title.trim()) return toast.error("Title is required");
     if (!company?.id) return;
     setSaving(true);
-    const { error } = await supabase.from("leads").insert({
-      company_id: company.id,
-      created_by: user?.id,
-      owner_id: user?.id,
+    const payload = {
       title: form.title.trim(),
       contact_name: form.contact_name || null,
       company_name: form.company_name || null,
@@ -169,16 +194,19 @@ function LeadDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => 
       win_probability: form.win_probability,
       expected_close_date: form.expected_close_date || null,
       notes: form.notes || null,
-    });
+    };
+    const { error } = initial
+      ? await supabase.from("leads").update(payload).eq("id", initial.id)
+      : await supabase.from("leads").insert({ ...payload, company_id: company.id, created_by: user?.id, owner_id: user?.id });
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Lead created");
+    toast.success(initial ? "Lead updated" : "Lead created");
     onSaved();
   };
 
   return (
     <DialogContent className="max-w-xl">
-      <DialogHeader><DialogTitle>New lead</DialogTitle></DialogHeader>
+      <DialogHeader><DialogTitle>{initial ? "Edit lead" : "New lead"}</DialogTitle></DialogHeader>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Title *" className="sm:col-span-2"><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. CNC machine for ACME" /></Field>
         <Field label="Contact name"><Input value={form.contact_name} onChange={(e) => setForm({ ...form, contact_name: e.target.value })} /></Field>
@@ -202,7 +230,7 @@ function LeadDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => 
       </div>
       <DialogFooter>
         <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
-        <Button onClick={submit} disabled={saving}>{saving ? "Saving…" : "Create"}</Button>
+        <Button onClick={submit} disabled={saving}>{saving ? "Saving…" : initial ? "Save" : "Create"}</Button>
       </DialogFooter>
     </DialogContent>
   );

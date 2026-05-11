@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { ClipboardList, Check, X, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { inr } from "@/lib/sales-utils";
+import { RowActions } from "@/components/RowActions";
 import type { Database } from "@/integrations/supabase/types";
 
 type SOStatus = Database["public"]["Enums"]["sales_order_status"];
@@ -180,6 +181,17 @@ function OrdersPage() {
                     <Button size="sm" variant="ghost" onClick={() => generateInvoice(o)}>
                       <Receipt className="h-3.5 w-3.5 mr-1" />Invoice
                     </Button>
+                  )}
+                  {canEditFinance && (o.status === "draft" || o.status === "rejected" || o.status === "cancelled" || o.status === "pending_approval") && (
+                    <RowActions
+                      label={`order ${o.order_number}`}
+                      invalidateKeys={[["sales-orders", company?.id]]}
+                      onDelete={async () => {
+                        await supabase.from("sales_order_items").delete().eq("sales_order_id", o.id);
+                        const { error } = await supabase.from("sales_orders").delete().eq("id", o.id);
+                        if (error) throw error;
+                      }}
+                    />
                   )}
                 </TableCell>
               </TableRow>

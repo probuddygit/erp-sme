@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Warehouse } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/inventory/warehouses")({
   component: WarehousesPage,
@@ -23,6 +24,7 @@ function WarehousesPage() {
   const qc = useQueryClient();
   const canEdit = isCompanyAdmin || hasRole("procurement") || hasRole("production");
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ code: "", name: "", address: "" });
 
   const { data } = useQuery({
@@ -37,17 +39,21 @@ function WarehousesPage() {
 
   const create = async () => {
     if (!form.code.trim() || !form.name.trim()) { toast.error("Code and name required"); return; }
-    const { error } = await supabase.from("warehouses").insert({
-      company_id: company!.id,
-      code: form.code.trim(),
-      name: form.name.trim(),
-      address: form.address.trim() || null,
-    });
+    const payload = { code: form.code.trim(), name: form.name.trim(), address: form.address.trim() || null };
+    const { error } = editingId
+      ? await supabase.from("warehouses").update(payload).eq("id", editingId)
+      : await supabase.from("warehouses").insert({ ...payload, company_id: company!.id });
     if (error) { toast.error(error.message); return; }
-    toast.success("Warehouse created");
-    setOpen(false);
+    toast.success(editingId ? "Warehouse updated" : "Warehouse created");
+    setOpen(false); setEditingId(null);
     setForm({ code: "", name: "", address: "" });
     qc.invalidateQueries({ queryKey: ["warehouses"] });
+  };
+
+  const startEdit = (w: WH) => {
+    setEditingId(w.id);
+    setForm({ code: w.code, name: w.name, address: w.address ?? "" });
+    setOpen(true);
   };
 
   return (
@@ -55,10 +61,10 @@ function WarehousesPage() {
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">{data?.length ?? 0} warehouses</div>
         {canEdit && (
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm({ code: "", name: "", address: "" }); } }}>
             <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 mr-1" />New warehouse</Button></DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>New warehouse</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{editingId ? "Edit warehouse" : "New warehouse"}</DialogTitle></DialogHeader>
               <div className="grid gap-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>Code *</Label><Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} /></div>
@@ -66,7 +72,7 @@ function WarehousesPage() {
                 </div>
                 <div><Label>Address</Label><Textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
               </div>
-              <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button><Button onClick={create}>Create</Button></DialogFooter>
+              <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button><Button onClick={create}>{editingId ? "Save" : "Create"}</Button></DialogFooter>
             </DialogContent>
           </Dialog>
         )}
@@ -75,7 +81,18 @@ function WarehousesPage() {
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {(data ?? []).map((w) => (
           <Card key={w.id}>
-            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Warehouse className="h-4 w-4" />{w.name}</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base flex items-center gap-2"><Warehouse className="h-4 w-4" />{w.name}</CardTitle>
+              {canEdit && (
+                <RowActions
+                  onEdit={() => startEdit(w)}
+                  table="warehouses"
+                  id={w.id}
+                  label={`warehouse "${w.name}"`}
+                  invalidateKeys={[["warehouses", company?.id]]}
+                />
+              )}
+            </CardHeader>
             <CardContent>
               <div className="text-xs text-muted-foreground font-mono">{w.code}</div>
               {w.address && <div className="text-sm mt-2 whitespace-pre-line">{w.address}</div>}

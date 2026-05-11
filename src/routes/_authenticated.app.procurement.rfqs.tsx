@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, FileQuestion, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/procurement/rfqs")({
   component: RfqsPage,
@@ -99,7 +100,21 @@ function RfqsPage() {
                   <TableCell><Badge variant="outline" className="capitalize">{r.status}</Badge></TableCell>
                   <TableCell className="text-xs text-muted-foreground">{r.issue_date}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{r.due_date ?? "—"}</TableCell>
-                  <TableCell><Button size="sm" variant="ghost" onClick={() => setSelectedRfq(r.id)}>Compare</Button></TableCell>
+                  <TableCell className="space-x-1">
+                    <Button size="sm" variant="ghost" onClick={() => setSelectedRfq(r.id)}>Compare</Button>
+                    {canEdit && (
+                      <RowActions
+                        label={`RFQ ${r.rfq_number}`}
+                        invalidateKeys={[["rfqs", company?.id]]}
+                        onDelete={async () => {
+                          await supabase.from("rfq_supplier_quotes").delete().eq("rfq_id", r.id);
+                          await supabase.from("rfq_items").delete().eq("rfq_id", r.id);
+                          const { error } = await supabase.from("rfqs").delete().eq("id", r.id);
+                          if (error) throw error;
+                        }}
+                      />
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
