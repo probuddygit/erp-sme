@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, FileQuestion, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/procurement/rfqs")({
   component: RfqsPage,
