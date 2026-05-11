@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/sales/customers")({
   component: CustomersPage,
@@ -33,6 +34,7 @@ function CustomersPage() {
   const { company, hasRole, isCompanyAdmin } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Customer | null>(null);
   const [search, setSearch] = useState("");
   const canEdit = isCompanyAdmin || hasRole("sales");
 
@@ -77,6 +79,19 @@ function CustomersPage() {
         )}
       </div>
 
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        {editing && (
+          <CustomerDialog
+            initial={editing}
+            onClose={() => setEditing(null)}
+            onSaved={() => {
+              setEditing(null);
+              qc.invalidateQueries({ queryKey: ["customers", company?.id] });
+            }}
+          />
+        )}
+      </Dialog>
+
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -88,14 +103,15 @@ function CustomersPage() {
                 <TableHead>State</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
+                {canEdit && <TableHead className="text-right w-24">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Loading…</TableCell></TableRow>
+                <TableRow><TableCell colSpan={canEdit ? 7 : 6} className="text-center text-muted-foreground py-8">Loading…</TableCell></TableRow>
               )}
               {!isLoading && filtered.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">
+                <TableRow><TableCell colSpan={canEdit ? 7 : 6} className="text-center text-muted-foreground py-12">
                   <Building2 className="mx-auto h-8 w-8 mb-2 opacity-50" />
                   No customers yet
                 </TableCell></TableRow>
@@ -108,6 +124,17 @@ function CustomersPage() {
                   <TableCell>{c.state_code || "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{c.email || "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{c.phone || "—"}</TableCell>
+                  {canEdit && (
+                    <TableCell className="text-right">
+                      <RowActions
+                        onEdit={() => setEditing(c)}
+                        table="customers"
+                        id={c.id}
+                        label={`customer "${c.name}"`}
+                        invalidateKeys={[["customers", company?.id]]}
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -118,17 +145,17 @@ function CustomersPage() {
   );
 }
 
-function CustomerDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+function CustomerDialog({ onClose, onSaved, initial }: { onClose: () => void; onSaved: () => void; initial?: Customer }) {
   const { company, user } = useAuth();
   const [form, setForm] = useState({
-    name: "",
-    contact_person: "",
-    email: "",
-    phone: "",
-    gst_number: "",
-    state_code: "",
-    billing_address: "",
-    shipping_address: "",
+    name: initial?.name ?? "",
+    contact_person: initial?.contact_person ?? "",
+    email: initial?.email ?? "",
+    phone: initial?.phone ?? "",
+    gst_number: initial?.gst_number ?? "",
+    state_code: initial?.state_code ?? "",
+    billing_address: initial?.billing_address ?? "",
+    shipping_address: initial?.shipping_address ?? "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -139,9 +166,7 @@ function CustomerDialog({ onClose, onSaved }: { onClose: () => void; onSaved: ()
     }
     if (!company?.id) return;
     setSaving(true);
-    const { error } = await supabase.from("customers").insert({
-      company_id: company.id,
-      created_by: user?.id,
+    const payload = {
       name: form.name.trim(),
       contact_person: form.contact_person || null,
       email: form.email || null,
@@ -150,20 +175,23 @@ function CustomerDialog({ onClose, onSaved }: { onClose: () => void; onSaved: ()
       state_code: form.state_code || null,
       billing_address: form.billing_address || null,
       shipping_address: form.shipping_address || null,
-    });
+    };
+    const { error } = initial
+      ? await supabase.from("customers").update(payload).eq("id", initial.id)
+      : await supabase.from("customers").insert({ ...payload, company_id: company.id, created_by: user?.id });
     setSaving(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Customer created");
+    toast.success(initial ? "Customer updated" : "Customer created");
     onSaved();
   };
 
   return (
     <DialogContent className="max-w-2xl">
       <DialogHeader>
-        <DialogTitle>New customer</DialogTitle>
+        <DialogTitle>{initial ? "Edit customer" : "New customer"}</DialogTitle>
       </DialogHeader>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Company name *"><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
@@ -177,7 +205,7 @@ function CustomerDialog({ onClose, onSaved }: { onClose: () => void; onSaved: ()
       </div>
       <DialogFooter>
         <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
-        <Button onClick={submit} disabled={saving}>{saving ? "Saving…" : "Create"}</Button>
+        <Button onClick={submit} disabled={saving}>{saving ? "Saving…" : initial ? "Save" : "Create"}</Button>
       </DialogFooter>
     </DialogContent>
   );
