@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Eye, FileText, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 import { PoStatusBadge } from "./_authenticated.app.procurement.index";
 
 export const Route = createFileRoute("/_authenticated/app/procurement/purchase-orders")({
@@ -136,7 +137,20 @@ function PurchaseOrdersPage() {
                   <TableCell className="text-xs text-muted-foreground">{p.order_date}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{p.expected_date ?? "—"}</TableCell>
                   <TableCell className="text-right font-medium">₹{Number(p.grand_total).toLocaleString("en-IN")}</TableCell>
-                  <TableCell><Button asChild size="sm" variant="ghost"><Link to="/app/procurement/purchase-orders/$id" params={{ id: p.id }}><Eye className="h-4 w-4" /></Link></Button></TableCell>
+                  <TableCell className="space-x-1 text-right">
+                    <Button asChild size="sm" variant="ghost"><Link to="/app/procurement/purchase-orders/$id" params={{ id: p.id }}><Eye className="h-4 w-4" /></Link></Button>
+                    {canEdit && (p.status === "draft" || p.status === "pending_approval" || p.status === "rejected" || p.status === "cancelled") && (
+                      <RowActions
+                        label={`PO ${p.po_number}`}
+                        invalidateKeys={[["purchase-orders", company?.id]]}
+                        onDelete={async () => {
+                          await supabase.from("purchase_order_items").delete().eq("po_id", p.id);
+                          const { error } = await supabase.from("purchase_orders").delete().eq("id", p.id);
+                          if (error) throw error;
+                        }}
+                      />
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
