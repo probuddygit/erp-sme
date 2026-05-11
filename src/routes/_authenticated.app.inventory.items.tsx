@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/inventory/items")({
   component: ItemsPage,
@@ -35,6 +36,7 @@ function ItemsPage() {
   const qc = useQueryClient();
   const canEdit = isCompanyAdmin || hasRole("procurement") || hasRole("production");
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [form, setForm] = useState({
     sku: "", name: "", item_type: "raw_material" as ItemRow["item_type"], unit: "pcs",
@@ -77,18 +79,31 @@ function ItemsPage() {
       });
   }, [items, levels, q]);
 
+  const resetForm = () => setForm({ sku: "", name: "", item_type: "raw_material", unit: "pcs", min_stock: "0", reorder_qty: "0", standard_cost: "0", valuation_method: "weighted_average" });
+
+  const startEdit = (i: ItemRow) => {
+    setEditingId(i.id);
+    setForm({
+      sku: i.sku, name: i.name, item_type: i.item_type, unit: i.unit,
+      min_stock: String(i.min_stock), reorder_qty: String(i.reorder_qty),
+      standard_cost: String(i.standard_cost), valuation_method: i.valuation_method,
+    });
+    setOpen(true);
+  };
+
   const create = async () => {
     if (!form.sku.trim() || !form.name.trim()) { toast.error("SKU and name required"); return; }
-    const { error } = await supabase.from("items").insert({
-      company_id: company!.id,
+    const payload = {
       sku: form.sku.trim(), name: form.name.trim(), item_type: form.item_type, unit: form.unit.trim() || "pcs",
       min_stock: Number(form.min_stock) || 0, reorder_qty: Number(form.reorder_qty) || 0,
       standard_cost: Number(form.standard_cost) || 0, valuation_method: form.valuation_method,
-    });
+    };
+    const { error } = editingId
+      ? await supabase.from("items").update(payload).eq("id", editingId)
+      : await supabase.from("items").insert({ ...payload, company_id: company!.id });
     if (error) { toast.error(error.message); return; }
-    toast.success("Item created");
-    setOpen(false);
-    setForm({ sku: "", name: "", item_type: "raw_material", unit: "pcs", min_stock: "0", reorder_qty: "0", standard_cost: "0", valuation_method: "weighted_average" });
+    toast.success(editingId ? "Item updated" : "Item created");
+    setOpen(false); setEditingId(null); resetForm();
     qc.invalidateQueries({ queryKey: ["items"] });
   };
 
@@ -100,10 +115,10 @@ function ItemsPage() {
           <Input placeholder="Search items…" className="pl-8" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         {canEdit && (
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); resetForm(); } }}>
             <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 mr-1" />New item</Button></DialogTrigger>
             <DialogContent className="max-w-lg">
-              <DialogHeader><DialogTitle>New item</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{editingId ? "Edit item" : "New item"}</DialogTitle></DialogHeader>
               <div className="grid gap-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>SKU *</Label><Input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} /></div>
@@ -139,7 +154,7 @@ function ItemsPage() {
                   </Select>
                 </div>
               </div>
-              <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button><Button onClick={create}>Create</Button></DialogFooter>
+              <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button><Button onClick={create}>{editingId ? "Save" : "Create"}</Button></DialogFooter>
             </DialogContent>
           </Dialog>
         )}
@@ -157,6 +172,7 @@ function ItemsPage() {
                 <TableHead className="text-right">Min</TableHead>
                 <TableHead className="text-right">Value</TableHead>
                 <TableHead>Method</TableHead>
+                {canEdit && <TableHead className="text-right w-24">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -174,10 +190,21 @@ function ItemsPage() {
                   <TableCell className="text-right text-muted-foreground">{Number(r.min_stock)}</TableCell>
                   <TableCell className="text-right">₹{Number(r.value).toFixed(2)}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{r.valuation_method === "fifo" ? "FIFO" : "Avg"}</TableCell>
+                  {canEdit && (
+                    <TableCell className="text-right">
+                      <RowActions
+                        onEdit={() => startEdit(r)}
+                        table="items"
+                        id={r.id}
+                        label={`item "${r.name}"`}
+                        invalidateKeys={[["items", company?.id]]}
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
               {!rows.length && (
-                <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-6">No items.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="text-center text-muted-foreground py-6">No items.</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
