@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Users, Star } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/procurement/suppliers")({
   component: SuppliersPage,
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/app/procurement/suppliers"
 interface Supplier {
   id: string; name: string; code: string | null; contact_person: string | null;
   email: string | null; phone: string | null; gst_number: string | null;
+  address?: string | null;
   payment_terms: string | null; lead_time_days: number; rating: number; is_active: boolean;
 }
 
@@ -30,6 +32,7 @@ function SuppliersPage() {
   const canEdit = isCompanyAdmin || hasRole("procurement");
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", code: "", contact_person: "", email: "", phone: "", gst_number: "", address: "", payment_terms: "Net 30", lead_time_days: "7" });
 
   const { data: suppliers, isLoading } = useQuery({
@@ -70,9 +73,7 @@ function SuppliersPage() {
 
   const create = async () => {
     if (!form.name.trim()) { toast.error("Name is required"); return; }
-    const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from("suppliers").insert({
-      company_id: company!.id,
+    const payload = {
       name: form.name.trim(),
       code: form.code.trim() || null,
       contact_person: form.contact_person.trim() || null,
@@ -82,13 +83,29 @@ function SuppliersPage() {
       address: form.address.trim() || null,
       payment_terms: form.payment_terms.trim() || null,
       lead_time_days: Number(form.lead_time_days) || 7,
-      created_by: u.user?.id ?? null,
-    });
+    };
+    const { error } = editingId
+      ? await supabase.from("suppliers").update(payload).eq("id", editingId)
+      : await (async () => {
+          const { data: u } = await supabase.auth.getUser();
+          return supabase.from("suppliers").insert({ ...payload, company_id: company!.id, created_by: u.user?.id ?? null });
+        })();
     if (error) { toast.error(error.message); return; }
-    toast.success("Supplier added");
-    setOpen(false);
+    toast.success(editingId ? "Supplier updated" : "Supplier added");
+    setOpen(false); setEditingId(null);
     setForm({ name: "", code: "", contact_person: "", email: "", phone: "", gst_number: "", address: "", payment_terms: "Net 30", lead_time_days: "7" });
     qc.invalidateQueries({ queryKey: ["suppliers"] });
+  };
+
+  const startEdit = (s: Supplier) => {
+    setEditingId(s.id);
+    setForm({
+      name: s.name, code: s.code ?? "", contact_person: s.contact_person ?? "",
+      email: s.email ?? "", phone: s.phone ?? "", gst_number: s.gst_number ?? "",
+      address: s.address ?? "", payment_terms: s.payment_terms ?? "Net 30",
+      lead_time_days: String(s.lead_time_days ?? 7),
+    });
+    setOpen(true);
   };
 
   return (
@@ -99,10 +116,10 @@ function SuppliersPage() {
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search suppliers…" className="pl-9" />
         </div>
         {canEdit && (
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm({ name: "", code: "", contact_person: "", email: "", phone: "", gst_number: "", address: "", payment_terms: "Net 30", lead_time_days: "7" }); } }}>
             <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" />New supplier</Button></DialogTrigger>
             <DialogContent className="max-w-lg">
-              <DialogHeader><DialogTitle>Add supplier</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{editingId ? "Edit supplier" : "Add supplier"}</DialogTitle></DialogHeader>
               <div className="grid gap-3">
                 <div><Label>Name *</Label><Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
                 <div className="grid grid-cols-2 gap-3">
@@ -122,7 +139,7 @@ function SuppliersPage() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                <Button onClick={create}>Save</Button>
+                <Button onClick={create}>{editingId ? "Save changes" : "Save"}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -141,13 +158,14 @@ function SuppliersPage() {
                 <TableHead>On-time %</TableHead>
                 <TableHead>Total spend</TableHead>
                 <TableHead>Rating</TableHead>
+                {canEdit && <TableHead className="text-right w-24">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Loading…</TableCell></TableRow>
+                <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="text-center text-muted-foreground py-8">Loading…</TableCell></TableRow>
               ) : filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-12">
+                <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="text-center text-muted-foreground py-12">
                   <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />No suppliers yet.
                 </TableCell></TableRow>
               ) : filtered.map((s) => {
@@ -170,6 +188,17 @@ function SuppliersPage() {
                     <TableCell>
                       <div className="inline-flex items-center gap-1 text-amber-500"><Star className="h-3.5 w-3.5 fill-current" /><span className="text-sm">{Number(s.rating).toFixed(1)}</span></div>
                     </TableCell>
+                    {canEdit && (
+                      <TableCell className="text-right">
+                        <RowActions
+                          onEdit={() => startEdit(s)}
+                          table="suppliers"
+                          id={s.id}
+                          label={`supplier "${s.name}"`}
+                          invalidateKeys={[["suppliers", company?.id]]}
+                        />
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
