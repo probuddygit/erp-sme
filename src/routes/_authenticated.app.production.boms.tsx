@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Search, GitBranch, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { RowActions } from "@/components/RowActions";
-import { supabase as sb } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/production/boms")({
   component: BomsPage,
