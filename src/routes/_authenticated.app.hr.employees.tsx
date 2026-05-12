@@ -10,8 +10,9 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/hr/employees")({
   component: EmployeesPage,
@@ -68,12 +69,6 @@ function EmployeesPage() {
     setOpen(false);
     setForm({ ...form, employee_code: "", full_name: "", email: "", phone: "", designation: "", department: "", ctc_annual: 0, basic: 0, hra: 0, special_allowance: 0 });
     load();
-  };
-
-  const remove = async (id: string) => {
-    if (!confirm("Delete employee?")) return;
-    const { error } = await supabase.from("employees").delete().eq("id", id);
-    if (error) toast.error(error.message); else { toast.success("Deleted"); load(); }
   };
 
   return (
@@ -139,7 +134,19 @@ function EmployeesPage() {
                     <TableCell>{e.date_of_joining}</TableCell>
                     <TableCell><Badge variant={e.status === "active" ? "default" : "secondary"}>{e.status}</Badge></TableCell>
                     <TableCell className="text-right font-mono">₹ {Number(e.ctc_annual).toLocaleString("en-IN")}</TableCell>
-                    <TableCell>{canManage && <Button size="icon" variant="ghost" onClick={() => remove(e.id)}><Trash2 className="h-4 w-4" /></Button>}</TableCell>
+                    <TableCell>
+                      {canManage && (
+                        <RowActions
+                          label={`employee ${e.full_name}`}
+                          onDelete={async () => {
+                            await supabase.from("salary_structures").delete().eq("employee_id", e.id);
+                            const { error } = await supabase.from("employees").delete().eq("id", e.id);
+                            if (error) throw error;
+                            load();
+                          }}
+                        />
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, ListChecks, Eye, Sparkles, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 import { StatusBadge } from "./_authenticated.app.production.index";
 
 export const Route = createFileRoute("/_authenticated/app/production/work-orders")({
@@ -348,9 +349,24 @@ function WorkOrdersPage() {
                     </TableCell>
                     <TableCell><Badge variant="outline">P{w.priority}</Badge></TableCell>
                     <TableCell>
-                      <Button asChild size="sm" variant="ghost">
-                        <Link to="/app/production/work-orders/$id" params={{ id: w.id }}><Eye className="h-4 w-4" /></Link>
-                      </Button>
+                      <span className="inline-flex items-center gap-0.5">
+                        <Button asChild size="sm" variant="ghost">
+                          <Link to="/app/production/work-orders/$id" params={{ id: w.id }}><Eye className="h-4 w-4" /></Link>
+                        </Button>
+                        {canEdit && (w.status === "planned" || w.status === "cancelled") && (
+                          <RowActions
+                            label={`work order ${w.wo_number}`}
+                            invalidateKeys={[["work-orders", company?.id]]}
+                            onDelete={async () => {
+                              await supabase.from("material_consumption").delete().eq("work_order_id", w.id);
+                              await supabase.from("production_output").delete().eq("work_order_id", w.id);
+                              await supabase.from("production_logs").delete().eq("work_order_id", w.id);
+                              const { error } = await supabase.from("work_orders").delete().eq("id", w.id);
+                              if (error) throw error;
+                            }}
+                          />
+                        )}
+                      </span>
                     </TableCell>
                   </TableRow>
                 );

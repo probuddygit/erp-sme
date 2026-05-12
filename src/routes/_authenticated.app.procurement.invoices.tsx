@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Receipt, Wallet } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/procurement/invoices")({
   component: InvoicesPage,
@@ -159,7 +160,19 @@ function InvoicesPage() {
                   <TableCell className="text-xs text-muted-foreground">{v.due_date ?? "—"}</TableCell>
                   <TableCell className="text-right">₹{Number(v.grand_total).toLocaleString("en-IN")}</TableCell>
                   <TableCell className="text-right font-medium">₹{Number(v.amount_due).toLocaleString("en-IN")}</TableCell>
-                  <TableCell>{Number(v.amount_due) > 0 && canEdit && <Button size="sm" variant="ghost" onClick={() => { setPayOpen(v.id); setPayAmount(String(v.amount_due)); }}><Wallet className="h-4 w-4" /></Button>}</TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center gap-0.5">
+                      {Number(v.amount_due) > 0 && canEdit && <Button size="sm" variant="ghost" onClick={() => { setPayOpen(v.id); setPayAmount(String(v.amount_due)); }}><Wallet className="h-4 w-4" /></Button>}
+                      {canEdit && v.status === "draft" && (
+                        <RowActions
+                          table="vendor_invoices"
+                          id={v.id}
+                          label={`vendor invoice ${v.vinv_number}`}
+                          invalidateKeys={[["vinvoices", company?.id], ["cashflow", company?.id]]}
+                        />
+                      )}
+                    </span>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
