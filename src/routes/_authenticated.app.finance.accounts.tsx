@@ -32,6 +32,17 @@ function AccountsPage() {
     queryFn: async () => (await supabase.rpc("account_balances", { _company_id: company!.id })).data ?? [],
   });
 
+  const { data: systemMap } = useQuery({
+    enabled: !!company?.id,
+    queryKey: ["coa-system", company?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("chart_of_accounts").select("id,is_system").eq("company_id", company!.id);
+      const m: Record<string, boolean> = {};
+      (data ?? []).forEach((r: any) => { m[r.id] = !!r.is_system; });
+      return m;
+    },
+  });
+
   const submit = async () => {
     if (!code || !name) { toast.error("Code and name required"); return; }
     const { error } = editingId
@@ -49,7 +60,7 @@ function AccountsPage() {
   };
 
   const grouped = (accounts ?? []).reduce<Record<string, any[]>>((acc: Record<string, any[]>, r: any) => {
-    (acc[r.type] = acc[r.type] || []).push(r); return acc;
+    (acc[r.type] = acc[r.type] || []).push({ ...r, is_system: systemMap?.[r.account_id] ?? false }); return acc;
   }, {});
 
   return (
