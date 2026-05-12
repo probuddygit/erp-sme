@@ -13,6 +13,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, GitBranch, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
+import { supabase as sb } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/production/boms")({
   component: BomsPage,
@@ -34,6 +36,7 @@ function BomsPage() {
   const qc = useQueryClient();
   const canEdit = isCompanyAdmin || hasRole("production");
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({
     product_name: "",
@@ -67,25 +70,42 @@ function BomsPage() {
       toast.error("Product name is required");
       return;
     }
-    const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from("bills_of_materials").insert({
-      company_id: company!.id,
+    const payload = {
       product_name: form.product_name.trim(),
       product_code: form.product_code.trim() || null,
       version: form.version.trim() || "v1",
       output_quantity: Number(form.output_quantity) || 1,
       output_unit: form.output_unit.trim() || "pcs",
       notes: form.notes.trim() || null,
-      created_by: u.user?.id ?? null,
-    });
+    };
+    let error;
+    if (editingId) {
+      ({ error } = await supabase.from("bills_of_materials").update(payload).eq("id", editingId));
+    } else {
+      const { data: u } = await supabase.auth.getUser();
+      ({ error } = await supabase.from("bills_of_materials").insert({ ...payload, company_id: company!.id, created_by: u.user?.id ?? null }));
+    }
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("BOM created");
-    setOpen(false);
+    toast.success(editingId ? "BOM updated" : "BOM created");
+    setOpen(false); setEditingId(null);
     setForm({ product_name: "", product_code: "", version: "v1", output_quantity: "1", output_unit: "pcs", notes: "" });
     qc.invalidateQueries({ queryKey: ["boms"] });
+  };
+
+  const startEdit = (b: Bom & { notes?: string | null }) => {
+    setEditingId(b.id);
+    setForm({
+      product_name: b.product_name,
+      product_code: b.product_code ?? "",
+      version: b.version,
+      output_quantity: String(b.output_quantity),
+      output_unit: b.output_unit,
+      notes: (b as any).notes ?? "",
+    });
+    setOpen(true);
   };
 
   return (
@@ -101,13 +121,13 @@ function BomsPage() {
           />
         </div>
         {canEdit && (
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm({ product_name: "", product_code: "", version: "v1", output_quantity: "1", output_unit: "pcs", notes: "" }); } }}>
             <DialogTrigger asChild>
               <Button><Plus className="h-4 w-4 mr-1" />New BOM</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Bill of Materials</DialogTitle>
+                <DialogTitle>{editingId ? "Edit Bill of Materials" : "Create Bill of Materials"}</DialogTitle>
               </DialogHeader>
               <div className="grid gap-3">
                 <div>
@@ -141,7 +161,7 @@ function BomsPage() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                <Button onClick={createBom}>Create</Button>
+                <Button onClick={createBom}>{editingId ? "Save" : "Create"}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -177,9 +197,23 @@ function BomsPage() {
                   <TableCell>{b.output_quantity} {b.output_unit}</TableCell>
                   <TableCell><Badge variant={b.status === "active" ? "default" : "secondary"}>{b.status}</Badge></TableCell>
                   <TableCell>
-                    <Button asChild size="sm" variant="ghost">
-                      <Link to="/app/production/boms/$id" params={{ id: b.id }}><Eye className="h-4 w-4" /></Link>
-                    </Button>
+                    <span className="inline-flex items-center gap-0.5">
+                      <Button asChild size="sm" variant="ghost">
+                        <Link to="/app/production/boms/$id" params={{ id: b.id }}><Eye className="h-4 w-4" /></Link>
+                      </Button>
+                      {canEdit && (
+                        <RowActions
+                          onEdit={() => startEdit(b)}
+                          label={`BOM "${b.product_name}"`}
+                          invalidateKeys={[["boms", company?.id]]}
+                          onDelete={async () => {
+                            await sb.from("bom_components").delete().eq("bom_id", b.id);
+                            const { error } = await sb.from("bills_of_materials").delete().eq("id", b.id);
+                            if (error) throw error;
+                          }}
+                        />
+                      )}
+                    </span>
                   </TableCell>
                 </TableRow>
               ))}
