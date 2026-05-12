@@ -359,7 +359,8 @@ function WorkOrdersPage() {
                             invalidateKeys={[["work-orders", company?.id]]}
                             onDelete={async () => {
                               await supabase.from("material_consumption").delete().eq("work_order_id", w.id);
-                              await supabase.from("production_outputs").delete().eq("work_order_id", w.id);
+                              await supabase.from("production_output").delete().eq("work_order_id", w.id);
+                              await supabase.from("production_logs").delete().eq("work_order_id", w.id);
                               const { error } = await supabase.from("work_orders").delete().eq("id", w.id);
                               if (error) throw error;
                             }}
