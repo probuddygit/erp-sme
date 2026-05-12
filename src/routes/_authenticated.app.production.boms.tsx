@@ -206,8 +206,8 @@ function BomsPage() {
                           label={`BOM "${b.product_name}"`}
                           invalidateKeys={[["boms", company?.id]]}
                           onDelete={async () => {
-                            await sb.from("bom_components").delete().eq("bom_id", b.id);
-                            const { error } = await sb.from("bills_of_materials").delete().eq("id", b.id);
+                            await supabase.from("bom_components").delete().eq("bom_id", b.id);
+                            const { error } = await supabase.from("bills_of_materials").delete().eq("id", b.id);
                             if (error) throw error;
                           }}
                         />
