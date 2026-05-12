@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Badge } from "@/components/ui/badge";
 import { Plus, FileText, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { RowActions } from "@/components/RowActions";
 
 export const Route = createFileRoute("/_authenticated/app/hr/payroll")({
   component: PayrollPage,
@@ -187,7 +188,7 @@ function PayrollPage() {
           <CardContent>
             {runs.length === 0 ? <p className="text-sm text-muted-foreground">No payroll runs yet.</p> : (
               <Table>
-                <TableHeader><TableRow><TableHead>Number</TableHead><TableHead>Period</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Net</TableHead><TableHead></TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead>Number</TableHead><TableHead>Period</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Net</TableHead><TableHead className="w-32"></TableHead></TableRow></TableHeader>
                 <TableBody>
                   {runs.map((r) => (
                     <TableRow key={r.id} className="cursor-pointer" onClick={() => loadItems(r)}>
@@ -195,7 +196,23 @@ function PayrollPage() {
                       <TableCell>{MONTHS[r.period_month - 1]} {r.period_year}</TableCell>
                       <TableCell><Badge variant={r.status === "posted" ? "default" : "secondary"}>{r.status}</Badge></TableCell>
                       <TableCell className="text-right font-mono">₹ {Number(r.total_net).toLocaleString("en-IN")}</TableCell>
-                      <TableCell>{canManage && r.status === "processed" && <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); post(r); }}><CheckCircle2 className="h-3.5 w-3.5 mr-1" />Post</Button>}</TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <span className="inline-flex items-center gap-1">
+                          {canManage && r.status === "processed" && <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); post(r); }}><CheckCircle2 className="h-3.5 w-3.5 mr-1" />Post</Button>}
+                          {canManage && r.status !== "posted" && (
+                            <RowActions
+                              label={`payroll run ${r.run_number}`}
+                              onDelete={async () => {
+                                await supabase.from("payroll_items").delete().eq("run_id", r.id);
+                                const { error } = await supabase.from("payroll_runs").delete().eq("id", r.id);
+                                if (error) throw error;
+                                if (selected?.id === r.id) { setSelected(null); setItems([]); }
+                                load();
+                              }}
+                            />
+                          )}
+                        </span>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
