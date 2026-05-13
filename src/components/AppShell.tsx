@@ -18,10 +18,8 @@ import {
 } from "lucide-react";
 import { useAuth, type AppModule } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 
 const MODULES: { key: AppModule; label: string; icon: typeof ShoppingCart; path: string }[] = [
   { key: "sales", label: "Sales", icon: ShoppingCart, path: "/app/sales" },
@@ -34,21 +32,12 @@ const MODULES: { key: AppModule; label: string; icon: typeof ShoppingCart; path:
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, canAccessModule, hasModule, signOut, setActiveCompany } = useAuth();
+  const { profile, company, roles, isSuperAdmin, isCompanyAdmin, canAccessModule, hasModule, signOut } = useAuth();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
-  const [companies, setCompanies] = useState<{ id: string; name: string }[]>([]);
 
-  useEffect(() => {
-    if (!isSuperAdmin) return;
-    void supabase.from("companies").select("id,name").order("name").then(({ data }) => {
-      setCompanies((data ?? []) as { id: string; name: string }[]);
-    });
-  }, [isSuperAdmin]);
-
-  // Super admin sees workspace modules when an active company is selected
-  const showWorkspace = !isSuperAdmin || !!company;
+  const showWorkspace = !isSuperAdmin;
 
   const navItems: { to: string; label: string; icon: typeof LayoutDashboard; show: boolean }[] = [
     { to: "/app", label: "Dashboard", icon: LayoutDashboard, show: showWorkspace },
@@ -56,15 +45,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       to: m.path,
       label: m.label,
       icon: m.icon,
-      show: isSuperAdmin ? !!company : canAccessModule(m.key),
+      show: !isSuperAdmin && canAccessModule(m.key),
     })),
     {
       to: "/app/reports",
       label: "Reports",
       icon: BarChart3,
-      show: isSuperAdmin
-        ? !!company
-        : hasModule("reports") && (isCompanyAdmin || roles.includes("finance") || roles.includes("sales") || roles.includes("procurement")),
+      show: !isSuperAdmin && hasModule("reports") && (isCompanyAdmin || roles.includes("finance") || roles.includes("sales") || roles.includes("procurement")),
     },
     { to: "/app/users", label: "Users & Roles", icon: Users, show: !isSuperAdmin && isCompanyAdmin },
     { to: "/app/settings", label: "Settings", icon: Settings, show: true },
@@ -128,23 +115,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     {it.label}
                   </Link>
                 ))}
-              </div>
-              <div className="mt-4 px-3">
-                <div className="mb-1 text-[10px] uppercase tracking-widest text-sidebar-foreground/50">View as company</div>
-                <Select
-                  value={company?.id ?? "none"}
-                  onValueChange={(v) => void setActiveCompany(v === "none" ? null : v)}
-                >
-                  <SelectTrigger className="h-8 bg-sidebar-accent/40 border-sidebar-border text-xs">
-                    <SelectValue placeholder="Select company" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">— None —</SelectItem>
-                    {companies.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </div>
           )}
