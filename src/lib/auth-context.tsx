@@ -54,7 +54,6 @@ interface AuthCtx {
   hasRole: (r: AppRole) => boolean;
   hasModule: (m: AppModule) => boolean;
   canAccessModule: (m: AppModule) => boolean;
-  setActiveCompany: (companyId: string | null) => Promise<void>;
 }
 
 const Ctx = createContext<AuthCtx | undefined>(undefined);
@@ -200,30 +199,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const setActiveCompany: AuthCtx["setActiveCompany"] = async (companyId) => {
-    if (!companyId) {
-      setCompany(null);
-      try { sessionStorage.removeItem("active_company_id"); } catch {}
-      return;
-    }
-    const { data: co, error } = await supabase
-      .from("companies").select("*").eq("id", companyId).maybeSingle();
-    if (error) { console.error(error); return; }
-    setCompany(co as Company | null);
-    try { sessionStorage.setItem("active_company_id", companyId); } catch {}
-  };
-
-  // Restore super-admin selected company across reloads
-  useEffect(() => {
-    if (!user) return;
-    if (company) return;
-    if (!roles.includes("super_admin")) return;
-    let saved: string | null = null;
-    try { saved = sessionStorage.getItem("active_company_id"); } catch {}
-    if (saved) void setActiveCompany(saved);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, roles.join(",")]);
-
   const isSuperAdmin = roles.includes("super_admin");
   const isCompanyAdmin = roles.includes("admin");
   const hasRole = (r: AppRole) => roles.includes(r);
@@ -252,7 +227,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasRole,
         hasModule,
         canAccessModule,
-        setActiveCompany,
       }}
     >
       {children}
