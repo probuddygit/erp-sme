@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.account_balances(uuid, date, date) TO authenticated;
