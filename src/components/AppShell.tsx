@@ -15,6 +15,7 @@ import {
   Settings,
   BarChart3,
   ShieldCheck,
+  Wrench,
 } from "lucide-react";
 import { useAuth, type AppModule } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const MODULES: { key: AppModule; label: string; icon: typeof ShoppingCart; path:
   { key: "finance", label: "Finance", icon: Wallet, path: "/app/finance" },
   { key: "hr", label: "HR", icon: UserCog, path: "/app/hr" },
   { key: "quality", label: "Quality", icon: ShieldCheck, path: "/app/quality" },
+  { key: "maintenance", label: "Maintenance", icon: Wrench, path: "/app/maintenance" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
