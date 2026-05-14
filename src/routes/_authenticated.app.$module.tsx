@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth, type AppModule } from "@/lib/auth-context";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Truck, Boxes, Factory, Wallet, UserCog, BarChart3, ShieldCheck, Lock } from "lucide-react";
+import { ShoppingCart, Truck, Boxes, Factory, Wallet, UserCog, BarChart3, ShieldCheck, Lock, Wrench } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/$module")({
   component: ModulePage,
@@ -17,6 +17,7 @@ const META: Record<AppModule, { icon: typeof ShoppingCart; tagline: string; sect
   hr: { icon: UserCog, tagline: "Employees, attendance, payroll.", sections: ["Employees", "Attendance", "Leave", "Payroll"] },
   reports: { icon: BarChart3, tagline: "Live P&L, sales, procurement and inventory analytics.", sections: ["Executive", "Sales", "Procurement", "Inventory"] },
   quality: { icon: ShieldCheck, tagline: "Inspections, NCRs and traceability.", sections: ["Inspections", "NCRs", "Reports", "Traceability"] },
+  maintenance: { icon: Wrench, tagline: "Machines, work orders, breakdowns and spare parts.", sections: ["Machines", "Work orders", "Breakdowns", "Spare parts"] },
 };
 
 function ModulePage() {

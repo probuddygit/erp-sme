@@ -951,6 +951,93 @@ export type Database = {
           },
         ]
       }
+      machines: {
+        Row: {
+          attachment_url: string | null
+          capacity: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          department: string | null
+          id: string
+          installation_date: string | null
+          is_active: boolean
+          last_maintenance_date: string | null
+          machine_code: string
+          machine_type: string | null
+          maintenance_frequency_days: number | null
+          manufacturer: string | null
+          model_number: string | null
+          name: string
+          next_maintenance_date: string | null
+          notes: string | null
+          plant_location: string | null
+          production_line: string | null
+          runtime_hours: number
+          runtime_threshold_hours: number | null
+          serial_number: string | null
+          status: Database["public"]["Enums"]["machine_status"]
+          updated_at: string
+          warranty_expiry: string | null
+        }
+        Insert: {
+          attachment_url?: string | null
+          capacity?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          id?: string
+          installation_date?: string | null
+          is_active?: boolean
+          last_maintenance_date?: string | null
+          machine_code: string
+          machine_type?: string | null
+          maintenance_frequency_days?: number | null
+          manufacturer?: string | null
+          model_number?: string | null
+          name: string
+          next_maintenance_date?: string | null
+          notes?: string | null
+          plant_location?: string | null
+          production_line?: string | null
+          runtime_hours?: number
+          runtime_threshold_hours?: number | null
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["machine_status"]
+          updated_at?: string
+          warranty_expiry?: string | null
+        }
+        Update: {
+          attachment_url?: string | null
+          capacity?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          id?: string
+          installation_date?: string | null
+          is_active?: boolean
+          last_maintenance_date?: string | null
+          machine_code?: string
+          machine_type?: string | null
+          maintenance_frequency_days?: number | null
+          manufacturer?: string | null
+          model_number?: string | null
+          name?: string
+          next_maintenance_date?: string | null
+          notes?: string | null
+          plant_location?: string | null
+          production_line?: string | null
+          runtime_hours?: number
+          runtime_threshold_hours?: number | null
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["machine_status"]
+          updated_at?: string
+          warranty_expiry?: string | null
+        }
+        Relationships: []
+      }
       material_consumption: {
         Row: {
           company_id: string
@@ -2784,6 +2871,7 @@ export type Database = {
         | "hr"
         | "reports"
         | "quality"
+        | "maintenance"
       app_role:
         | "super_admin"
         | "admin"
@@ -2793,6 +2881,7 @@ export type Database = {
         | "finance"
         | "hr"
         | "quality"
+        | "maintenance"
       attendance_status:
         | "present"
         | "absent"
@@ -2840,6 +2929,7 @@ export type Database = {
         | "negotiation"
         | "won"
         | "lost"
+      machine_status: "running" | "idle" | "under_maintenance" | "breakdown"
       ncr_severity: "minor" | "major" | "critical"
       ncr_status: "open" | "investigating" | "resolved" | "closed"
       payment_method:
@@ -3043,6 +3133,7 @@ export const Constants = {
         "hr",
         "reports",
         "quality",
+        "maintenance",
       ],
       app_role: [
         "super_admin",
@@ -3053,6 +3144,7 @@ export const Constants = {
         "finance",
         "hr",
         "quality",
+        "maintenance",
       ],
       attendance_status: [
         "present",
@@ -3107,6 +3199,7 @@ export const Constants = {
         "won",
         "lost",
       ],
+      machine_status: ["running", "idle", "under_maintenance", "breakdown"],
       ncr_severity: ["minor", "major", "critical"],
       ncr_status: ["open", "investigating", "resolved", "closed"],
       payment_method: [

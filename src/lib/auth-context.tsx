@@ -10,7 +10,8 @@ export type AppRole =
   | "production"
   | "finance"
   | "hr"
-  | "quality";
+  | "quality"
+  | "maintenance";
 
 export type AppModule =
   | "sales"
@@ -20,7 +21,8 @@ export type AppModule =
   | "finance"
   | "hr"
   | "reports"
-  | "quality";
+  | "quality"
+  | "maintenance";
 
 export interface Company {
   id: string;
@@ -59,14 +61,15 @@ interface AuthCtx {
 const Ctx = createContext<AuthCtx | undefined>(undefined);
 
 const ROLE_MODULE_MAP: Record<AppRole, AppModule[]> = {
-  super_admin: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality"],
-  admin: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality"],
+  super_admin: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality", "maintenance"],
+  admin: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality", "maintenance"],
   sales: ["sales", "inventory", "reports"],
   procurement: ["procurement", "inventory", "reports"],
-  production: ["production", "inventory", "quality"],
+  production: ["production", "inventory", "quality", "maintenance"],
   finance: ["finance", "reports"],
   hr: ["hr"],
   quality: ["quality", "production", "inventory"],
+  maintenance: ["maintenance", "inventory", "production"],
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
