@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/app/users")({
   component: UsersPage,
 });
 
-const ASSIGNABLE_ROLES: AppRole[] = ["admin", "sales", "procurement", "production", "finance", "hr"];
+const ASSIGNABLE_ROLES: AppRole[] = ["admin", "sales", "procurement", "production", "finance", "hr", "quality", "maintenance"];
 
 interface Member {
   id: string;
