@@ -59,6 +59,7 @@ import { Route as AuthenticatedAppProcurementInvoicesRouteImport } from './route
 import { Route as AuthenticatedAppProcurementIndentsRouteImport } from './routes/_authenticated.app.procurement.indents'
 import { Route as AuthenticatedAppProcurementGrnsRouteImport } from './routes/_authenticated.app.procurement.grns'
 import { Route as AuthenticatedAppMaintenanceTicketsRouteImport } from './routes/_authenticated.app.maintenance.tickets'
+import { Route as AuthenticatedAppMaintenanceRuntimeRouteImport } from './routes/_authenticated.app.maintenance.runtime'
 import { Route as AuthenticatedAppMaintenancePlansRouteImport } from './routes/_authenticated.app.maintenance.plans'
 import { Route as AuthenticatedAppMaintenanceMachinesRouteImport } from './routes/_authenticated.app.maintenance.machines'
 import { Route as AuthenticatedAppInventoryWarehousesRouteImport } from './routes/_authenticated.app.inventory.warehouses'
@@ -359,6 +360,12 @@ const AuthenticatedAppMaintenanceTicketsRoute =
     path: '/tickets',
     getParentRoute: () => AuthenticatedAppMaintenanceRoute,
   } as any)
+const AuthenticatedAppMaintenanceRuntimeRoute =
+  AuthenticatedAppMaintenanceRuntimeRouteImport.update({
+    id: '/runtime',
+    path: '/runtime',
+    getParentRoute: () => AuthenticatedAppMaintenanceRoute,
+  } as any)
 const AuthenticatedAppMaintenancePlansRoute =
   AuthenticatedAppMaintenancePlansRouteImport.update({
     id: '/plans',
@@ -488,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
   '/app/maintenance/machines': typeof AuthenticatedAppMaintenanceMachinesRouteWithChildren
   '/app/maintenance/plans': typeof AuthenticatedAppMaintenancePlansRoute
+  '/app/maintenance/runtime': typeof AuthenticatedAppMaintenanceRuntimeRoute
   '/app/maintenance/tickets': typeof AuthenticatedAppMaintenanceTicketsRoute
   '/app/procurement/grns': typeof AuthenticatedAppProcurementGrnsRoute
   '/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
@@ -544,6 +552,7 @@ export interface FileRoutesByTo {
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
   '/app/maintenance/machines': typeof AuthenticatedAppMaintenanceMachinesRouteWithChildren
   '/app/maintenance/plans': typeof AuthenticatedAppMaintenancePlansRoute
+  '/app/maintenance/runtime': typeof AuthenticatedAppMaintenanceRuntimeRoute
   '/app/maintenance/tickets': typeof AuthenticatedAppMaintenanceTicketsRoute
   '/app/procurement/grns': typeof AuthenticatedAppProcurementGrnsRoute
   '/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
@@ -613,6 +622,7 @@ export interface FileRoutesById {
   '/_authenticated/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
   '/_authenticated/app/maintenance/machines': typeof AuthenticatedAppMaintenanceMachinesRouteWithChildren
   '/_authenticated/app/maintenance/plans': typeof AuthenticatedAppMaintenancePlansRoute
+  '/_authenticated/app/maintenance/runtime': typeof AuthenticatedAppMaintenanceRuntimeRoute
   '/_authenticated/app/maintenance/tickets': typeof AuthenticatedAppMaintenanceTicketsRoute
   '/_authenticated/app/procurement/grns': typeof AuthenticatedAppProcurementGrnsRoute
   '/_authenticated/app/procurement/indents': typeof AuthenticatedAppProcurementIndentsRoute
@@ -682,6 +692,7 @@ export interface FileRouteTypes {
     | '/app/inventory/warehouses'
     | '/app/maintenance/machines'
     | '/app/maintenance/plans'
+    | '/app/maintenance/runtime'
     | '/app/maintenance/tickets'
     | '/app/procurement/grns'
     | '/app/procurement/indents'
@@ -738,6 +749,7 @@ export interface FileRouteTypes {
     | '/app/inventory/warehouses'
     | '/app/maintenance/machines'
     | '/app/maintenance/plans'
+    | '/app/maintenance/runtime'
     | '/app/maintenance/tickets'
     | '/app/procurement/grns'
     | '/app/procurement/indents'
@@ -806,6 +818,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/inventory/warehouses'
     | '/_authenticated/app/maintenance/machines'
     | '/_authenticated/app/maintenance/plans'
+    | '/_authenticated/app/maintenance/runtime'
     | '/_authenticated/app/maintenance/tickets'
     | '/_authenticated/app/procurement/grns'
     | '/_authenticated/app/procurement/indents'
@@ -1200,6 +1213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppMaintenanceTicketsRouteImport
       parentRoute: typeof AuthenticatedAppMaintenanceRoute
     }
+    '/_authenticated/app/maintenance/runtime': {
+      id: '/_authenticated/app/maintenance/runtime'
+      path: '/runtime'
+      fullPath: '/app/maintenance/runtime'
+      preLoaderRoute: typeof AuthenticatedAppMaintenanceRuntimeRouteImport
+      parentRoute: typeof AuthenticatedAppMaintenanceRoute
+    }
     '/_authenticated/app/maintenance/plans': {
       id: '/_authenticated/app/maintenance/plans'
       path: '/plans'
@@ -1407,6 +1427,7 @@ const AuthenticatedAppMaintenanceMachinesRouteWithChildren =
 interface AuthenticatedAppMaintenanceRouteChildren {
   AuthenticatedAppMaintenanceMachinesRoute: typeof AuthenticatedAppMaintenanceMachinesRouteWithChildren
   AuthenticatedAppMaintenancePlansRoute: typeof AuthenticatedAppMaintenancePlansRoute
+  AuthenticatedAppMaintenanceRuntimeRoute: typeof AuthenticatedAppMaintenanceRuntimeRoute
   AuthenticatedAppMaintenanceTicketsRoute: typeof AuthenticatedAppMaintenanceTicketsRoute
   AuthenticatedAppMaintenanceIndexRoute: typeof AuthenticatedAppMaintenanceIndexRoute
 }
@@ -1417,6 +1438,8 @@ const AuthenticatedAppMaintenanceRouteChildren: AuthenticatedAppMaintenanceRoute
       AuthenticatedAppMaintenanceMachinesRouteWithChildren,
     AuthenticatedAppMaintenancePlansRoute:
       AuthenticatedAppMaintenancePlansRoute,
+    AuthenticatedAppMaintenanceRuntimeRoute:
+      AuthenticatedAppMaintenanceRuntimeRoute,
     AuthenticatedAppMaintenanceTicketsRoute:
       AuthenticatedAppMaintenanceTicketsRoute,
     AuthenticatedAppMaintenanceIndexRoute:
