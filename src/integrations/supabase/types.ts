@@ -951,6 +951,116 @@ export type Database = {
           },
         ]
       }
+      machine_downtime_logs: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          downtime_hours: number
+          ended_at: string | null
+          id: string
+          machine_id: string
+          notes: string | null
+          reason: Database["public"]["Enums"]["downtime_reason"]
+          started_at: string
+          ticket_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          downtime_hours?: number
+          ended_at?: string | null
+          id?: string
+          machine_id: string
+          notes?: string | null
+          reason?: Database["public"]["Enums"]["downtime_reason"]
+          started_at?: string
+          ticket_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          downtime_hours?: number
+          ended_at?: string | null
+          id?: string
+          machine_id?: string
+          notes?: string | null
+          reason?: Database["public"]["Enums"]["downtime_reason"]
+          started_at?: string
+          ticket_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "machine_downtime_logs_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "machine_downtime_logs_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      machine_runtime_logs: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          ended_at: string | null
+          id: string
+          machine_id: string
+          notes: string | null
+          operator: string | null
+          runtime_hours: number
+          started_at: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          ended_at?: string | null
+          id?: string
+          machine_id: string
+          notes?: string | null
+          operator?: string | null
+          runtime_hours?: number
+          started_at?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          ended_at?: string | null
+          id?: string
+          machine_id?: string
+          notes?: string | null
+          operator?: string | null
+          runtime_hours?: number
+          started_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "machine_runtime_logs_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       machines: {
         Row: {
           attachment_url: string | null
@@ -1037,6 +1147,149 @@ export type Database = {
           warranty_expiry?: string | null
         }
         Relationships: []
+      }
+      maintenance_plans: {
+        Row: {
+          company_id: string
+          created_at: string
+          default_checklist: Json
+          default_priority: Database["public"]["Enums"]["maintenance_priority"]
+          frequency_days: number
+          id: string
+          is_active: boolean
+          machine_id: string
+          maintenance_type: Database["public"]["Enums"]["maintenance_type"]
+          name: string
+          next_due_date: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          default_checklist?: Json
+          default_priority?: Database["public"]["Enums"]["maintenance_priority"]
+          frequency_days?: number
+          id?: string
+          is_active?: boolean
+          machine_id: string
+          maintenance_type?: Database["public"]["Enums"]["maintenance_type"]
+          name: string
+          next_due_date?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          default_checklist?: Json
+          default_priority?: Database["public"]["Enums"]["maintenance_priority"]
+          frequency_days?: number
+          id?: string
+          is_active?: boolean
+          machine_id?: string
+          maintenance_type?: Database["public"]["Enums"]["maintenance_type"]
+          name?: string
+          next_due_date?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_plans_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_tickets: {
+        Row: {
+          assigned_to: string | null
+          attachments: Json
+          checklist: Json
+          company_id: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          downtime_hours: number
+          id: string
+          labour_hours: number
+          machine_id: string
+          maintenance_type: Database["public"]["Enums"]["maintenance_type"]
+          notes: string | null
+          plan_id: string | null
+          priority: Database["public"]["Enums"]["maintenance_priority"]
+          scheduled_date: string
+          spare_parts: Json
+          started_at: string | null
+          status: Database["public"]["Enums"]["maintenance_status"]
+          ticket_number: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          attachments?: Json
+          checklist?: Json
+          company_id: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          downtime_hours?: number
+          id?: string
+          labour_hours?: number
+          machine_id: string
+          maintenance_type?: Database["public"]["Enums"]["maintenance_type"]
+          notes?: string | null
+          plan_id?: string | null
+          priority?: Database["public"]["Enums"]["maintenance_priority"]
+          scheduled_date?: string
+          spare_parts?: Json
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["maintenance_status"]
+          ticket_number: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          attachments?: Json
+          checklist?: Json
+          company_id?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          downtime_hours?: number
+          id?: string
+          labour_hours?: number
+          machine_id?: string
+          maintenance_type?: Database["public"]["Enums"]["maintenance_type"]
+          notes?: string | null
+          plan_id?: string | null
+          priority?: Database["public"]["Enums"]["maintenance_priority"]
+          scheduled_date?: string
+          spare_parts?: Json
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["maintenance_status"]
+          ticket_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_tickets_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mt_plan_fk"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       material_consumption: {
         Row: {
@@ -2806,6 +3059,10 @@ export type Database = {
         Returns: string
       }
       next_je_number: { Args: { _company_id: string }; Returns: string }
+      next_maintenance_ticket_number: {
+        Args: { _company_id: string }
+        Returns: string
+      }
       next_payroll_number: { Args: { _company_id: string }; Returns: string }
       next_proc_number: {
         Args: { _company_id: string; _prefix: string }
@@ -2890,6 +3147,15 @@ export type Database = {
         | "holiday"
         | "week_off"
       bom_status: "draft" | "active" | "archived"
+      downtime_reason:
+        | "mechanical_failure"
+        | "electrical_failure"
+        | "power_failure"
+        | "material_shortage"
+        | "operator_error"
+        | "scheduled_maintenance"
+        | "qc_hold"
+        | "other"
       employee_status: "active" | "on_leave" | "resigned" | "terminated"
       grn_status: "draft" | "posted" | "cancelled"
       gst_kind: "output" | "input"
@@ -2930,6 +3196,9 @@ export type Database = {
         | "won"
         | "lost"
       machine_status: "running" | "idle" | "under_maintenance" | "breakdown"
+      maintenance_priority: "low" | "medium" | "high" | "critical"
+      maintenance_status: "open" | "in_progress" | "completed" | "delayed"
+      maintenance_type: "preventive" | "breakdown" | "corrective" | "inspection"
       ncr_severity: "minor" | "major" | "critical"
       ncr_status: "open" | "investigating" | "resolved" | "closed"
       payment_method:
@@ -3155,6 +3424,16 @@ export const Constants = {
         "week_off",
       ],
       bom_status: ["draft", "active", "archived"],
+      downtime_reason: [
+        "mechanical_failure",
+        "electrical_failure",
+        "power_failure",
+        "material_shortage",
+        "operator_error",
+        "scheduled_maintenance",
+        "qc_hold",
+        "other",
+      ],
       employee_status: ["active", "on_leave", "resigned", "terminated"],
       grn_status: ["draft", "posted", "cancelled"],
       gst_kind: ["output", "input"],
@@ -3200,6 +3479,9 @@ export const Constants = {
         "lost",
       ],
       machine_status: ["running", "idle", "under_maintenance", "breakdown"],
+      maintenance_priority: ["low", "medium", "high", "critical"],
+      maintenance_status: ["open", "in_progress", "completed", "delayed"],
+      maintenance_type: ["preventive", "breakdown", "corrective", "inspection"],
       ncr_severity: ["minor", "major", "critical"],
       ncr_status: ["open", "investigating", "resolved", "closed"],
       payment_method: [
