@@ -143,9 +143,10 @@ function TicketsPage() {
       spare_parts: form.spare_parts,
       attachments: form.attachments,
     };
+    const row = { ...payload, company_id: company!.id } as never;
     const { error } = editingId
-      ? await supabase.from("maintenance_tickets").update(payload).eq("id", editingId)
-      : await supabase.from("maintenance_tickets").insert({ ...payload, company_id: company!.id });
+      ? await supabase.from("maintenance_tickets").update(payload as never).eq("id", editingId)
+      : await supabase.from("maintenance_tickets").insert(row);
     if (error) { toast.error(error.message); return; }
     toast.success(editingId ? "Ticket updated" : "Ticket created");
     setOpen(false); reset();
