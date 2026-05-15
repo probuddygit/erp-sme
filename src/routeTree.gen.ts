@@ -62,6 +62,7 @@ import { Route as AuthenticatedAppMaintenanceTicketsRouteImport } from './routes
 import { Route as AuthenticatedAppMaintenanceRuntimeRouteImport } from './routes/_authenticated.app.maintenance.runtime'
 import { Route as AuthenticatedAppMaintenancePlansRouteImport } from './routes/_authenticated.app.maintenance.plans'
 import { Route as AuthenticatedAppMaintenanceMachinesRouteImport } from './routes/_authenticated.app.maintenance.machines'
+import { Route as AuthenticatedAppMaintenanceAnalyticsRouteImport } from './routes/_authenticated.app.maintenance.analytics'
 import { Route as AuthenticatedAppInventoryWarehousesRouteImport } from './routes/_authenticated.app.inventory.warehouses'
 import { Route as AuthenticatedAppInventoryMovementsRouteImport } from './routes/_authenticated.app.inventory.movements'
 import { Route as AuthenticatedAppInventoryItemsRouteImport } from './routes/_authenticated.app.inventory.items'
@@ -378,6 +379,12 @@ const AuthenticatedAppMaintenanceMachinesRoute =
     path: '/machines',
     getParentRoute: () => AuthenticatedAppMaintenanceRoute,
   } as any)
+const AuthenticatedAppMaintenanceAnalyticsRoute =
+  AuthenticatedAppMaintenanceAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAppMaintenanceRoute,
+  } as any)
 const AuthenticatedAppInventoryWarehousesRoute =
   AuthenticatedAppInventoryWarehousesRouteImport.update({
     id: '/warehouses',
@@ -493,6 +500,7 @@ export interface FileRoutesByFullPath {
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
+  '/app/maintenance/analytics': typeof AuthenticatedAppMaintenanceAnalyticsRoute
   '/app/maintenance/machines': typeof AuthenticatedAppMaintenanceMachinesRouteWithChildren
   '/app/maintenance/plans': typeof AuthenticatedAppMaintenancePlansRoute
   '/app/maintenance/runtime': typeof AuthenticatedAppMaintenanceRuntimeRoute
@@ -550,6 +558,7 @@ export interface FileRoutesByTo {
   '/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
+  '/app/maintenance/analytics': typeof AuthenticatedAppMaintenanceAnalyticsRoute
   '/app/maintenance/machines': typeof AuthenticatedAppMaintenanceMachinesRouteWithChildren
   '/app/maintenance/plans': typeof AuthenticatedAppMaintenancePlansRoute
   '/app/maintenance/runtime': typeof AuthenticatedAppMaintenanceRuntimeRoute
@@ -620,6 +629,7 @@ export interface FileRoutesById {
   '/_authenticated/app/inventory/items': typeof AuthenticatedAppInventoryItemsRoute
   '/_authenticated/app/inventory/movements': typeof AuthenticatedAppInventoryMovementsRoute
   '/_authenticated/app/inventory/warehouses': typeof AuthenticatedAppInventoryWarehousesRoute
+  '/_authenticated/app/maintenance/analytics': typeof AuthenticatedAppMaintenanceAnalyticsRoute
   '/_authenticated/app/maintenance/machines': typeof AuthenticatedAppMaintenanceMachinesRouteWithChildren
   '/_authenticated/app/maintenance/plans': typeof AuthenticatedAppMaintenancePlansRoute
   '/_authenticated/app/maintenance/runtime': typeof AuthenticatedAppMaintenanceRuntimeRoute
@@ -690,6 +700,7 @@ export interface FileRouteTypes {
     | '/app/inventory/items'
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
+    | '/app/maintenance/analytics'
     | '/app/maintenance/machines'
     | '/app/maintenance/plans'
     | '/app/maintenance/runtime'
@@ -747,6 +758,7 @@ export interface FileRouteTypes {
     | '/app/inventory/items'
     | '/app/inventory/movements'
     | '/app/inventory/warehouses'
+    | '/app/maintenance/analytics'
     | '/app/maintenance/machines'
     | '/app/maintenance/plans'
     | '/app/maintenance/runtime'
@@ -816,6 +828,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/inventory/items'
     | '/_authenticated/app/inventory/movements'
     | '/_authenticated/app/inventory/warehouses'
+    | '/_authenticated/app/maintenance/analytics'
     | '/_authenticated/app/maintenance/machines'
     | '/_authenticated/app/maintenance/plans'
     | '/_authenticated/app/maintenance/runtime'
@@ -1234,6 +1247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppMaintenanceMachinesRouteImport
       parentRoute: typeof AuthenticatedAppMaintenanceRoute
     }
+    '/_authenticated/app/maintenance/analytics': {
+      id: '/_authenticated/app/maintenance/analytics'
+      path: '/analytics'
+      fullPath: '/app/maintenance/analytics'
+      preLoaderRoute: typeof AuthenticatedAppMaintenanceAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAppMaintenanceRoute
+    }
     '/_authenticated/app/inventory/warehouses': {
       id: '/_authenticated/app/inventory/warehouses'
       path: '/warehouses'
@@ -1425,6 +1445,7 @@ const AuthenticatedAppMaintenanceMachinesRouteWithChildren =
   )
 
 interface AuthenticatedAppMaintenanceRouteChildren {
+  AuthenticatedAppMaintenanceAnalyticsRoute: typeof AuthenticatedAppMaintenanceAnalyticsRoute
   AuthenticatedAppMaintenanceMachinesRoute: typeof AuthenticatedAppMaintenanceMachinesRouteWithChildren
   AuthenticatedAppMaintenancePlansRoute: typeof AuthenticatedAppMaintenancePlansRoute
   AuthenticatedAppMaintenanceRuntimeRoute: typeof AuthenticatedAppMaintenanceRuntimeRoute
@@ -1434,6 +1455,8 @@ interface AuthenticatedAppMaintenanceRouteChildren {
 
 const AuthenticatedAppMaintenanceRouteChildren: AuthenticatedAppMaintenanceRouteChildren =
   {
+    AuthenticatedAppMaintenanceAnalyticsRoute:
+      AuthenticatedAppMaintenanceAnalyticsRoute,
     AuthenticatedAppMaintenanceMachinesRoute:
       AuthenticatedAppMaintenanceMachinesRouteWithChildren,
     AuthenticatedAppMaintenancePlansRoute:
