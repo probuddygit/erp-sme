@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
-import { Lock, Wrench, LayoutDashboard, HardDrive } from "lucide-react";
+import { Lock, Wrench, LayoutDashboard, HardDrive, ClipboardList, CalendarClock, Activity, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +12,10 @@ type Tab = { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
 const TABS: Tab[] = [
   { to: "/app/maintenance", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/app/maintenance/machines", label: "Machines", icon: HardDrive },
+  { to: "/app/maintenance/tickets", label: "Tickets", icon: ClipboardList },
+  { to: "/app/maintenance/plans", label: "Schedules", icon: CalendarClock },
+  { to: "/app/maintenance/runtime", label: "Runtime & Downtime", icon: Activity },
+  { to: "/app/maintenance/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
 function MaintenanceLayout() {
