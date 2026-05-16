@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
-import { Lock, Wrench, LayoutDashboard, HardDrive, ClipboardList, CalendarClock, Activity, BarChart3 } from "lucide-react";
+import { Lock, Wrench, LayoutDashboard, HardDrive, ClipboardList, CalendarClock, Activity, BarChart3, Bell, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +15,8 @@ const TABS: Tab[] = [
   { to: "/app/maintenance/tickets", label: "Tickets", icon: ClipboardList },
   { to: "/app/maintenance/plans", label: "Schedules", icon: CalendarClock },
   { to: "/app/maintenance/runtime", label: "Runtime & Downtime", icon: Activity },
+  { to: "/app/maintenance/spares", label: "Spare Parts", icon: Package },
+  { to: "/app/maintenance/alerts", label: "Alerts", icon: Bell },
   { to: "/app/maintenance/analytics", label: "Analytics", icon: BarChart3 },
 ];
 

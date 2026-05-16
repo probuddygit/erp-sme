@@ -14,6 +14,85 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          category: Database["public"]["Enums"]["alert_category"]
+          channels_sent: Json
+          company_id: string
+          created_at: string
+          id: string
+          item_id: string | null
+          machine_id: string | null
+          message: string | null
+          resolved_at: string | null
+          severity: Database["public"]["Enums"]["alert_severity"]
+          status: Database["public"]["Enums"]["alert_status"]
+          ticket_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          category?: Database["public"]["Enums"]["alert_category"]
+          channels_sent?: Json
+          company_id: string
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          machine_id?: string | null
+          message?: string | null
+          resolved_at?: string | null
+          severity?: Database["public"]["Enums"]["alert_severity"]
+          status?: Database["public"]["Enums"]["alert_status"]
+          ticket_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          category?: Database["public"]["Enums"]["alert_category"]
+          channels_sent?: Json
+          company_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          machine_id?: string | null
+          message?: string | null
+          resolved_at?: string | null
+          severity?: Database["public"]["Enums"]["alert_severity"]
+          status?: Database["public"]["Enums"]["alert_status"]
+          ticket_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           attendance_date: string
@@ -1061,6 +1140,51 @@ export type Database = {
           },
         ]
       }
+      machine_spare_parts: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          item_id: string
+          machine_id: string
+          notes: string | null
+          reorder_level: number | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          item_id: string
+          machine_id: string
+          notes?: string | null
+          reorder_level?: number | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          machine_id?: string
+          notes?: string | null
+          reorder_level?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "machine_spare_parts_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "machine_spare_parts_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       machines: {
         Row: {
           attachment_url: string | null
@@ -1200,6 +1324,73 @@ export type Database = {
             columns: ["machine_id"]
             isOneToOne: false
             referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_spare_usage: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          item_id: string
+          machine_id: string | null
+          notes: string | null
+          quantity: number
+          ticket_id: string | null
+          unit_cost: number
+          used_at: string
+          warehouse_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_id: string
+          machine_id?: string | null
+          notes?: string | null
+          quantity: number
+          ticket_id?: string | null
+          unit_cost?: number
+          used_at?: string
+          warehouse_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_id?: string
+          machine_id?: string | null
+          notes?: string | null
+          quantity?: number
+          ticket_id?: string | null
+          unit_cost?: number
+          used_at?: string
+          warehouse_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_spare_usage_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_spare_usage_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_spare_usage_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_tickets"
             referencedColumns: ["id"]
           },
         ]
@@ -1444,6 +1635,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_preferences: {
+        Row: {
+          company_id: string
+          email_enabled: boolean
+          min_severity: Database["public"]["Enums"]["alert_severity"]
+          updated_at: string
+          user_id: string
+          whatsapp_enabled: boolean
+          whatsapp_number: string | null
+        }
+        Insert: {
+          company_id: string
+          email_enabled?: boolean
+          min_severity?: Database["public"]["Enums"]["alert_severity"]
+          updated_at?: string
+          user_id: string
+          whatsapp_enabled?: boolean
+          whatsapp_number?: string | null
+        }
+        Update: {
+          company_id?: string
+          email_enabled?: boolean
+          min_severity?: Database["public"]["Enums"]["alert_severity"]
+          updated_at?: string
+          user_id?: string
+          whatsapp_enabled?: boolean
+          whatsapp_number?: string | null
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -3119,6 +3340,16 @@ export type Database = {
     }
     Enums: {
       account_type: "asset" | "liability" | "equity" | "revenue" | "expense"
+      alert_category:
+        | "maintenance_due"
+        | "runtime_threshold"
+        | "breakdown"
+        | "excess_downtime"
+        | "delayed_maintenance"
+        | "low_stock"
+        | "other"
+      alert_severity: "info" | "warning" | "critical"
+      alert_status: "active" | "acknowledged" | "resolved" | "dismissed"
       app_module:
         | "sales"
         | "procurement"
@@ -3393,6 +3624,17 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["asset", "liability", "equity", "revenue", "expense"],
+      alert_category: [
+        "maintenance_due",
+        "runtime_threshold",
+        "breakdown",
+        "excess_downtime",
+        "delayed_maintenance",
+        "low_stock",
+        "other",
+      ],
+      alert_severity: ["info", "warning", "critical"],
+      alert_status: ["active", "acknowledged", "resolved", "dismissed"],
       app_module: [
         "sales",
         "procurement",
