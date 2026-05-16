@@ -108,8 +108,16 @@ function AlertsPage() {
   }, [alerts]);
 
   const setStatus = async (id: string, status: Status) => {
-    const patch: Record<string, unknown> = { status };
-    if (status === "acknowledged") { patch.acknowledged_by = user?.id ?? null; patch.acknowledged_at = new Date().toISOString(); }
+    const patch: {
+      status: Status;
+      acknowledged_by?: string | null;
+      acknowledged_at?: string | null;
+      resolved_at?: string | null;
+    } = { status };
+    if (status === "acknowledged") {
+      patch.acknowledged_by = user?.id ?? null;
+      patch.acknowledged_at = new Date().toISOString();
+    }
     if (status === "resolved") patch.resolved_at = new Date().toISOString();
     const { error } = await supabase.from("alerts").update(patch).eq("id", id);
     if (error) { toast.error(error.message); return; }
