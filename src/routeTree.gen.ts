@@ -39,10 +39,12 @@ import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
 import { Route as AuthenticatedAppSalesReturnsRouteImport } from './routes/_authenticated.app.sales.returns'
+import { Route as AuthenticatedAppSalesRecurringRouteImport } from './routes/_authenticated.app.sales.recurring'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
 import { Route as AuthenticatedAppSalesPipelineRouteImport } from './routes/_authenticated.app.sales.pipeline'
 import { Route as AuthenticatedAppSalesOrdersRouteImport } from './routes/_authenticated.app.sales.orders'
 import { Route as AuthenticatedAppSalesInvoicesRouteImport } from './routes/_authenticated.app.sales.invoices'
+import { Route as AuthenticatedAppSalesDeliveriesRouteImport } from './routes/_authenticated.app.sales.deliveries'
 import { Route as AuthenticatedAppSalesCustomersRouteImport } from './routes/_authenticated.app.sales.customers'
 import { Route as AuthenticatedAppReportsSalesRouteImport } from './routes/_authenticated.app.reports.sales'
 import { Route as AuthenticatedAppReportsProcurementRouteImport } from './routes/_authenticated.app.reports.procurement'
@@ -244,6 +246,12 @@ const AuthenticatedAppSalesReturnsRoute =
     path: '/returns',
     getParentRoute: () => AuthenticatedAppSalesRoute,
   } as any)
+const AuthenticatedAppSalesRecurringRoute =
+  AuthenticatedAppSalesRecurringRouteImport.update({
+    id: '/recurring',
+    path: '/recurring',
+    getParentRoute: () => AuthenticatedAppSalesRoute,
+  } as any)
 const AuthenticatedAppSalesQuotationsRoute =
   AuthenticatedAppSalesQuotationsRouteImport.update({
     id: '/quotations',
@@ -266,6 +274,12 @@ const AuthenticatedAppSalesInvoicesRoute =
   AuthenticatedAppSalesInvoicesRouteImport.update({
     id: '/invoices',
     path: '/invoices',
+    getParentRoute: () => AuthenticatedAppSalesRoute,
+  } as any)
+const AuthenticatedAppSalesDeliveriesRoute =
+  AuthenticatedAppSalesDeliveriesRouteImport.update({
+    id: '/deliveries',
+    path: '/deliveries',
     getParentRoute: () => AuthenticatedAppSalesRoute,
   } as any)
 const AuthenticatedAppSalesCustomersRoute =
@@ -544,10 +558,12 @@ export interface FileRoutesByFullPath {
   '/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/app/sales/deliveries': typeof AuthenticatedAppSalesDeliveriesRoute
   '/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -605,10 +621,12 @@ export interface FileRoutesByTo {
   '/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
   '/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/app/sales/deliveries': typeof AuthenticatedAppSalesDeliveriesRoute
   '/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
@@ -679,10 +697,12 @@ export interface FileRoutesById {
   '/_authenticated/app/reports/procurement': typeof AuthenticatedAppReportsProcurementRoute
   '/_authenticated/app/reports/sales': typeof AuthenticatedAppReportsSalesRoute
   '/_authenticated/app/sales/customers': typeof AuthenticatedAppSalesCustomersRoute
+  '/_authenticated/app/sales/deliveries': typeof AuthenticatedAppSalesDeliveriesRoute
   '/_authenticated/app/sales/invoices': typeof AuthenticatedAppSalesInvoicesRoute
   '/_authenticated/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/_authenticated/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/_authenticated/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/_authenticated/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -753,10 +773,12 @@ export interface FileRouteTypes {
     | '/app/reports/procurement'
     | '/app/reports/sales'
     | '/app/sales/customers'
+    | '/app/sales/deliveries'
     | '/app/sales/invoices'
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
+    | '/app/sales/recurring'
     | '/app/sales/returns'
     | '/app/finance/'
     | '/app/hr/'
@@ -814,10 +836,12 @@ export interface FileRouteTypes {
     | '/app/reports/procurement'
     | '/app/reports/sales'
     | '/app/sales/customers'
+    | '/app/sales/deliveries'
     | '/app/sales/invoices'
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
+    | '/app/sales/recurring'
     | '/app/sales/returns'
     | '/app/finance'
     | '/app/hr'
@@ -887,10 +911,12 @@ export interface FileRouteTypes {
     | '/_authenticated/app/reports/procurement'
     | '/_authenticated/app/reports/sales'
     | '/_authenticated/app/sales/customers'
+    | '/_authenticated/app/sales/deliveries'
     | '/_authenticated/app/sales/invoices'
     | '/_authenticated/app/sales/orders'
     | '/_authenticated/app/sales/pipeline'
     | '/_authenticated/app/sales/quotations'
+    | '/_authenticated/app/sales/recurring'
     | '/_authenticated/app/sales/returns'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
@@ -1125,6 +1151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSalesReturnsRouteImport
       parentRoute: typeof AuthenticatedAppSalesRoute
     }
+    '/_authenticated/app/sales/recurring': {
+      id: '/_authenticated/app/sales/recurring'
+      path: '/recurring'
+      fullPath: '/app/sales/recurring'
+      preLoaderRoute: typeof AuthenticatedAppSalesRecurringRouteImport
+      parentRoute: typeof AuthenticatedAppSalesRoute
+    }
     '/_authenticated/app/sales/quotations': {
       id: '/_authenticated/app/sales/quotations'
       path: '/quotations'
@@ -1151,6 +1184,13 @@ declare module '@tanstack/react-router' {
       path: '/invoices'
       fullPath: '/app/sales/invoices'
       preLoaderRoute: typeof AuthenticatedAppSalesInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAppSalesRoute
+    }
+    '/_authenticated/app/sales/deliveries': {
+      id: '/_authenticated/app/sales/deliveries'
+      path: '/deliveries'
+      fullPath: '/app/sales/deliveries'
+      preLoaderRoute: typeof AuthenticatedAppSalesDeliveriesRouteImport
       parentRoute: typeof AuthenticatedAppSalesRoute
     }
     '/_authenticated/app/sales/customers': {
@@ -1684,20 +1724,24 @@ const AuthenticatedAppReportsRouteWithChildren =
 
 interface AuthenticatedAppSalesRouteChildren {
   AuthenticatedAppSalesCustomersRoute: typeof AuthenticatedAppSalesCustomersRoute
+  AuthenticatedAppSalesDeliveriesRoute: typeof AuthenticatedAppSalesDeliveriesRoute
   AuthenticatedAppSalesInvoicesRoute: typeof AuthenticatedAppSalesInvoicesRoute
   AuthenticatedAppSalesOrdersRoute: typeof AuthenticatedAppSalesOrdersRoute
   AuthenticatedAppSalesPipelineRoute: typeof AuthenticatedAppSalesPipelineRoute
   AuthenticatedAppSalesQuotationsRoute: typeof AuthenticatedAppSalesQuotationsRoute
+  AuthenticatedAppSalesRecurringRoute: typeof AuthenticatedAppSalesRecurringRoute
   AuthenticatedAppSalesReturnsRoute: typeof AuthenticatedAppSalesReturnsRoute
   AuthenticatedAppSalesIndexRoute: typeof AuthenticatedAppSalesIndexRoute
 }
 
 const AuthenticatedAppSalesRouteChildren: AuthenticatedAppSalesRouteChildren = {
   AuthenticatedAppSalesCustomersRoute: AuthenticatedAppSalesCustomersRoute,
+  AuthenticatedAppSalesDeliveriesRoute: AuthenticatedAppSalesDeliveriesRoute,
   AuthenticatedAppSalesInvoicesRoute: AuthenticatedAppSalesInvoicesRoute,
   AuthenticatedAppSalesOrdersRoute: AuthenticatedAppSalesOrdersRoute,
   AuthenticatedAppSalesPipelineRoute: AuthenticatedAppSalesPipelineRoute,
   AuthenticatedAppSalesQuotationsRoute: AuthenticatedAppSalesQuotationsRoute,
+  AuthenticatedAppSalesRecurringRoute: AuthenticatedAppSalesRecurringRoute,
   AuthenticatedAppSalesReturnsRoute: AuthenticatedAppSalesReturnsRoute,
   AuthenticatedAppSalesIndexRoute: AuthenticatedAppSalesIndexRoute,
 }
