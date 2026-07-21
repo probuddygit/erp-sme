@@ -48,7 +48,7 @@ function RegisterPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight">Create your organization</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Start a workspace on Forge ERP.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Start a workspace on Ind Guru ERP.</p>
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>

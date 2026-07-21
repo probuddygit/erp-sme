@@ -40,7 +40,7 @@ export function SideNav({ open, onClose }: Props) {
           </div>
           <div>
             <div className="text-sm font-semibold tracking-tight text-sidebar-foreground">
-              Forge ERP
+              Ind Guru ERP
             </div>
             <div className="text-[10px] uppercase tracking-wider text-sidebar-foreground/60">
               MSME Cloud
