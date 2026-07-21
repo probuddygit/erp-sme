@@ -56,7 +56,8 @@ const PAGE_SIZE = 20;
 export function MasterDataTable({ master }: Props) {
   const { company, hasRole, isCompanyAdmin, user } = useAuth();
   const qc = useQueryClient();
-  const canEdit = isCompanyAdmin || (master.editorRoles ?? []).some((r) => hasRole(r));
+  const canEdit =
+    isCompanyAdmin || (master.editorRoles ?? []).some((r) => hasRole(r as never));
 
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
@@ -364,7 +365,7 @@ function MasterFormDialog({
     if (initial) {
       res = await supabase.from(master.table as never).update(payload as never).eq("id", initial.id).select("*").single();
     } else {
-      const insertPayload = { ...payload, company_id: company.id };
+      const insertPayload: Record<string, unknown> = { ...payload, company_id: company.id };
       if (master.table === "customers" || master.table === "suppliers") insertPayload.created_by = user?.id;
       res = await supabase.from(master.table as never).insert(insertPayload as never).select("*").single();
     }
