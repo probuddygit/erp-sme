@@ -21,7 +21,7 @@ function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: isSuperAdmin ? "/admin" : "/app" });
+    if (!loading && user) navigate({ to: isSuperAdmin ? "/admin" : "/workspace" });
   }, [user, loading, isSuperAdmin, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {

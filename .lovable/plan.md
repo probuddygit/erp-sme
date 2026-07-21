@@ -1,128 +1,76 @@
+# Platform Revamp — Scaffold Only (No Business Logic)
 
-# ERP Platform Revamp — Audit & Roadmap
+Reshape the existing ERP into a modern SAP Fiori / Zoho-inspired shell for Indian MSME Trading & Distribution. This pass is **architecture, navigation, layout, auth/RBAC, empty pages, shared components, and theme** only — no CRUD logic, no data fetching in module pages.
 
-## Part 1 — Current State (What's Implemented)
+## Scope guardrails
+- Keep existing DB, auth-context, RLS, and Supabase integration intact.
+- Existing feature routes (`/app/*` sales/procurement/etc.) remain functional — we do **not** delete them. New scaffold lives alongside as the new primary shell.
+- No new business logic. New module pages render an `<EmptyModule />` placeholder.
 
-### Platform Foundation
-- Multi-tenant SaaS with `companies`, per-company module toggles (`enabled_modules`), role-based access (`user_roles`), Super Admin + Company Admin hierarchy
-- Auth via Lovable Cloud (Supabase), RLS on every table, security-hardened helper functions
-- TanStack Start SSR shell, sidebar navigation (`AppShell`), module-gated routes under `/_authenticated/app/*`
+## 1. Design system refresh (`src/styles.css`)
+- White background, blue primary (`hsl(217 91% 60%)` family), neutral grays, subtle borders.
+- Fiori-inspired: flat surfaces, rounded-lg cards, soft shadows, generous spacing.
+- Typography: Inter via `<link>` in `__root.tsx` head.
+- Update semantic tokens: `--background`, `--primary`, `--sidebar-*`, `--accent`, radius `0.75rem`.
 
-### Modules & Features
+## 2. Folder structure (DDD-lite)
+```
+src/
+  modules/
+    dashboard/    pages/  components/  index.ts
+    crm/          pages/  components/  index.ts
+    sales/        pages/  components/  index.ts
+    procurement/  ...
+    inventory/    ...
+    finance/      ...
+    gst/          ...
+    reports/      ...
+    workflow/     ...
+    administration/ ...
+  shared/
+    components/   (PageHeader, EmptyModule, StatCard, DataCard, ModuleGrid, Breadcrumbs)
+    layout/       (AppLayout, TopBar, SideNav, MobileNav)
+    hooks/
+    types/
+  lib/            (existing: auth-context, utils)
+```
+Existing `src/components/ui/*` (shadcn) stays.
 
-**1. Sales & CRM** (`/app/sales`)
-- Pipeline (Leads), Customers, Quotations, Sales Orders, Invoices
-- Line-item editor, status workflows, CRUD with row actions
+## 3. Routing (new shell under `/workspace`)
+New pathless layout `src/routes/_authenticated.workspace.tsx` renders the new `AppLayout`. Module index routes:
+- `/workspace` → Dashboard
+- `/workspace/crm`
+- `/workspace/sales`
+- `/workspace/procurement`
+- `/workspace/inventory`
+- `/workspace/finance`
+- `/workspace/gst`
+- `/workspace/reports`
+- `/workspace/workflow`
+- `/workspace/administration`
 
-**2. Procurement** (`/app/procurement`)
-- Suppliers, Purchase Indents, RFQs (with supplier quotes), Purchase Orders (+ detail page), GRNs, Vendor Invoices
-- Status-gated deletes, PO → GRN → invoice flow
+Each page renders `<EmptyModule title="..." description="..." />`. Existing `/app/*` routes are untouched.
 
-**3. Inventory** (`/app/inventory`)
-- Items master, Warehouses, Stock Movements (audit trail), stock batches
-- CRUD on masters; movements immutable
+## 4. Shared layout components
+- **`AppLayout`** — TopBar + collapsible SideNav + main content, mobile-first drawer.
+- **`TopBar`** — logo, company/branch/FY switcher (visual only), global search input (non-functional), notifications icon, user menu with sign-out.
+- **`SideNav`** — icon+label modules, active state, role-gated visibility via `useAuth`. Collapsible to icon rail on desktop.
+- **`MobileNav`** — bottom tab bar for top 5 modules on small screens.
+- **`PageHeader`** — title, subtitle, breadcrumbs, actions slot.
+- **`EmptyModule`** — icon, title, description, "Coming soon" chip.
+- **`StatCard`**, **`DataCard`**, **`ModuleGrid`** — reusable primitives.
 
-**4. Production** (`/app/production`)
-- Bills of Materials (+ components), Work Orders (+ detail), Timeline view
-- Material consumption + production output tracking
+## 5. RBAC scaffold
+Extend `auth-context` role → module map to cover new modules (`crm`, `gst`, `workflow`, `administration`). No DB changes. `SideNav` filters by `canAccessModule`. Non-accessible modules hidden, not disabled.
 
-**5. Finance & Accounting** (`/app/finance`)
-- Chart of Accounts, Journal Entries + Lines, GST Ledger, P&L / Balance Sheet reports
-- Auto-posting triggers from invoices/payroll, `account_balances` RPC
+## 6. Auth
+Reuse existing `_authenticated` gate and login route. Redirect authenticated users landing on `/` to `/workspace` (keep existing dashboard `/app` as legacy alias).
 
-**6. HR & Payroll** (`/app/hr`)
-- Employees, Attendance, Salary Structures, Payroll Runs & Items
-- Restricted PII access (admin/hr only)
+## 7. Not in scope this pass
+- No new DB migrations.
+- No CRUD, no forms, no data fetching in new module pages.
+- Legacy `/app/*` UI stays as-is (can be migrated module by module in follow-ups).
+- Approvals, audit logs, branches, FY switching — UI affordances only (dropdowns render static options), no persistence.
 
-**7. Quality** (`/app/quality`)
-- QC Inspections (incoming/in-process/finished) with checklists, NCR records, reports
-
-**8. Smart Maintenance** (`/app/maintenance`)
-- Machines master, Tickets (kanban+calendar), Preventive Plans, Runtime/Downtime logs
-- Spare parts linkage, Alerts engine, Analytics (Utilization, MTBF, MTTR)
-
-**9. Reports** (`/app/reports`)
-- Executive dashboard, Sales analytics, Procurement, Inventory reports
-
-**10. Admin** (`/admin`)
-- Companies provisioning, Users & Roles management
-
----
-
-## Part 2 — Gaps & Refinement Opportunities
-
-### Cross-cutting gaps
-- No **document/file storage** (attachments on POs, invoices, QC certs, machine manuals)
-- No **email/PDF generation** (invoices, POs, quotations aren't sendable/printable)
-- No **approval workflows** (PO approval matrix, leave approval, JE posting approval)
-- No **audit log** of who changed what
-- No **global search** across entities
-- No **dashboards per role** (only one executive view)
-- No **import/export** (CSV/Excel) for master data
-- No **notifications delivery** (alerts exist but no email/in-app toast pipeline)
-- Limited **mobile responsiveness** review
-
-### Module-level refinements
-- **Sales**: credit limits, recurring invoices, dispatch/delivery notes, sales returns, commission tracking
-- **Procurement**: 3-way match (PO/GRN/Invoice), landed cost, supplier scorecards, contract mgmt
-- **Inventory**: multi-UOM conversions, serial/batch traceability UI, cycle counts, reorder point automation, stock valuation (FIFO/weighted avg) reports
-- **Production**: capacity planning, shop-floor operator terminal, routing/operations, scrap tracking, MRP run
-- **Finance**: bank reconciliation, cash flow statement, budgets vs actuals, fixed asset register + depreciation, TDS, e-invoicing/e-way bill (India)
-- **HR**: leave management, shift scheduling, appraisals, expense claims, loans/advances, statutory reports (PF/ESI/PT)
-- **Quality**: CAPA workflow, supplier quality (incoming reject trends), calibration register
-- **Maintenance**: work-order labour cost → finance JE, condition-based/IoT sensor hooks, predictive ML scoring (already envisioned)
-- **Reports**: custom report builder, scheduled email reports, drill-through
-
-### Technical refinements
-- Consolidate duplicated layout/tab code across module `*.tsx` layout files into a shared component
-- Introduce a **notification center** (in-app toasts + email via edge/server fn) driven by `alerts`
-- **PDF service** (server function → HTML template → PDF) for invoices/POs/quotations
-- **Storage buckets** wired to attachment fields
-- **Query performance** review (indexes on frequently-filtered columns: company_id + status combos)
-- **Consistent status enums** and reusable status-badge component
-- **Form UX**: replace ad-hoc dialogs with a shared record drawer/side-sheet pattern
-- **Empty states, skeleton loaders, error boundaries** standardized
-
----
-
-## Part 3 — Proposed Revamp Roadmap (Phased)
-
-### Phase A — Platform polish & cross-cutting foundations
-1. Shared **module layout** component + reusable **StatusBadge**, **RecordDrawer**, **DataTable** primitives
-2. **Attachments/storage** infrastructure (bucket + reusable uploader)
-3. **PDF generation** server function + templates for invoice/PO/quotation
-4. **Notification center** UI + email delivery for `alerts`
-5. **Global search** command palette (Cmd+K)
-6. **Audit log** table + triggers on critical entities
-7. **CSV import/export** utility for masters
-
-### Phase B — Sales/Procurement/Inventory depth
-8. Approval workflows (PO matrix, credit-limit override)
-9. Sales returns, delivery notes, recurring invoices
-10. 3-way match, supplier scorecards
-11. Serial/batch traceability UI, cycle counts, reorder automation, valuation reports
-
-### Phase C — Finance maturity
-12. Bank reconciliation, cash flow, budgets
-13. Fixed assets + depreciation
-14. TDS, e-invoicing, e-way bill (India localization)
-
-### Phase D — Production & HR depth
-15. Capacity planning, shop-floor terminal, MRP
-16. Leave/shift/expense/appraisal modules, statutory reports
-
-### Phase E — Quality/Maintenance/Analytics
-17. CAPA, supplier quality, calibration
-18. Maintenance labour → finance posting, IoT sensor ingest, predictive scoring
-19. Report builder + scheduled reports; role-based dashboards
-
----
-
-## Questions Before I Start Phase A
-
-1. **Priority order** — do you want to follow A→E, or jump to a specific module (e.g., Finance localization or Production shop-floor first)?
-2. **Localization scope** — Is India-only (GST, TDS, e-invoice) sufficient, or multi-country?
-3. **PDF/email** — OK to use Lovable AI Gateway + a server-side PDF library, and add an email provider connector (Resend) for outbound?
-4. **Approvals** — should approvals be a generic engine (reusable across modules) or hard-coded per module?
-
-Reply with priorities/answers and I'll produce a detailed Phase A build plan.
+## Deliverable
+User navigates to `/workspace`, sees Fiori-style shell, can click through 10 modules, each showing a polished empty state. Role-based nav filtering works. Existing app continues to function.

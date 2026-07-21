@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Cog, Factory, ShieldCheck, Layers, ArrowRight } from "lucide-react";
 
@@ -8,6 +9,15 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { user, loading, isSuperAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate({ to: isSuperAdmin ? "/admin" : "/workspace" });
+    }
+  }, [user, loading, isSuperAdmin, navigate]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
