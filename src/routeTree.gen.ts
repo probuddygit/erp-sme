@@ -39,6 +39,7 @@ import { Route as AuthenticatedWorkspaceMastersRouteImport } from './routes/_aut
 import { Route as AuthenticatedWorkspaceInventoryRouteImport } from './routes/_authenticated.workspace.inventory'
 import { Route as AuthenticatedWorkspaceGstRouteImport } from './routes/_authenticated.workspace.gst'
 import { Route as AuthenticatedWorkspaceFinanceRouteImport } from './routes/_authenticated.workspace.finance'
+import { Route as AuthenticatedWorkspaceCrmRouteImport } from './routes/_authenticated.workspace.crm'
 import { Route as AuthenticatedWorkspaceAdministrationRouteImport } from './routes/_authenticated.workspace.administration'
 import { Route as AuthenticatedAppUsersRouteImport } from './routes/_authenticated.app.users'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated.app.settings'
@@ -54,6 +55,7 @@ import { Route as AuthenticatedAppFinanceRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedWorkspaceMastersIndexRouteImport } from './routes/_authenticated.workspace.masters.index'
+import { Route as AuthenticatedWorkspaceCrmIndexRouteImport } from './routes/_authenticated.workspace.crm.index'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
 import { Route as AuthenticatedAppReportsIndexRouteImport } from './routes/_authenticated.app.reports.index'
 import { Route as AuthenticatedAppQualityIndexRouteImport } from './routes/_authenticated.app.quality.index'
@@ -268,6 +270,12 @@ const AuthenticatedWorkspaceFinanceRoute =
     path: '/finance',
     getParentRoute: () => AuthenticatedWorkspaceRoute,
   } as any)
+const AuthenticatedWorkspaceCrmRoute =
+  AuthenticatedWorkspaceCrmRouteImport.update({
+    id: '/crm',
+    path: '/crm',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
 const AuthenticatedWorkspaceAdministrationRoute =
   AuthenticatedWorkspaceAdministrationRouteImport.update({
     id: '/administration',
@@ -349,6 +357,12 @@ const AuthenticatedWorkspaceMastersIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedWorkspaceMastersRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmIndexRoute =
+  AuthenticatedWorkspaceCrmIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
   } as any)
 const AuthenticatedAppSalesIndexRoute =
   AuthenticatedAppSalesIndexRouteImport.update({
@@ -707,6 +721,7 @@ export interface FileRoutesByFullPath {
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
+  '/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
   '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRoute
@@ -768,6 +783,7 @@ export interface FileRoutesByFullPath {
   '/app/quality/': typeof AuthenticatedAppQualityIndexRoute
   '/app/reports/': typeof AuthenticatedAppReportsIndexRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/workspace/crm/': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
@@ -855,6 +871,7 @@ export interface FileRoutesByTo {
   '/app/quality': typeof AuthenticatedAppQualityIndexRoute
   '/app/reports': typeof AuthenticatedAppReportsIndexRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
+  '/workspace/crm': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/workspace/masters': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
@@ -896,6 +913,7 @@ export interface FileRoutesById {
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRoute
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
   '/_authenticated/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
+  '/_authenticated/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
   '/_authenticated/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/_authenticated/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/_authenticated/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRoute
@@ -957,6 +975,7 @@ export interface FileRoutesById {
   '/_authenticated/app/quality/': typeof AuthenticatedAppQualityIndexRoute
   '/_authenticated/app/reports/': typeof AuthenticatedAppReportsIndexRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/_authenticated/workspace/crm/': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/_authenticated/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/_authenticated/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/_authenticated/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
@@ -998,6 +1017,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/users'
     | '/workspace/administration'
+    | '/workspace/crm'
     | '/workspace/finance'
     | '/workspace/gst'
     | '/workspace/inventory'
@@ -1059,6 +1079,7 @@ export interface FileRouteTypes {
     | '/app/quality/'
     | '/app/reports/'
     | '/app/sales/'
+    | '/workspace/crm/'
     | '/workspace/masters/'
     | '/app/maintenance/machines/$id'
     | '/app/procurement/purchase-orders/$id'
@@ -1146,6 +1167,7 @@ export interface FileRouteTypes {
     | '/app/quality'
     | '/app/reports'
     | '/app/sales'
+    | '/workspace/crm'
     | '/workspace/masters'
     | '/app/maintenance/machines/$id'
     | '/app/procurement/purchase-orders/$id'
@@ -1186,6 +1208,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/settings'
     | '/_authenticated/app/users'
     | '/_authenticated/workspace/administration'
+    | '/_authenticated/workspace/crm'
     | '/_authenticated/workspace/finance'
     | '/_authenticated/workspace/gst'
     | '/_authenticated/workspace/inventory'
@@ -1247,6 +1270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/quality/'
     | '/_authenticated/app/reports/'
     | '/_authenticated/app/sales/'
+    | '/_authenticated/workspace/crm/'
     | '/_authenticated/workspace/masters/'
     | '/_authenticated/app/maintenance/machines/$id'
     | '/_authenticated/app/procurement/purchase-orders/$id'
@@ -1474,6 +1498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceFinanceRouteImport
       parentRoute: typeof AuthenticatedWorkspaceRoute
     }
+    '/_authenticated/workspace/crm': {
+      id: '/_authenticated/workspace/crm'
+      path: '/crm'
+      fullPath: '/workspace/crm'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
     '/_authenticated/workspace/administration': {
       id: '/_authenticated/workspace/administration'
       path: '/administration'
@@ -1578,6 +1609,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/masters/'
       preLoaderRoute: typeof AuthenticatedWorkspaceMastersIndexRouteImport
       parentRoute: typeof AuthenticatedWorkspaceMastersRoute
+    }
+    '/_authenticated/workspace/crm/': {
+      id: '/_authenticated/workspace/crm/'
+      path: '/'
+      fullPath: '/workspace/crm/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
     }
     '/_authenticated/app/sales/': {
       id: '/_authenticated/app/sales/'
@@ -2293,6 +2331,20 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
 const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
+interface AuthenticatedWorkspaceCrmRouteChildren {
+  AuthenticatedWorkspaceCrmIndexRoute: typeof AuthenticatedWorkspaceCrmIndexRoute
+}
+
+const AuthenticatedWorkspaceCrmRouteChildren: AuthenticatedWorkspaceCrmRouteChildren =
+  {
+    AuthenticatedWorkspaceCrmIndexRoute: AuthenticatedWorkspaceCrmIndexRoute,
+  }
+
+const AuthenticatedWorkspaceCrmRouteWithChildren =
+  AuthenticatedWorkspaceCrmRoute._addFileChildren(
+    AuthenticatedWorkspaceCrmRouteChildren,
+  )
+
 interface AuthenticatedWorkspaceMastersRouteChildren {
   AuthenticatedWorkspaceMastersMasterRoute: typeof AuthenticatedWorkspaceMastersMasterRoute
   AuthenticatedWorkspaceMastersIndexRoute: typeof AuthenticatedWorkspaceMastersIndexRoute
@@ -2313,6 +2365,7 @@ const AuthenticatedWorkspaceMastersRouteWithChildren =
 
 interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceAdministrationRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+  AuthenticatedWorkspaceCrmRoute: typeof AuthenticatedWorkspaceCrmRouteWithChildren
   AuthenticatedWorkspaceFinanceRoute: typeof AuthenticatedWorkspaceFinanceRoute
   AuthenticatedWorkspaceGstRoute: typeof AuthenticatedWorkspaceGstRoute
   AuthenticatedWorkspaceInventoryRoute: typeof AuthenticatedWorkspaceInventoryRoute
@@ -2328,6 +2381,7 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
   {
     AuthenticatedWorkspaceAdministrationRoute:
       AuthenticatedWorkspaceAdministrationRoute,
+    AuthenticatedWorkspaceCrmRoute: AuthenticatedWorkspaceCrmRouteWithChildren,
     AuthenticatedWorkspaceFinanceRoute: AuthenticatedWorkspaceFinanceRoute,
     AuthenticatedWorkspaceGstRoute: AuthenticatedWorkspaceGstRoute,
     AuthenticatedWorkspaceInventoryRoute: AuthenticatedWorkspaceInventoryRoute,
