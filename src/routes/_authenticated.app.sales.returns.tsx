@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/app/sales/returns")({
 type Row = {
   id: string; return_no: string; return_date: string; status: string;
   reason: string | null; subtotal: number; tax_amount: number; total: number;
-  customer: { name: string } | null; invoice: { invoice_no: string } | null;
+  customer: { name: string } | null; invoice: { invoice_number: string } | null;
 };
 
 const STATUS_TONE: Record<string, string> = {
@@ -45,7 +45,7 @@ function ReturnsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sales_returns" as never)
-        .select("*, customer:customers(name), invoice:invoices(invoice_no)")
+        .select("*, customer:customers(name), invoice:invoices(invoice_number)")
         .eq("company_id", company!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -96,7 +96,7 @@ function ReturnsPage() {
                   <TableCell className="font-mono text-xs">{r.return_no}</TableCell>
                   <TableCell>{r.return_date}</TableCell>
                   <TableCell>{r.customer?.name ?? "—"}</TableCell>
-                  <TableCell className="font-mono text-xs text-muted-foreground">{r.invoice?.invoice_no ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">{r.invoice?.invoice_number ?? "—"}</TableCell>
                   <TableCell><Badge className={STATUS_TONE[r.status] ?? ""} variant="secondary">{r.status}</Badge></TableCell>
                   <TableCell className="text-right font-medium">₹{Number(r.total).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</TableCell>
                   {canEdit && (
@@ -136,7 +136,7 @@ function ReturnDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () =
   const { data: invoices } = useQuery({
     enabled: !!company?.id && !!form.customer_id,
     queryKey: ["ret-invoices", form.customer_id],
-    queryFn: async () => (await supabase.from("invoices").select("id,invoice_no").eq("customer_id", form.customer_id)).data ?? [],
+    queryFn: async () => (await supabase.from("invoices").select("id,invoice_number").eq("customer_id", form.customer_id)).data ?? [],
   });
   const { data: items } = useQuery({
     enabled: !!company?.id,
@@ -179,7 +179,7 @@ function ReturnDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () =
         <Field label="Return #"><Input value={form.return_no} onChange={(e) => setForm({ ...form, return_no: e.target.value })} /></Field>
         <Field label="Date"><Input type="date" value={form.return_date} onChange={(e) => setForm({ ...form, return_date: e.target.value })} /></Field>
         <Field label="Customer *"><Select value={form.customer_id} onValueChange={(v) => setForm({ ...form, customer_id: v, invoice_id: "" })}><SelectTrigger><SelectValue placeholder="Select customer" /></SelectTrigger><SelectContent>{(customers ?? []).map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select></Field>
-        <Field label="Original invoice"><Select value={form.invoice_id} onValueChange={(v) => setForm({ ...form, invoice_id: v })}><SelectTrigger><SelectValue placeholder="Optional" /></SelectTrigger><SelectContent>{(invoices ?? []).map((i) => <SelectItem key={i.id} value={i.id}>{i.invoice_no}</SelectItem>)}</SelectContent></Select></Field>
+        <Field label="Original invoice"><Select value={form.invoice_id} onValueChange={(v) => setForm({ ...form, invoice_id: v })}><SelectTrigger><SelectValue placeholder="Optional" /></SelectTrigger><SelectContent>{(invoices ?? []).map((i) => <SelectItem key={i.id} value={i.id}>{i.invoice_number}</SelectItem>)}</SelectContent></Select></Field>
         <Field label="Reason" className="sm:col-span-2"><Textarea rows={2} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></Field>
       </div>
 
