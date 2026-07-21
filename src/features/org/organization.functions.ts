@@ -14,14 +14,18 @@ export const createOrganization = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     const base = slugify(data.name);
     const slug = `${base}-${Math.random().toString(36).slice(2, 7)}`;
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     const { data: org, error } = await context.supabase
       .from('organizations')
       .insert({ name: data.name, slug, owner_id: context.userId })
       .select('*')
       .single();
     if (error) throw new Error(error.message);
-    // Grant owner role scoped to organization (no company yet)
-    await context.supabase.from('user_roles').insert({ user_id: context.userId, role: 'owner' });
+    // Bootstrap: owner role has no company yet; RLS blocks self-insert, use admin
+    await supabaseAdmin.from('user_roles').upsert(
+      { user_id: context.userId, role: 'owner', company_id: null },
+      { onConflict: 'user_id,role,company_id' },
+    );
     return org;
   });
 
