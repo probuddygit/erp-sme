@@ -9,11 +9,13 @@ import {
   BarChart3,
   GitBranch,
   Settings,
+  Database,
   type LucideIcon,
 } from "lucide-react";
 
 export type WorkspaceModule =
   | "dashboard"
+  | "masters"
   | "crm"
   | "sales"
   | "procurement"

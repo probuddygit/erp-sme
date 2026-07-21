@@ -64,6 +64,7 @@ import { Route as AuthenticatedAppMaintenanceIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_authenticated.app.inventory.index'
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
+import { Route as AuthenticatedWorkspaceMastersMasterRouteImport } from './routes/_authenticated.workspace.masters.$master'
 import { Route as AuthenticatedAppSalesReturnsRouteImport } from './routes/_authenticated.app.sales.returns'
 import { Route as AuthenticatedAppSalesRecurringRouteImport } from './routes/_authenticated.app.sales.recurring'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
@@ -408,6 +409,12 @@ const AuthenticatedAppFinanceIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedAppFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceMastersMasterRoute =
+  AuthenticatedWorkspaceMastersMasterRouteImport.update({
+    id: '/$master',
+    path: '/$master',
+    getParentRoute: () => AuthenticatedWorkspaceMastersRoute,
   } as any)
 const AuthenticatedAppSalesReturnsRoute =
   AuthenticatedAppSalesReturnsRouteImport.update({
@@ -759,6 +766,7 @@ export interface FileRoutesByFullPath {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
@@ -846,6 +854,7 @@ export interface FileRoutesByTo {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory': typeof AuthenticatedAppInventoryIndexRoute
@@ -948,6 +957,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/_authenticated/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/_authenticated/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/_authenticated/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/_authenticated/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
@@ -1050,6 +1060,7 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/masters/$master'
     | '/app/finance/'
     | '/app/hr/'
     | '/app/inventory/'
@@ -1137,6 +1148,7 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/masters/$master'
     | '/app/finance'
     | '/app/hr'
     | '/app/inventory'
@@ -1238,6 +1250,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/quotations'
     | '/_authenticated/app/sales/recurring'
     | '/_authenticated/app/sales/returns'
+    | '/_authenticated/workspace/masters/$master'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
     | '/_authenticated/app/inventory/'
@@ -1648,6 +1661,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/finance/'
       preLoaderRoute: typeof AuthenticatedAppFinanceIndexRouteImport
       parentRoute: typeof AuthenticatedAppFinanceRoute
+    }
+    '/_authenticated/workspace/masters/$master': {
+      id: '/_authenticated/workspace/masters/$master'
+      path: '/$master'
+      fullPath: '/workspace/masters/$master'
+      preLoaderRoute: typeof AuthenticatedWorkspaceMastersMasterRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceMastersRoute
     }
     '/_authenticated/app/sales/returns': {
       id: '/_authenticated/app/sales/returns'
@@ -2294,11 +2314,14 @@ const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 interface AuthenticatedWorkspaceMastersRouteChildren {
+  AuthenticatedWorkspaceMastersMasterRoute: typeof AuthenticatedWorkspaceMastersMasterRoute
   AuthenticatedWorkspaceMastersIndexRoute: typeof AuthenticatedWorkspaceMastersIndexRoute
 }
 
 const AuthenticatedWorkspaceMastersRouteChildren: AuthenticatedWorkspaceMastersRouteChildren =
   {
+    AuthenticatedWorkspaceMastersMasterRoute:
+      AuthenticatedWorkspaceMastersMasterRoute,
     AuthenticatedWorkspaceMastersIndexRoute:
       AuthenticatedWorkspaceMastersIndexRoute,
   }
