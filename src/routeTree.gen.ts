@@ -38,6 +38,7 @@ import { Route as AuthenticatedAppMaintenanceIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_authenticated.app.inventory.index'
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
+import { Route as AuthenticatedAppSalesReturnsRouteImport } from './routes/_authenticated.app.sales.returns'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
 import { Route as AuthenticatedAppSalesPipelineRouteImport } from './routes/_authenticated.app.sales.pipeline'
 import { Route as AuthenticatedAppSalesOrdersRouteImport } from './routes/_authenticated.app.sales.orders'
@@ -236,6 +237,12 @@ const AuthenticatedAppFinanceIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedAppFinanceRoute,
+  } as any)
+const AuthenticatedAppSalesReturnsRoute =
+  AuthenticatedAppSalesReturnsRouteImport.update({
+    id: '/returns',
+    path: '/returns',
+    getParentRoute: () => AuthenticatedAppSalesRoute,
   } as any)
 const AuthenticatedAppSalesQuotationsRoute =
   AuthenticatedAppSalesQuotationsRouteImport.update({
@@ -541,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
@@ -601,6 +609,7 @@ export interface FileRoutesByTo {
   '/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory': typeof AuthenticatedAppInventoryIndexRoute
@@ -674,6 +683,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/orders': typeof AuthenticatedAppSalesOrdersRoute
   '/_authenticated/app/sales/pipeline': typeof AuthenticatedAppSalesPipelineRoute
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
+  '/_authenticated/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/_authenticated/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
@@ -747,6 +757,7 @@ export interface FileRouteTypes {
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
+    | '/app/sales/returns'
     | '/app/finance/'
     | '/app/hr/'
     | '/app/inventory/'
@@ -807,6 +818,7 @@ export interface FileRouteTypes {
     | '/app/sales/orders'
     | '/app/sales/pipeline'
     | '/app/sales/quotations'
+    | '/app/sales/returns'
     | '/app/finance'
     | '/app/hr'
     | '/app/inventory'
@@ -879,6 +891,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/orders'
     | '/_authenticated/app/sales/pipeline'
     | '/_authenticated/app/sales/quotations'
+    | '/_authenticated/app/sales/returns'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
     | '/_authenticated/app/inventory/'
@@ -1104,6 +1117,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/finance/'
       preLoaderRoute: typeof AuthenticatedAppFinanceIndexRouteImport
       parentRoute: typeof AuthenticatedAppFinanceRoute
+    }
+    '/_authenticated/app/sales/returns': {
+      id: '/_authenticated/app/sales/returns'
+      path: '/returns'
+      fullPath: '/app/sales/returns'
+      preLoaderRoute: typeof AuthenticatedAppSalesReturnsRouteImport
+      parentRoute: typeof AuthenticatedAppSalesRoute
     }
     '/_authenticated/app/sales/quotations': {
       id: '/_authenticated/app/sales/quotations'
@@ -1668,6 +1688,7 @@ interface AuthenticatedAppSalesRouteChildren {
   AuthenticatedAppSalesOrdersRoute: typeof AuthenticatedAppSalesOrdersRoute
   AuthenticatedAppSalesPipelineRoute: typeof AuthenticatedAppSalesPipelineRoute
   AuthenticatedAppSalesQuotationsRoute: typeof AuthenticatedAppSalesQuotationsRoute
+  AuthenticatedAppSalesReturnsRoute: typeof AuthenticatedAppSalesReturnsRoute
   AuthenticatedAppSalesIndexRoute: typeof AuthenticatedAppSalesIndexRoute
 }
 
@@ -1677,6 +1698,7 @@ const AuthenticatedAppSalesRouteChildren: AuthenticatedAppSalesRouteChildren = {
   AuthenticatedAppSalesOrdersRoute: AuthenticatedAppSalesOrdersRoute,
   AuthenticatedAppSalesPipelineRoute: AuthenticatedAppSalesPipelineRoute,
   AuthenticatedAppSalesQuotationsRoute: AuthenticatedAppSalesQuotationsRoute,
+  AuthenticatedAppSalesReturnsRoute: AuthenticatedAppSalesReturnsRoute,
   AuthenticatedAppSalesIndexRoute: AuthenticatedAppSalesIndexRoute,
 }
 
