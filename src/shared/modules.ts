@@ -45,6 +45,14 @@ export const WORKSPACE_MODULES: ModuleDef[] = [
     roles: ["*"],
   },
   {
+    key: "masters",
+    label: "Master Data",
+    path: "/workspace/masters",
+    icon: Database,
+    description: "Reusable reference data — customers, vendors, items and more.",
+    roles: ["*"],
+  },
+  {
     key: "crm",
     label: "CRM",
     path: "/workspace/crm",
