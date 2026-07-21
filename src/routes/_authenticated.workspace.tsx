@@ -8,12 +8,16 @@ export const Route = createFileRoute("/_authenticated/workspace")({
 });
 
 function WorkspaceLayout() {
-  const { user, loading } = useAuth();
+  const { user, loading, company, organization, roles } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) navigate({ to: "/login" });
-  }, [user, loading, navigate]);
+    if (loading) return;
+    if (!user) { navigate({ to: "/auth/login" }); return; }
+    // Onboarding gates
+    if (!organization && roles.includes("owner")) { navigate({ to: "/onboarding/organization" }); return; }
+    if (!company && (roles.includes("owner") || roles.includes("admin"))) { navigate({ to: "/onboarding/company" }); return; }
+  }, [user, loading, organization, company, roles, navigate]);
 
   if (loading || !user) {
     return (
