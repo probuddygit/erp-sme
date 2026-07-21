@@ -4,7 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type AppRole =
   | "super_admin"
+  | "owner"
   | "admin"
+  | "manager"
+  | "viewer"
   | "sales"
   | "procurement"
   | "production"
@@ -62,7 +65,10 @@ const Ctx = createContext<AuthCtx | undefined>(undefined);
 
 const ROLE_MODULE_MAP: Record<AppRole, AppModule[]> = {
   super_admin: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality", "maintenance"],
+  owner: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality", "maintenance"],
   admin: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality", "maintenance"],
+  manager: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality", "maintenance"],
+  viewer: ["sales", "procurement", "inventory", "production", "finance", "hr", "reports", "quality", "maintenance"],
   sales: ["sales", "inventory", "reports"],
   procurement: ["procurement", "inventory", "reports"],
   production: ["production", "inventory", "quality", "maintenance"],
