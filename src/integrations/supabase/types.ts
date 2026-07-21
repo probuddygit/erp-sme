@@ -295,6 +295,63 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          company_id: string | null
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: string
+          ip: string | null
+          metadata: Json | null
+          organization_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          company_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          ip?: string | null
+          metadata?: Json | null
+          organization_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          company_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          ip?: string | null
+          metadata?: Json | null
+          organization_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bills_of_materials: {
         Row: {
           company_id: string
@@ -400,6 +457,56 @@ export type Database = {
           },
         ]
       }
+      branches: {
+        Row: {
+          address: string | null
+          code: string
+          company_id: string
+          created_at: string
+          gstin: string | null
+          id: string
+          is_active: boolean
+          is_head_office: boolean
+          name: string
+          state_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          code: string
+          company_id: string
+          created_at?: string
+          gstin?: string | null
+          id?: string
+          is_active?: boolean
+          is_head_office?: boolean
+          name: string
+          state_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          code?: string
+          company_id?: string
+          created_at?: string
+          gstin?: string | null
+          id?: string
+          is_active?: boolean
+          is_head_office?: boolean
+          name?: string
+          state_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "branches_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chart_of_accounts: {
         Row: {
           code: string
@@ -447,36 +554,71 @@ export type Database = {
       }
       companies: {
         Row: {
+          address: string | null
+          country: string | null
           created_at: string
+          currency: string | null
           enabled_modules: Database["public"]["Enums"]["app_module"][]
+          gstin: string | null
           id: string
           is_active: boolean
+          legal_name: string | null
+          logo_url: string | null
           name: string
+          organization_id: string | null
+          pan: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
           slug: string
+          state_code: string | null
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          country?: string | null
           created_at?: string
+          currency?: string | null
           enabled_modules?: Database["public"]["Enums"]["app_module"][]
+          gstin?: string | null
           id?: string
           is_active?: boolean
+          legal_name?: string | null
+          logo_url?: string | null
           name: string
+          organization_id?: string | null
+          pan?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           slug: string
+          state_code?: string | null
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          country?: string | null
           created_at?: string
+          currency?: string | null
           enabled_modules?: Database["public"]["Enums"]["app_module"][]
+          gstin?: string | null
           id?: string
           is_active?: boolean
+          legal_name?: string | null
+          logo_url?: string | null
           name?: string
+          organization_id?: string | null
+          pan?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           slug?: string
+          state_code?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "companies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customer_pricing_rules: {
         Row: {
@@ -769,6 +911,50 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_years: {
+        Row: {
+          company_id: string
+          created_at: string
+          end_date: string
+          id: string
+          is_active: boolean
+          is_closed: boolean
+          name: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          end_date: string
+          id?: string
+          is_active?: boolean
+          is_closed?: boolean
+          name: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          is_closed?: boolean
+          name?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_years_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       grn_items: {
         Row: {
           batch_no: string | null
@@ -926,6 +1112,66 @@ export type Database = {
             columns: ["entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invitations: {
+        Row: {
+          accepted_at: string | null
+          company_id: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          organization_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["invitation_status"]
+          token_hash: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          company_id?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          organization_id: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token_hash: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          company_id?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          organization_id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -1944,6 +2190,39 @@ export type Database = {
         }
         Relationships: []
       }
+      organizations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          plan: string
+          slug: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+          plan?: string
+          slug: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          plan?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -2122,6 +2401,30 @@ export type Database = {
           total_pf_employee?: number
           total_pf_employer?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      permissions: {
+        Row: {
+          action: string
+          created_at: string
+          description: string | null
+          key: string
+          module: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          description?: string | null
+          key: string
+          module: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          description?: string | null
+          key?: string
+          module?: string
         }
         Relationships: []
       }
@@ -2885,6 +3188,29 @@ export type Database = {
         }
         Relationships: []
       }
+      role_permissions: {
+        Row: {
+          permission_key: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          permission_key: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          permission_key?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_key_fkey"
+            columns: ["permission_key"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
       salary_structures: {
         Row: {
           basic: number
@@ -3419,6 +3745,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_permission_overrides: {
+        Row: {
+          company_id: string
+          created_at: string
+          granted: boolean
+          id: string
+          permission_key: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          granted?: boolean
+          id?: string
+          permission_key: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          granted?: boolean
+          id?: string
+          permission_key?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_permission_overrides_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_permission_overrides_permission_key_fkey"
+            columns: ["permission_key"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           company_id: string | null
@@ -3719,6 +4087,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_permission: {
+        Args: { _company_id: string; _perm_key: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -3728,6 +4100,14 @@ export type Database = {
       }
       is_company_admin: {
         Args: { _company_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_org_member: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_org_owner: {
+        Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
@@ -3867,6 +4247,7 @@ export type Database = {
         | "rejected"
         | "converted"
         | "closed"
+      invitation_status: "pending" | "accepted" | "revoked" | "expired"
       invoice_status:
         | "draft"
         | "sent"
@@ -4164,6 +4545,7 @@ export const Constants = {
         "converted",
         "closed",
       ],
+      invitation_status: ["pending", "accepted", "revoked", "expired"],
       invoice_status: [
         "draft",
         "sent",
