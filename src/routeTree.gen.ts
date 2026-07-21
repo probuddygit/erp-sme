@@ -54,6 +54,7 @@ import { Route as AuthenticatedAppHrRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedAppFinanceRouteImport } from './routes/_authenticated.app.finance'
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
+import { Route as AuthenticatedWorkspaceMastersIndexRouteImport } from './routes/_authenticated.workspace.masters.index'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
 import { Route as AuthenticatedAppReportsIndexRouteImport } from './routes/_authenticated.app.reports.index'
 import { Route as AuthenticatedAppQualityIndexRouteImport } from './routes/_authenticated.app.quality.index'
@@ -349,6 +350,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedWorkspaceMastersIndexRoute =
+  AuthenticatedWorkspaceMastersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkspaceMastersRoute,
+  } as any)
 const AuthenticatedAppSalesIndexRoute =
   AuthenticatedAppSalesIndexRouteImport.update({
     id: '/',
@@ -704,7 +711,7 @@ export interface FileRoutesByFullPath {
   '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRoute
-  '/workspace/masters': typeof AuthenticatedWorkspaceMastersRoute
+  '/workspace/masters': typeof AuthenticatedWorkspaceMastersRouteWithChildren
   '/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRoute
   '/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/workspace/sales': typeof AuthenticatedWorkspaceSalesRoute
@@ -761,6 +768,7 @@ export interface FileRoutesByFullPath {
   '/app/quality/': typeof AuthenticatedAppQualityIndexRoute
   '/app/reports/': typeof AuthenticatedAppReportsIndexRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
@@ -791,7 +799,6 @@ export interface FileRoutesByTo {
   '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRoute
-  '/workspace/masters': typeof AuthenticatedWorkspaceMastersRoute
   '/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRoute
   '/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/workspace/sales': typeof AuthenticatedWorkspaceSalesRoute
@@ -848,6 +855,7 @@ export interface FileRoutesByTo {
   '/app/quality': typeof AuthenticatedAppQualityIndexRoute
   '/app/reports': typeof AuthenticatedAppReportsIndexRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
+  '/workspace/masters': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
@@ -892,7 +900,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/_authenticated/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/_authenticated/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRoute
-  '/_authenticated/workspace/masters': typeof AuthenticatedWorkspaceMastersRoute
+  '/_authenticated/workspace/masters': typeof AuthenticatedWorkspaceMastersRouteWithChildren
   '/_authenticated/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRoute
   '/_authenticated/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/_authenticated/workspace/sales': typeof AuthenticatedWorkspaceSalesRoute
@@ -949,6 +957,7 @@ export interface FileRoutesById {
   '/_authenticated/app/quality/': typeof AuthenticatedAppQualityIndexRoute
   '/_authenticated/app/reports/': typeof AuthenticatedAppReportsIndexRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/_authenticated/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/_authenticated/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/_authenticated/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/_authenticated/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
@@ -1050,6 +1059,7 @@ export interface FileRouteTypes {
     | '/app/quality/'
     | '/app/reports/'
     | '/app/sales/'
+    | '/workspace/masters/'
     | '/app/maintenance/machines/$id'
     | '/app/procurement/purchase-orders/$id'
     | '/app/production/boms/$id'
@@ -1080,7 +1090,6 @@ export interface FileRouteTypes {
     | '/workspace/finance'
     | '/workspace/gst'
     | '/workspace/inventory'
-    | '/workspace/masters'
     | '/workspace/procurement'
     | '/workspace/reports'
     | '/workspace/sales'
@@ -1137,6 +1146,7 @@ export interface FileRouteTypes {
     | '/app/quality'
     | '/app/reports'
     | '/app/sales'
+    | '/workspace/masters'
     | '/app/maintenance/machines/$id'
     | '/app/procurement/purchase-orders/$id'
     | '/app/production/boms/$id'
@@ -1237,6 +1247,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/quality/'
     | '/_authenticated/app/reports/'
     | '/_authenticated/app/sales/'
+    | '/_authenticated/workspace/masters/'
     | '/_authenticated/app/maintenance/machines/$id'
     | '/_authenticated/app/procurement/purchase-orders/$id'
     | '/_authenticated/app/production/boms/$id'
@@ -1567,6 +1578,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/users'
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/workspace/masters/': {
+      id: '/_authenticated/workspace/masters/'
+      path: '/'
+      fullPath: '/workspace/masters/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceMastersIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceMastersRoute
     }
     '/_authenticated/app/sales/': {
       id: '/_authenticated/app/sales/'
@@ -2275,13 +2293,28 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
 const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
+interface AuthenticatedWorkspaceMastersRouteChildren {
+  AuthenticatedWorkspaceMastersIndexRoute: typeof AuthenticatedWorkspaceMastersIndexRoute
+}
+
+const AuthenticatedWorkspaceMastersRouteChildren: AuthenticatedWorkspaceMastersRouteChildren =
+  {
+    AuthenticatedWorkspaceMastersIndexRoute:
+      AuthenticatedWorkspaceMastersIndexRoute,
+  }
+
+const AuthenticatedWorkspaceMastersRouteWithChildren =
+  AuthenticatedWorkspaceMastersRoute._addFileChildren(
+    AuthenticatedWorkspaceMastersRouteChildren,
+  )
+
 interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceAdministrationRoute: typeof AuthenticatedWorkspaceAdministrationRoute
   AuthenticatedWorkspaceCrmRoute: typeof AuthenticatedWorkspaceCrmRoute
   AuthenticatedWorkspaceFinanceRoute: typeof AuthenticatedWorkspaceFinanceRoute
   AuthenticatedWorkspaceGstRoute: typeof AuthenticatedWorkspaceGstRoute
   AuthenticatedWorkspaceInventoryRoute: typeof AuthenticatedWorkspaceInventoryRoute
-  AuthenticatedWorkspaceMastersRoute: typeof AuthenticatedWorkspaceMastersRoute
+  AuthenticatedWorkspaceMastersRoute: typeof AuthenticatedWorkspaceMastersRouteWithChildren
   AuthenticatedWorkspaceProcurementRoute: typeof AuthenticatedWorkspaceProcurementRoute
   AuthenticatedWorkspaceReportsRoute: typeof AuthenticatedWorkspaceReportsRoute
   AuthenticatedWorkspaceSalesRoute: typeof AuthenticatedWorkspaceSalesRoute
@@ -2297,7 +2330,8 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
     AuthenticatedWorkspaceFinanceRoute: AuthenticatedWorkspaceFinanceRoute,
     AuthenticatedWorkspaceGstRoute: AuthenticatedWorkspaceGstRoute,
     AuthenticatedWorkspaceInventoryRoute: AuthenticatedWorkspaceInventoryRoute,
-    AuthenticatedWorkspaceMastersRoute: AuthenticatedWorkspaceMastersRoute,
+    AuthenticatedWorkspaceMastersRoute:
+      AuthenticatedWorkspaceMastersRouteWithChildren,
     AuthenticatedWorkspaceProcurementRoute:
       AuthenticatedWorkspaceProcurementRoute,
     AuthenticatedWorkspaceReportsRoute: AuthenticatedWorkspaceReportsRoute,
