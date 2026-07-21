@@ -9,10 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OnboardingOrganizationRouteImport } from './routes/onboarding.organization'
+import { Route as OnboardingFinancialYearRouteImport } from './routes/onboarding.financial-year'
+import { Route as OnboardingCompanyRouteImport } from './routes/onboarding.company'
+import { Route as OnboardingBranchRouteImport } from './routes/onboarding.branch'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth.verify-email'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth.register'
@@ -20,6 +25,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthAcceptInviteRouteImport } from './routes/auth.accept-invite'
 import { Route as AuthenticatedWorkspaceRouteImport } from './routes/_authenticated.workspace'
+import { Route as AuthenticatedUnauthorizedRouteImport } from './routes/_authenticated.unauthorized'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedWorkspaceIndexRouteImport } from './routes/_authenticated.workspace.index'
@@ -101,6 +107,11 @@ import { Route as AuthenticatedAppProductionBomsIdRouteImport } from './routes/_
 import { Route as AuthenticatedAppProcurementPurchaseOrdersIdRouteImport } from './routes/_authenticated.app.procurement.purchase-orders.$id'
 import { Route as AuthenticatedAppMaintenanceMachinesIdRouteImport } from './routes/_authenticated.app.maintenance.machines.$id'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -119,6 +130,26 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingOrganizationRoute = OnboardingOrganizationRouteImport.update({
+  id: '/organization',
+  path: '/organization',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingFinancialYearRoute = OnboardingFinancialYearRouteImport.update({
+  id: '/financial-year',
+  path: '/financial-year',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingCompanyRoute = OnboardingCompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingBranchRoute = OnboardingBranchRouteImport.update({
+  id: '/branch',
+  path: '/branch',
+  getParentRoute: () => OnboardingRoute,
 } as any)
 const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -155,6 +186,12 @@ const AuthenticatedWorkspaceRoute = AuthenticatedWorkspaceRouteImport.update({
   path: '/workspace',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedUnauthorizedRoute =
+  AuthenticatedUnauthorizedRouteImport.update({
+    id: '/unauthorized',
+    path: '/unauthorized',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -627,8 +664,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/unauthorized': typeof AuthenticatedUnauthorizedRoute
   '/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/auth/accept-invite': typeof AuthAcceptInviteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -636,6 +675,10 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/onboarding/branch': typeof OnboardingBranchRoute
+  '/onboarding/company': typeof OnboardingCompanyRoute
+  '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
+  '/onboarding/organization': typeof OnboardingOrganizationRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
   '/app/finance': typeof AuthenticatedAppFinanceRouteWithChildren
@@ -719,12 +762,18 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
+  '/unauthorized': typeof AuthenticatedUnauthorizedRoute
   '/auth/accept-invite': typeof AuthAcceptInviteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/onboarding/branch': typeof OnboardingBranchRoute
+  '/onboarding/company': typeof OnboardingCompanyRoute
+  '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
+  '/onboarding/organization': typeof OnboardingOrganizationRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
@@ -801,8 +850,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/unauthorized': typeof AuthenticatedUnauthorizedRoute
   '/_authenticated/workspace': typeof AuthenticatedWorkspaceRouteWithChildren
   '/auth/accept-invite': typeof AuthAcceptInviteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -810,6 +861,10 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/onboarding/branch': typeof OnboardingBranchRoute
+  '/onboarding/company': typeof OnboardingCompanyRoute
+  '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
+  '/onboarding/organization': typeof OnboardingOrganizationRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
   '/_authenticated/app/finance': typeof AuthenticatedAppFinanceRouteWithChildren
@@ -895,8 +950,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/login'
+    | '/onboarding'
     | '/admin'
     | '/app'
+    | '/unauthorized'
     | '/workspace'
     | '/auth/accept-invite'
     | '/auth/forgot-password'
@@ -904,6 +961,10 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/auth/verify-email'
+    | '/onboarding/branch'
+    | '/onboarding/company'
+    | '/onboarding/financial-year'
+    | '/onboarding/organization'
     | '/admin/users'
     | '/app/$module'
     | '/app/finance'
@@ -987,12 +1048,18 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/login'
+    | '/onboarding'
+    | '/unauthorized'
     | '/auth/accept-invite'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
     | '/auth/verify-email'
+    | '/onboarding/branch'
+    | '/onboarding/company'
+    | '/onboarding/financial-year'
+    | '/onboarding/organization'
     | '/admin/users'
     | '/app/$module'
     | '/app/settings'
@@ -1068,8 +1135,10 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/login'
+    | '/onboarding'
     | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/_authenticated/unauthorized'
     | '/_authenticated/workspace'
     | '/auth/accept-invite'
     | '/auth/forgot-password'
@@ -1077,6 +1146,10 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/auth/verify-email'
+    | '/onboarding/branch'
+    | '/onboarding/company'
+    | '/onboarding/financial-year'
+    | '/onboarding/organization'
     | '/_authenticated/admin/users'
     | '/_authenticated/app/$module'
     | '/_authenticated/app/finance'
@@ -1162,10 +1235,18 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -1193,6 +1274,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/organization': {
+      id: '/onboarding/organization'
+      path: '/organization'
+      fullPath: '/onboarding/organization'
+      preLoaderRoute: typeof OnboardingOrganizationRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/financial-year': {
+      id: '/onboarding/financial-year'
+      path: '/financial-year'
+      fullPath: '/onboarding/financial-year'
+      preLoaderRoute: typeof OnboardingFinancialYearRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/company': {
+      id: '/onboarding/company'
+      path: '/company'
+      fullPath: '/onboarding/company'
+      preLoaderRoute: typeof OnboardingCompanyRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/branch': {
+      id: '/onboarding/branch'
+      path: '/branch'
+      fullPath: '/onboarding/branch'
+      preLoaderRoute: typeof OnboardingBranchRouteImport
+      parentRoute: typeof OnboardingRoute
     }
     '/auth/verify-email': {
       id: '/auth/verify-email'
@@ -1241,6 +1350,13 @@ declare module '@tanstack/react-router' {
       path: '/workspace'
       fullPath: '/workspace'
       preLoaderRoute: typeof AuthenticatedWorkspaceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/unauthorized': {
+      id: '/_authenticated/unauthorized'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof AuthenticatedUnauthorizedRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/app': {
@@ -2176,12 +2292,14 @@ const AuthenticatedWorkspaceRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
+  AuthenticatedUnauthorizedRoute: typeof AuthenticatedUnauthorizedRoute
   AuthenticatedWorkspaceRoute: typeof AuthenticatedWorkspaceRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
+  AuthenticatedUnauthorizedRoute: AuthenticatedUnauthorizedRoute,
   AuthenticatedWorkspaceRoute: AuthenticatedWorkspaceRouteWithChildren,
 }
 
@@ -2209,11 +2327,30 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface OnboardingRouteChildren {
+  OnboardingBranchRoute: typeof OnboardingBranchRoute
+  OnboardingCompanyRoute: typeof OnboardingCompanyRoute
+  OnboardingFinancialYearRoute: typeof OnboardingFinancialYearRoute
+  OnboardingOrganizationRoute: typeof OnboardingOrganizationRoute
+}
+
+const OnboardingRouteChildren: OnboardingRouteChildren = {
+  OnboardingBranchRoute: OnboardingBranchRoute,
+  OnboardingCompanyRoute: OnboardingCompanyRoute,
+  OnboardingFinancialYearRoute: OnboardingFinancialYearRoute,
+  OnboardingOrganizationRoute: OnboardingOrganizationRoute,
+}
+
+const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
+  OnboardingRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
