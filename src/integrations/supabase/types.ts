@@ -93,6 +93,166 @@ export type Database = {
           },
         ]
       }
+      approval_rules: {
+        Row: {
+          active: boolean
+          company_id: string
+          created_at: string
+          entity_type: string
+          id: string
+          max_amount: number | null
+          min_amount: number | null
+          name: string
+          steps: Json
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          company_id: string
+          created_at?: string
+          entity_type: string
+          id?: string
+          max_amount?: number | null
+          min_amount?: number | null
+          name: string
+          steps?: Json
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          company_id?: string
+          created_at?: string
+          entity_type?: string
+          id?: string
+          max_amount?: number | null
+          min_amount?: number | null
+          name?: string
+          steps?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_rules_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approval_steps: {
+        Row: {
+          approval_id: string
+          approver_role: Database["public"]["Enums"]["app_role"] | null
+          approver_user_id: string | null
+          comment: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision: Database["public"]["Enums"]["approval_status"]
+          id: string
+          step_number: number
+        }
+        Insert: {
+          approval_id: string
+          approver_role?: Database["public"]["Enums"]["app_role"] | null
+          approver_user_id?: string | null
+          comment?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: Database["public"]["Enums"]["approval_status"]
+          id?: string
+          step_number: number
+        }
+        Update: {
+          approval_id?: string
+          approver_role?: Database["public"]["Enums"]["app_role"] | null
+          approver_user_id?: string | null
+          comment?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: Database["public"]["Enums"]["approval_status"]
+          id?: string
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_steps_approval_id_fkey"
+            columns: ["approval_id"]
+            isOneToOne: false
+            referencedRelation: "approvals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approvals: {
+        Row: {
+          amount: number | null
+          company_id: string
+          created_at: string
+          current_step: number
+          entity_id: string
+          entity_type: string
+          id: string
+          notes: string | null
+          requested_by: string | null
+          rule_id: string | null
+          rule_name: string | null
+          status: Database["public"]["Enums"]["approval_status"]
+          total_steps: number
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          company_id: string
+          created_at?: string
+          current_step?: number
+          entity_id: string
+          entity_type: string
+          id?: string
+          notes?: string | null
+          requested_by?: string | null
+          rule_id?: string | null
+          rule_name?: string | null
+          status?: Database["public"]["Enums"]["approval_status"]
+          total_steps?: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          company_id?: string
+          created_at?: string
+          current_step?: number
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          notes?: string | null
+          requested_by?: string | null
+          rule_id?: string | null
+          rule_name?: string | null
+          status?: Database["public"]["Enums"]["approval_status"]
+          total_steps?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approvals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approvals_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "approval_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           attendance_date: string
@@ -415,6 +575,121 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      delivery_note_items: {
+        Row: {
+          dn_id: string
+          id: string
+          item_id: string
+          notes: string | null
+          qty: number
+          uom: string | null
+        }
+        Insert: {
+          dn_id: string
+          id?: string
+          item_id: string
+          notes?: string | null
+          qty: number
+          uom?: string | null
+        }
+        Update: {
+          dn_id?: string
+          id?: string
+          item_id?: string
+          notes?: string | null
+          qty?: number
+          uom?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_note_items_dn_id_fkey"
+            columns: ["dn_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_notes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_note_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_notes: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          delivery_date: string
+          dn_no: string
+          driver_name: string | null
+          driver_phone: string | null
+          id: string
+          notes: string | null
+          sales_order_id: string | null
+          status: Database["public"]["Enums"]["delivery_note_status"]
+          updated_at: string
+          vehicle_no: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          delivery_date?: string
+          dn_no: string
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          notes?: string | null
+          sales_order_id?: string | null
+          status?: Database["public"]["Enums"]["delivery_note_status"]
+          updated_at?: string
+          vehicle_no?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          delivery_date?: string
+          dn_no?: string
+          driver_name?: string | null
+          driver_phone?: string | null
+          id?: string
+          notes?: string | null
+          sales_order_id?: string | null
+          status?: Database["public"]["Enums"]["delivery_note_status"]
+          updated_at?: string
+          vehicle_no?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_notes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_notes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_notes_sales_order_id_fkey"
+            columns: ["sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       employees: {
         Row: {
@@ -819,6 +1094,7 @@ export type Database = {
           item_type: Database["public"]["Enums"]["item_type"]
           min_stock: number
           name: string
+          reorder_level: number | null
           reorder_qty: number
           sku: string
           standard_cost: number
@@ -837,6 +1113,7 @@ export type Database = {
           item_type?: Database["public"]["Enums"]["item_type"]
           min_stock?: number
           name: string
+          reorder_level?: number | null
           reorder_qty?: number
           sku: string
           standard_cost?: number
@@ -855,6 +1132,7 @@ export type Database = {
           item_type?: Database["public"]["Enums"]["item_type"]
           min_stock?: number
           name?: string
+          reorder_level?: number | null
           reorder_qty?: number
           sku?: string
           standard_cost?: number
@@ -2430,6 +2708,66 @@ export type Database = {
           },
         ]
       }
+      recurring_invoice_templates: {
+        Row: {
+          active: boolean
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          frequency: Database["public"]["Enums"]["recurring_frequency"]
+          id: string
+          last_run_date: string | null
+          name: string
+          next_run_date: string
+          template: Json
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          frequency: Database["public"]["Enums"]["recurring_frequency"]
+          id?: string
+          last_run_date?: string | null
+          name: string
+          next_run_date: string
+          template?: Json
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          frequency?: Database["public"]["Enums"]["recurring_frequency"]
+          id?: string
+          last_run_date?: string | null
+          name?: string
+          next_run_date?: string
+          template?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_invoice_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_invoice_templates_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rfq_items: {
         Row: {
           company_id: string
@@ -2737,6 +3075,133 @@ export type Database = {
             columns: ["quotation_id"]
             isOneToOne: false
             referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_return_items: {
+        Row: {
+          id: string
+          item_id: string
+          line_total: number
+          qty: number
+          rate: number
+          return_id: string
+          tax_amount: number
+          tax_pct: number
+          uom: string | null
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          line_total?: number
+          qty: number
+          rate?: number
+          return_id: string
+          tax_amount?: number
+          tax_pct?: number
+          uom?: string | null
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          line_total?: number
+          qty?: number
+          rate?: number
+          return_id?: string
+          tax_amount?: number
+          tax_pct?: number
+          uom?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_return_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_return_items_return_id_fkey"
+            columns: ["return_id"]
+            isOneToOne: false
+            referencedRelation: "sales_returns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_returns: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          invoice_id: string | null
+          notes: string | null
+          reason: string | null
+          return_date: string
+          return_no: string
+          status: Database["public"]["Enums"]["sales_return_status"]
+          subtotal: number
+          tax_amount: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          reason?: string | null
+          return_date?: string
+          return_no: string
+          status?: Database["public"]["Enums"]["sales_return_status"]
+          subtotal?: number
+          tax_amount?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          reason?: string | null
+          return_date?: string
+          return_no?: string
+          status?: Database["public"]["Enums"]["sales_return_status"]
+          subtotal?: number
+          tax_amount?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_returns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_returns_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_returns_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
             referencedColumns: ["id"]
           },
         ]
@@ -3370,6 +3835,7 @@ export type Database = {
         | "hr"
         | "quality"
         | "maintenance"
+      approval_status: "pending" | "approved" | "rejected" | "cancelled"
       attendance_status:
         | "present"
         | "absent"
@@ -3378,6 +3844,7 @@ export type Database = {
         | "holiday"
         | "week_off"
       bom_status: "draft" | "active" | "archived"
+      delivery_note_status: "draft" | "dispatched" | "delivered" | "cancelled"
       downtime_reason:
         | "mechanical_failure"
         | "electrical_failure"
@@ -3462,6 +3929,7 @@ export type Database = {
       qc_result: "pending" | "accepted" | "rejected" | "accepted_with_deviation"
       qc_stage: "incoming" | "in_process" | "finished"
       quotation_status: "draft" | "sent" | "accepted" | "rejected" | "expired"
+      recurring_frequency: "monthly" | "quarterly" | "yearly"
       rfq_status: "draft" | "sent" | "quoted" | "closed" | "cancelled"
       sales_order_status:
         | "draft"
@@ -3470,6 +3938,7 @@ export type Database = {
         | "rejected"
         | "fulfilled"
         | "cancelled"
+      sales_return_status: "draft" | "approved" | "received" | "cancelled"
       stock_txn_type:
         | "receipt"
         | "issue"
@@ -3657,6 +4126,7 @@ export const Constants = {
         "quality",
         "maintenance",
       ],
+      approval_status: ["pending", "approved", "rejected", "cancelled"],
       attendance_status: [
         "present",
         "absent",
@@ -3666,6 +4136,7 @@ export const Constants = {
         "week_off",
       ],
       bom_status: ["draft", "active", "archived"],
+      delivery_note_status: ["draft", "dispatched", "delivered", "cancelled"],
       downtime_reason: [
         "mechanical_failure",
         "electrical_failure",
@@ -3759,6 +4230,7 @@ export const Constants = {
       qc_result: ["pending", "accepted", "rejected", "accepted_with_deviation"],
       qc_stage: ["incoming", "in_process", "finished"],
       quotation_status: ["draft", "sent", "accepted", "rejected", "expired"],
+      recurring_frequency: ["monthly", "quarterly", "yearly"],
       rfq_status: ["draft", "sent", "quoted", "closed", "cancelled"],
       sales_order_status: [
         "draft",
@@ -3768,6 +4240,7 @@ export const Constants = {
         "fulfilled",
         "cancelled",
       ],
+      sales_return_status: ["draft", "approved", "received", "cancelled"],
       stock_txn_type: [
         "receipt",
         "issue",

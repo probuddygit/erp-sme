@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
-import { Lock, ShoppingCart, LayoutDashboard, Users2, FileText, ClipboardList, Receipt, Kanban } from "lucide-react";
+import { Lock, ShoppingCart, LayoutDashboard, Users2, FileText, ClipboardList, Receipt, Kanban, Undo2, Truck, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +16,9 @@ const TABS: Tab[] = [
   { to: "/app/sales/quotations", label: "Quotations", icon: FileText },
   { to: "/app/sales/orders", label: "Sales Orders", icon: ClipboardList },
   { to: "/app/sales/invoices", label: "Invoices", icon: Receipt },
+  { to: "/app/sales/deliveries", label: "Delivery Notes", icon: Truck },
+  { to: "/app/sales/returns", label: "Returns", icon: Undo2 },
+  { to: "/app/sales/recurring", label: "Recurring", icon: Repeat },
 ];
 
 function SalesLayout() {
