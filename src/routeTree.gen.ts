@@ -55,6 +55,7 @@ import { Route as AuthenticatedAppFinanceRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedWorkspaceMastersIndexRouteImport } from './routes/_authenticated.workspace.masters.index'
+import { Route as AuthenticatedWorkspaceCrmIndexRouteImport } from './routes/_authenticated.workspace.crm.index'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
 import { Route as AuthenticatedAppReportsIndexRouteImport } from './routes/_authenticated.app.reports.index'
 import { Route as AuthenticatedAppQualityIndexRouteImport } from './routes/_authenticated.app.quality.index'
@@ -65,6 +66,14 @@ import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
 import { Route as AuthenticatedWorkspaceMastersMasterRouteImport } from './routes/_authenticated.workspace.masters.$master'
+import { Route as AuthenticatedWorkspaceCrmPipelineRouteImport } from './routes/_authenticated.workspace.crm.pipeline'
+import { Route as AuthenticatedWorkspaceCrmOpportunitiesRouteImport } from './routes/_authenticated.workspace.crm.opportunities'
+import { Route as AuthenticatedWorkspaceCrmLeadsRouteImport } from './routes/_authenticated.workspace.crm.leads'
+import { Route as AuthenticatedWorkspaceCrmFollowUpsRouteImport } from './routes/_authenticated.workspace.crm.follow-ups'
+import { Route as AuthenticatedWorkspaceCrmEmailHistoryRouteImport } from './routes/_authenticated.workspace.crm.email-history'
+import { Route as AuthenticatedWorkspaceCrmContactsRouteImport } from './routes/_authenticated.workspace.crm.contacts'
+import { Route as AuthenticatedWorkspaceCrmActivitiesRouteImport } from './routes/_authenticated.workspace.crm.activities'
+import { Route as AuthenticatedWorkspaceCrmAccountsRouteImport } from './routes/_authenticated.workspace.crm.accounts'
 import { Route as AuthenticatedAppSalesReturnsRouteImport } from './routes/_authenticated.app.sales.returns'
 import { Route as AuthenticatedAppSalesRecurringRouteImport } from './routes/_authenticated.app.sales.recurring'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
@@ -357,6 +366,12 @@ const AuthenticatedWorkspaceMastersIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedWorkspaceMastersRoute,
   } as any)
+const AuthenticatedWorkspaceCrmIndexRoute =
+  AuthenticatedWorkspaceCrmIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
 const AuthenticatedAppSalesIndexRoute =
   AuthenticatedAppSalesIndexRouteImport.update({
     id: '/',
@@ -415,6 +430,54 @@ const AuthenticatedWorkspaceMastersMasterRoute =
     id: '/$master',
     path: '/$master',
     getParentRoute: () => AuthenticatedWorkspaceMastersRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmPipelineRoute =
+  AuthenticatedWorkspaceCrmPipelineRouteImport.update({
+    id: '/pipeline',
+    path: '/pipeline',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmOpportunitiesRoute =
+  AuthenticatedWorkspaceCrmOpportunitiesRouteImport.update({
+    id: '/opportunities',
+    path: '/opportunities',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmLeadsRoute =
+  AuthenticatedWorkspaceCrmLeadsRouteImport.update({
+    id: '/leads',
+    path: '/leads',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmFollowUpsRoute =
+  AuthenticatedWorkspaceCrmFollowUpsRouteImport.update({
+    id: '/follow-ups',
+    path: '/follow-ups',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmEmailHistoryRoute =
+  AuthenticatedWorkspaceCrmEmailHistoryRouteImport.update({
+    id: '/email-history',
+    path: '/email-history',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmContactsRoute =
+  AuthenticatedWorkspaceCrmContactsRouteImport.update({
+    id: '/contacts',
+    path: '/contacts',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmActivitiesRoute =
+  AuthenticatedWorkspaceCrmActivitiesRouteImport.update({
+    id: '/activities',
+    path: '/activities',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmAccountsRoute =
+  AuthenticatedWorkspaceCrmAccountsRouteImport.update({
+    id: '/accounts',
+    path: '/accounts',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
   } as any)
 const AuthenticatedAppSalesReturnsRoute =
   AuthenticatedAppSalesReturnsRouteImport.update({
@@ -714,7 +777,7 @@ export interface FileRoutesByFullPath {
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
-  '/workspace/crm': typeof AuthenticatedWorkspaceCrmRoute
+  '/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
   '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRoute
@@ -766,6 +829,14 @@ export interface FileRoutesByFullPath {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
+  '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
+  '/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
+  '/workspace/crm/email-history': typeof AuthenticatedWorkspaceCrmEmailHistoryRoute
+  '/workspace/crm/follow-ups': typeof AuthenticatedWorkspaceCrmFollowUpsRoute
+  '/workspace/crm/leads': typeof AuthenticatedWorkspaceCrmLeadsRoute
+  '/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
+  '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -776,6 +847,7 @@ export interface FileRoutesByFullPath {
   '/app/quality/': typeof AuthenticatedAppQualityIndexRoute
   '/app/reports/': typeof AuthenticatedAppReportsIndexRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/workspace/crm/': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
@@ -803,7 +875,6 @@ export interface FileRoutesByTo {
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
-  '/workspace/crm': typeof AuthenticatedWorkspaceCrmRoute
   '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRoute
@@ -854,6 +925,14 @@ export interface FileRoutesByTo {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
+  '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
+  '/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
+  '/workspace/crm/email-history': typeof AuthenticatedWorkspaceCrmEmailHistoryRoute
+  '/workspace/crm/follow-ups': typeof AuthenticatedWorkspaceCrmFollowUpsRoute
+  '/workspace/crm/leads': typeof AuthenticatedWorkspaceCrmLeadsRoute
+  '/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
+  '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
@@ -864,6 +943,7 @@ export interface FileRoutesByTo {
   '/app/quality': typeof AuthenticatedAppQualityIndexRoute
   '/app/reports': typeof AuthenticatedAppReportsIndexRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
+  '/workspace/crm': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/workspace/masters': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
@@ -905,7 +985,7 @@ export interface FileRoutesById {
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRoute
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
   '/_authenticated/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
-  '/_authenticated/workspace/crm': typeof AuthenticatedWorkspaceCrmRoute
+  '/_authenticated/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
   '/_authenticated/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/_authenticated/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/_authenticated/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRoute
@@ -957,6 +1037,14 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/_authenticated/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/_authenticated/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/_authenticated/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
+  '/_authenticated/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
+  '/_authenticated/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
+  '/_authenticated/workspace/crm/email-history': typeof AuthenticatedWorkspaceCrmEmailHistoryRoute
+  '/_authenticated/workspace/crm/follow-ups': typeof AuthenticatedWorkspaceCrmFollowUpsRoute
+  '/_authenticated/workspace/crm/leads': typeof AuthenticatedWorkspaceCrmLeadsRoute
+  '/_authenticated/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
+  '/_authenticated/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/_authenticated/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -967,6 +1055,7 @@ export interface FileRoutesById {
   '/_authenticated/app/quality/': typeof AuthenticatedAppQualityIndexRoute
   '/_authenticated/app/reports/': typeof AuthenticatedAppReportsIndexRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
+  '/_authenticated/workspace/crm/': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/_authenticated/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/_authenticated/app/maintenance/machines/$id': typeof AuthenticatedAppMaintenanceMachinesIdRoute
   '/_authenticated/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
@@ -1060,6 +1149,14 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/crm/accounts'
+    | '/workspace/crm/activities'
+    | '/workspace/crm/contacts'
+    | '/workspace/crm/email-history'
+    | '/workspace/crm/follow-ups'
+    | '/workspace/crm/leads'
+    | '/workspace/crm/opportunities'
+    | '/workspace/crm/pipeline'
     | '/workspace/masters/$master'
     | '/app/finance/'
     | '/app/hr/'
@@ -1070,6 +1167,7 @@ export interface FileRouteTypes {
     | '/app/quality/'
     | '/app/reports/'
     | '/app/sales/'
+    | '/workspace/crm/'
     | '/workspace/masters/'
     | '/app/maintenance/machines/$id'
     | '/app/procurement/purchase-orders/$id'
@@ -1097,7 +1195,6 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/users'
     | '/workspace/administration'
-    | '/workspace/crm'
     | '/workspace/finance'
     | '/workspace/gst'
     | '/workspace/inventory'
@@ -1148,6 +1245,14 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/crm/accounts'
+    | '/workspace/crm/activities'
+    | '/workspace/crm/contacts'
+    | '/workspace/crm/email-history'
+    | '/workspace/crm/follow-ups'
+    | '/workspace/crm/leads'
+    | '/workspace/crm/opportunities'
+    | '/workspace/crm/pipeline'
     | '/workspace/masters/$master'
     | '/app/finance'
     | '/app/hr'
@@ -1158,6 +1263,7 @@ export interface FileRouteTypes {
     | '/app/quality'
     | '/app/reports'
     | '/app/sales'
+    | '/workspace/crm'
     | '/workspace/masters'
     | '/app/maintenance/machines/$id'
     | '/app/procurement/purchase-orders/$id'
@@ -1250,6 +1356,14 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/quotations'
     | '/_authenticated/app/sales/recurring'
     | '/_authenticated/app/sales/returns'
+    | '/_authenticated/workspace/crm/accounts'
+    | '/_authenticated/workspace/crm/activities'
+    | '/_authenticated/workspace/crm/contacts'
+    | '/_authenticated/workspace/crm/email-history'
+    | '/_authenticated/workspace/crm/follow-ups'
+    | '/_authenticated/workspace/crm/leads'
+    | '/_authenticated/workspace/crm/opportunities'
+    | '/_authenticated/workspace/crm/pipeline'
     | '/_authenticated/workspace/masters/$master'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
@@ -1260,6 +1374,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/quality/'
     | '/_authenticated/app/reports/'
     | '/_authenticated/app/sales/'
+    | '/_authenticated/workspace/crm/'
     | '/_authenticated/workspace/masters/'
     | '/_authenticated/app/maintenance/machines/$id'
     | '/_authenticated/app/procurement/purchase-orders/$id'
@@ -1599,6 +1714,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceMastersIndexRouteImport
       parentRoute: typeof AuthenticatedWorkspaceMastersRoute
     }
+    '/_authenticated/workspace/crm/': {
+      id: '/_authenticated/workspace/crm/'
+      path: '/'
+      fullPath: '/workspace/crm/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
     '/_authenticated/app/sales/': {
       id: '/_authenticated/app/sales/'
       path: '/'
@@ -1668,6 +1790,62 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/masters/$master'
       preLoaderRoute: typeof AuthenticatedWorkspaceMastersMasterRouteImport
       parentRoute: typeof AuthenticatedWorkspaceMastersRoute
+    }
+    '/_authenticated/workspace/crm/pipeline': {
+      id: '/_authenticated/workspace/crm/pipeline'
+      path: '/pipeline'
+      fullPath: '/workspace/crm/pipeline'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmPipelineRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
+    '/_authenticated/workspace/crm/opportunities': {
+      id: '/_authenticated/workspace/crm/opportunities'
+      path: '/opportunities'
+      fullPath: '/workspace/crm/opportunities'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmOpportunitiesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
+    '/_authenticated/workspace/crm/leads': {
+      id: '/_authenticated/workspace/crm/leads'
+      path: '/leads'
+      fullPath: '/workspace/crm/leads'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmLeadsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
+    '/_authenticated/workspace/crm/follow-ups': {
+      id: '/_authenticated/workspace/crm/follow-ups'
+      path: '/follow-ups'
+      fullPath: '/workspace/crm/follow-ups'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmFollowUpsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
+    '/_authenticated/workspace/crm/email-history': {
+      id: '/_authenticated/workspace/crm/email-history'
+      path: '/email-history'
+      fullPath: '/workspace/crm/email-history'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmEmailHistoryRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
+    '/_authenticated/workspace/crm/contacts': {
+      id: '/_authenticated/workspace/crm/contacts'
+      path: '/contacts'
+      fullPath: '/workspace/crm/contacts'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmContactsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
+    '/_authenticated/workspace/crm/activities': {
+      id: '/_authenticated/workspace/crm/activities'
+      path: '/activities'
+      fullPath: '/workspace/crm/activities'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmActivitiesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
+    '/_authenticated/workspace/crm/accounts': {
+      id: '/_authenticated/workspace/crm/accounts'
+      path: '/accounts'
+      fullPath: '/workspace/crm/accounts'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmAccountsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
     }
     '/_authenticated/app/sales/returns': {
       id: '/_authenticated/app/sales/returns'
@@ -2313,6 +2491,43 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
 const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
+interface AuthenticatedWorkspaceCrmRouteChildren {
+  AuthenticatedWorkspaceCrmAccountsRoute: typeof AuthenticatedWorkspaceCrmAccountsRoute
+  AuthenticatedWorkspaceCrmActivitiesRoute: typeof AuthenticatedWorkspaceCrmActivitiesRoute
+  AuthenticatedWorkspaceCrmContactsRoute: typeof AuthenticatedWorkspaceCrmContactsRoute
+  AuthenticatedWorkspaceCrmEmailHistoryRoute: typeof AuthenticatedWorkspaceCrmEmailHistoryRoute
+  AuthenticatedWorkspaceCrmFollowUpsRoute: typeof AuthenticatedWorkspaceCrmFollowUpsRoute
+  AuthenticatedWorkspaceCrmLeadsRoute: typeof AuthenticatedWorkspaceCrmLeadsRoute
+  AuthenticatedWorkspaceCrmOpportunitiesRoute: typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
+  AuthenticatedWorkspaceCrmPipelineRoute: typeof AuthenticatedWorkspaceCrmPipelineRoute
+  AuthenticatedWorkspaceCrmIndexRoute: typeof AuthenticatedWorkspaceCrmIndexRoute
+}
+
+const AuthenticatedWorkspaceCrmRouteChildren: AuthenticatedWorkspaceCrmRouteChildren =
+  {
+    AuthenticatedWorkspaceCrmAccountsRoute:
+      AuthenticatedWorkspaceCrmAccountsRoute,
+    AuthenticatedWorkspaceCrmActivitiesRoute:
+      AuthenticatedWorkspaceCrmActivitiesRoute,
+    AuthenticatedWorkspaceCrmContactsRoute:
+      AuthenticatedWorkspaceCrmContactsRoute,
+    AuthenticatedWorkspaceCrmEmailHistoryRoute:
+      AuthenticatedWorkspaceCrmEmailHistoryRoute,
+    AuthenticatedWorkspaceCrmFollowUpsRoute:
+      AuthenticatedWorkspaceCrmFollowUpsRoute,
+    AuthenticatedWorkspaceCrmLeadsRoute: AuthenticatedWorkspaceCrmLeadsRoute,
+    AuthenticatedWorkspaceCrmOpportunitiesRoute:
+      AuthenticatedWorkspaceCrmOpportunitiesRoute,
+    AuthenticatedWorkspaceCrmPipelineRoute:
+      AuthenticatedWorkspaceCrmPipelineRoute,
+    AuthenticatedWorkspaceCrmIndexRoute: AuthenticatedWorkspaceCrmIndexRoute,
+  }
+
+const AuthenticatedWorkspaceCrmRouteWithChildren =
+  AuthenticatedWorkspaceCrmRoute._addFileChildren(
+    AuthenticatedWorkspaceCrmRouteChildren,
+  )
+
 interface AuthenticatedWorkspaceMastersRouteChildren {
   AuthenticatedWorkspaceMastersMasterRoute: typeof AuthenticatedWorkspaceMastersMasterRoute
   AuthenticatedWorkspaceMastersIndexRoute: typeof AuthenticatedWorkspaceMastersIndexRoute
@@ -2333,7 +2548,7 @@ const AuthenticatedWorkspaceMastersRouteWithChildren =
 
 interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceAdministrationRoute: typeof AuthenticatedWorkspaceAdministrationRoute
-  AuthenticatedWorkspaceCrmRoute: typeof AuthenticatedWorkspaceCrmRoute
+  AuthenticatedWorkspaceCrmRoute: typeof AuthenticatedWorkspaceCrmRouteWithChildren
   AuthenticatedWorkspaceFinanceRoute: typeof AuthenticatedWorkspaceFinanceRoute
   AuthenticatedWorkspaceGstRoute: typeof AuthenticatedWorkspaceGstRoute
   AuthenticatedWorkspaceInventoryRoute: typeof AuthenticatedWorkspaceInventoryRoute
@@ -2349,7 +2564,7 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
   {
     AuthenticatedWorkspaceAdministrationRoute:
       AuthenticatedWorkspaceAdministrationRoute,
-    AuthenticatedWorkspaceCrmRoute: AuthenticatedWorkspaceCrmRoute,
+    AuthenticatedWorkspaceCrmRoute: AuthenticatedWorkspaceCrmRouteWithChildren,
     AuthenticatedWorkspaceFinanceRoute: AuthenticatedWorkspaceFinanceRoute,
     AuthenticatedWorkspaceGstRoute: AuthenticatedWorkspaceGstRoute,
     AuthenticatedWorkspaceInventoryRoute: AuthenticatedWorkspaceInventoryRoute,
