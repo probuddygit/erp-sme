@@ -43,11 +43,48 @@ interface Profile {
   company_id: string | null;
 }
 
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  owner_id: string;
+  plan: string;
+  status: string;
+}
+
+export interface Branch {
+  id: string;
+  company_id: string;
+  name: string;
+  code: string;
+  is_head_office: boolean;
+  is_active: boolean;
+}
+
+export interface FinancialYear {
+  id: string;
+  company_id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+  is_closed: boolean;
+}
+
 interface AuthCtx {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
   company: Company | null;
+  organization: Organization | null;
+  branches: Branch[];
+  activeBranchId: string | null;
+  setActiveBranchId: (id: string | null) => void;
+  financialYears: FinancialYear[];
+  activeFY: FinancialYear | null;
+  setActiveFYId: (id: string | null) => void;
+  permissions: Set<string>;
+  hasPermission: (key: string) => boolean;
   roles: AppRole[];
   isSuperAdmin: boolean;
   isCompanyAdmin: boolean;
