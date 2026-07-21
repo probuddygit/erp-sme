@@ -9,11 +9,13 @@ import {
   BarChart3,
   GitBranch,
   Settings,
+  Database,
   type LucideIcon,
 } from "lucide-react";
 
 export type WorkspaceModule =
   | "dashboard"
+  | "masters"
   | "crm"
   | "sales"
   | "procurement"
@@ -40,6 +42,14 @@ export const WORKSPACE_MODULES: ModuleDef[] = [
     path: "/workspace",
     icon: LayoutDashboard,
     description: "At-a-glance view of your business performance.",
+    roles: ["*"],
+  },
+  {
+    key: "masters",
+    label: "Master Data",
+    path: "/workspace/masters",
+    icon: Database,
+    description: "Reusable reference data — customers, vendors, items and more.",
     roles: ["*"],
   },
   {
