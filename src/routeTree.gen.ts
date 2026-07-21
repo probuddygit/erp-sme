@@ -84,8 +84,12 @@ import { Route as AuthenticatedWorkspaceProcurementPurchaseInvoicesRouteImport }
 import { Route as AuthenticatedWorkspaceProcurementGrnsRouteImport } from './routes/_authenticated.workspace.procurement.grns'
 import { Route as AuthenticatedWorkspaceMastersMasterRouteImport } from './routes/_authenticated.workspace.masters.$master'
 import { Route as AuthenticatedWorkspaceInventoryWarehousesRouteImport } from './routes/_authenticated.workspace.inventory.warehouses'
+import { Route as AuthenticatedWorkspaceInventoryStockTransferRouteImport } from './routes/_authenticated.workspace.inventory.stock-transfer'
 import { Route as AuthenticatedWorkspaceInventoryStockLedgerRouteImport } from './routes/_authenticated.workspace.inventory.stock-ledger'
+import { Route as AuthenticatedWorkspaceInventoryStockAdjustmentRouteImport } from './routes/_authenticated.workspace.inventory.stock-adjustment'
+import { Route as AuthenticatedWorkspaceInventoryOpeningStockRouteImport } from './routes/_authenticated.workspace.inventory.opening-stock'
 import { Route as AuthenticatedWorkspaceInventoryItemsRouteImport } from './routes/_authenticated.workspace.inventory.items'
+import { Route as AuthenticatedWorkspaceInventoryCycleCountRouteImport } from './routes/_authenticated.workspace.inventory.cycle-count'
 import { Route as AuthenticatedWorkspaceInventoryBinsRouteImport } from './routes/_authenticated.workspace.inventory.bins'
 import { Route as AuthenticatedWorkspaceCrmPipelineRouteImport } from './routes/_authenticated.workspace.crm.pipeline'
 import { Route as AuthenticatedWorkspaceCrmOpportunitiesRouteImport } from './routes/_authenticated.workspace.crm.opportunities'
@@ -560,16 +564,40 @@ const AuthenticatedWorkspaceInventoryWarehousesRoute =
     path: '/warehouses',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
   } as any)
+const AuthenticatedWorkspaceInventoryStockTransferRoute =
+  AuthenticatedWorkspaceInventoryStockTransferRouteImport.update({
+    id: '/stock-transfer',
+    path: '/stock-transfer',
+    getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
+  } as any)
 const AuthenticatedWorkspaceInventoryStockLedgerRoute =
   AuthenticatedWorkspaceInventoryStockLedgerRouteImport.update({
     id: '/stock-ledger',
     path: '/stock-ledger',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
   } as any)
+const AuthenticatedWorkspaceInventoryStockAdjustmentRoute =
+  AuthenticatedWorkspaceInventoryStockAdjustmentRouteImport.update({
+    id: '/stock-adjustment',
+    path: '/stock-adjustment',
+    getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
+  } as any)
+const AuthenticatedWorkspaceInventoryOpeningStockRoute =
+  AuthenticatedWorkspaceInventoryOpeningStockRouteImport.update({
+    id: '/opening-stock',
+    path: '/opening-stock',
+    getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
+  } as any)
 const AuthenticatedWorkspaceInventoryItemsRoute =
   AuthenticatedWorkspaceInventoryItemsRouteImport.update({
     id: '/items',
     path: '/items',
+    getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
+  } as any)
+const AuthenticatedWorkspaceInventoryCycleCountRoute =
+  AuthenticatedWorkspaceInventoryCycleCountRouteImport.update({
+    id: '/cycle-count',
+    path: '/cycle-count',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
   } as any)
 const AuthenticatedWorkspaceInventoryBinsRoute =
@@ -985,8 +1013,12 @@ export interface FileRoutesByFullPath {
   '/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
   '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
+  '/workspace/inventory/cycle-count': typeof AuthenticatedWorkspaceInventoryCycleCountRoute
   '/workspace/inventory/items': typeof AuthenticatedWorkspaceInventoryItemsRoute
+  '/workspace/inventory/opening-stock': typeof AuthenticatedWorkspaceInventoryOpeningStockRoute
+  '/workspace/inventory/stock-adjustment': typeof AuthenticatedWorkspaceInventoryStockAdjustmentRoute
   '/workspace/inventory/stock-ledger': typeof AuthenticatedWorkspaceInventoryStockLedgerRoute
+  '/workspace/inventory/stock-transfer': typeof AuthenticatedWorkspaceInventoryStockTransferRoute
   '/workspace/inventory/warehouses': typeof AuthenticatedWorkspaceInventoryWarehousesRoute
   '/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/workspace/procurement/grns': typeof AuthenticatedWorkspaceProcurementGrnsRoute
@@ -1099,8 +1131,12 @@ export interface FileRoutesByTo {
   '/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
   '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
+  '/workspace/inventory/cycle-count': typeof AuthenticatedWorkspaceInventoryCycleCountRoute
   '/workspace/inventory/items': typeof AuthenticatedWorkspaceInventoryItemsRoute
+  '/workspace/inventory/opening-stock': typeof AuthenticatedWorkspaceInventoryOpeningStockRoute
+  '/workspace/inventory/stock-adjustment': typeof AuthenticatedWorkspaceInventoryStockAdjustmentRoute
   '/workspace/inventory/stock-ledger': typeof AuthenticatedWorkspaceInventoryStockLedgerRoute
+  '/workspace/inventory/stock-transfer': typeof AuthenticatedWorkspaceInventoryStockTransferRoute
   '/workspace/inventory/warehouses': typeof AuthenticatedWorkspaceInventoryWarehousesRoute
   '/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/workspace/procurement/grns': typeof AuthenticatedWorkspaceProcurementGrnsRoute
@@ -1232,8 +1268,12 @@ export interface FileRoutesById {
   '/_authenticated/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
   '/_authenticated/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/_authenticated/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
+  '/_authenticated/workspace/inventory/cycle-count': typeof AuthenticatedWorkspaceInventoryCycleCountRoute
   '/_authenticated/workspace/inventory/items': typeof AuthenticatedWorkspaceInventoryItemsRoute
+  '/_authenticated/workspace/inventory/opening-stock': typeof AuthenticatedWorkspaceInventoryOpeningStockRoute
+  '/_authenticated/workspace/inventory/stock-adjustment': typeof AuthenticatedWorkspaceInventoryStockAdjustmentRoute
   '/_authenticated/workspace/inventory/stock-ledger': typeof AuthenticatedWorkspaceInventoryStockLedgerRoute
+  '/_authenticated/workspace/inventory/stock-transfer': typeof AuthenticatedWorkspaceInventoryStockTransferRoute
   '/_authenticated/workspace/inventory/warehouses': typeof AuthenticatedWorkspaceInventoryWarehousesRoute
   '/_authenticated/workspace/masters/$master': typeof AuthenticatedWorkspaceMastersMasterRoute
   '/_authenticated/workspace/procurement/grns': typeof AuthenticatedWorkspaceProcurementGrnsRoute
@@ -1365,8 +1405,12 @@ export interface FileRouteTypes {
     | '/workspace/crm/opportunities'
     | '/workspace/crm/pipeline'
     | '/workspace/inventory/bins'
+    | '/workspace/inventory/cycle-count'
     | '/workspace/inventory/items'
+    | '/workspace/inventory/opening-stock'
+    | '/workspace/inventory/stock-adjustment'
     | '/workspace/inventory/stock-ledger'
+    | '/workspace/inventory/stock-transfer'
     | '/workspace/inventory/warehouses'
     | '/workspace/masters/$master'
     | '/workspace/procurement/grns'
@@ -1479,8 +1523,12 @@ export interface FileRouteTypes {
     | '/workspace/crm/opportunities'
     | '/workspace/crm/pipeline'
     | '/workspace/inventory/bins'
+    | '/workspace/inventory/cycle-count'
     | '/workspace/inventory/items'
+    | '/workspace/inventory/opening-stock'
+    | '/workspace/inventory/stock-adjustment'
     | '/workspace/inventory/stock-ledger'
+    | '/workspace/inventory/stock-transfer'
     | '/workspace/inventory/warehouses'
     | '/workspace/masters/$master'
     | '/workspace/procurement/grns'
@@ -1611,8 +1659,12 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/crm/opportunities'
     | '/_authenticated/workspace/crm/pipeline'
     | '/_authenticated/workspace/inventory/bins'
+    | '/_authenticated/workspace/inventory/cycle-count'
     | '/_authenticated/workspace/inventory/items'
+    | '/_authenticated/workspace/inventory/opening-stock'
+    | '/_authenticated/workspace/inventory/stock-adjustment'
     | '/_authenticated/workspace/inventory/stock-ledger'
+    | '/_authenticated/workspace/inventory/stock-transfer'
     | '/_authenticated/workspace/inventory/warehouses'
     | '/_authenticated/workspace/masters/$master'
     | '/_authenticated/workspace/procurement/grns'
@@ -2184,6 +2236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryWarehousesRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
     }
+    '/_authenticated/workspace/inventory/stock-transfer': {
+      id: '/_authenticated/workspace/inventory/stock-transfer'
+      path: '/stock-transfer'
+      fullPath: '/workspace/inventory/stock-transfer'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInventoryStockTransferRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
     '/_authenticated/workspace/inventory/stock-ledger': {
       id: '/_authenticated/workspace/inventory/stock-ledger'
       path: '/stock-ledger'
@@ -2191,11 +2250,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryStockLedgerRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
     }
+    '/_authenticated/workspace/inventory/stock-adjustment': {
+      id: '/_authenticated/workspace/inventory/stock-adjustment'
+      path: '/stock-adjustment'
+      fullPath: '/workspace/inventory/stock-adjustment'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInventoryStockAdjustmentRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
+    '/_authenticated/workspace/inventory/opening-stock': {
+      id: '/_authenticated/workspace/inventory/opening-stock'
+      path: '/opening-stock'
+      fullPath: '/workspace/inventory/opening-stock'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInventoryOpeningStockRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
     '/_authenticated/workspace/inventory/items': {
       id: '/_authenticated/workspace/inventory/items'
       path: '/items'
       fullPath: '/workspace/inventory/items'
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryItemsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
+    '/_authenticated/workspace/inventory/cycle-count': {
+      id: '/_authenticated/workspace/inventory/cycle-count'
+      path: '/cycle-count'
+      fullPath: '/workspace/inventory/cycle-count'
+      preLoaderRoute: typeof AuthenticatedWorkspaceInventoryCycleCountRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
     }
     '/_authenticated/workspace/inventory/bins': {
@@ -2944,8 +3024,12 @@ const AuthenticatedWorkspaceCrmRouteWithChildren =
 
 interface AuthenticatedWorkspaceInventoryRouteChildren {
   AuthenticatedWorkspaceInventoryBinsRoute: typeof AuthenticatedWorkspaceInventoryBinsRoute
+  AuthenticatedWorkspaceInventoryCycleCountRoute: typeof AuthenticatedWorkspaceInventoryCycleCountRoute
   AuthenticatedWorkspaceInventoryItemsRoute: typeof AuthenticatedWorkspaceInventoryItemsRoute
+  AuthenticatedWorkspaceInventoryOpeningStockRoute: typeof AuthenticatedWorkspaceInventoryOpeningStockRoute
+  AuthenticatedWorkspaceInventoryStockAdjustmentRoute: typeof AuthenticatedWorkspaceInventoryStockAdjustmentRoute
   AuthenticatedWorkspaceInventoryStockLedgerRoute: typeof AuthenticatedWorkspaceInventoryStockLedgerRoute
+  AuthenticatedWorkspaceInventoryStockTransferRoute: typeof AuthenticatedWorkspaceInventoryStockTransferRoute
   AuthenticatedWorkspaceInventoryWarehousesRoute: typeof AuthenticatedWorkspaceInventoryWarehousesRoute
   AuthenticatedWorkspaceInventoryIndexRoute: typeof AuthenticatedWorkspaceInventoryIndexRoute
 }
@@ -2954,10 +3038,18 @@ const AuthenticatedWorkspaceInventoryRouteChildren: AuthenticatedWorkspaceInvent
   {
     AuthenticatedWorkspaceInventoryBinsRoute:
       AuthenticatedWorkspaceInventoryBinsRoute,
+    AuthenticatedWorkspaceInventoryCycleCountRoute:
+      AuthenticatedWorkspaceInventoryCycleCountRoute,
     AuthenticatedWorkspaceInventoryItemsRoute:
       AuthenticatedWorkspaceInventoryItemsRoute,
+    AuthenticatedWorkspaceInventoryOpeningStockRoute:
+      AuthenticatedWorkspaceInventoryOpeningStockRoute,
+    AuthenticatedWorkspaceInventoryStockAdjustmentRoute:
+      AuthenticatedWorkspaceInventoryStockAdjustmentRoute,
     AuthenticatedWorkspaceInventoryStockLedgerRoute:
       AuthenticatedWorkspaceInventoryStockLedgerRoute,
+    AuthenticatedWorkspaceInventoryStockTransferRoute:
+      AuthenticatedWorkspaceInventoryStockTransferRoute,
     AuthenticatedWorkspaceInventoryWarehousesRoute:
       AuthenticatedWorkspaceInventoryWarehousesRoute,
     AuthenticatedWorkspaceInventoryIndexRoute:
