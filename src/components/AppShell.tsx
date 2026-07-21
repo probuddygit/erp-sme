@@ -86,7 +86,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Cog className="h-5 w-5 text-accent-foreground" />
             </div>
             <div>
-              <div className="font-bold tracking-tight text-base">Forge ERP</div>
+              <div className="font-bold tracking-tight text-base">Ind Guru ERP</div>
               <div className="text-[11px] uppercase tracking-widest text-sidebar-foreground/60">
                 {isSuperAdmin ? "Platform" : company?.name ?? "Workspace"}
               </div>
@@ -171,7 +171,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button onClick={() => setOpen(!open)} className="p-2 -ml-2">
             <Menu className="h-5 w-5" />
           </button>
-          <div className="font-bold">Forge ERP</div>
+          <div className="font-bold">Ind Guru ERP</div>
           <div className="w-6" />
         </header>
         <main className="flex-1 overflow-y-auto">

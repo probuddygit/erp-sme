@@ -26,7 +26,7 @@ function Index() {
             <div className="h-9 w-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-accent)" }}>
               <Cog className="h-5 w-5 text-accent-foreground" />
             </div>
-            <span className="font-bold tracking-tight">Forge ERP</span>
+            <span className="font-bold tracking-tight">Ind Guru ERP</span>
           </div>
           <div className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
@@ -77,7 +77,7 @@ function Index() {
 
       <footer className="border-t border-border">
         <div className="mx-auto max-w-6xl px-6 py-6 text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Forge ERP
+          © {new Date().getFullYear()} Ind Guru ERP
         </div>
       </footer>
     </div>
