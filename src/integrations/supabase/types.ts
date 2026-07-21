@@ -3835,6 +3835,9 @@ export type Database = {
         | "hr"
         | "quality"
         | "maintenance"
+        | "owner"
+        | "manager"
+        | "viewer"
       approval_status: "pending" | "approved" | "rejected" | "cancelled"
       attendance_status:
         | "present"
@@ -4125,6 +4128,9 @@ export const Constants = {
         "hr",
         "quality",
         "maintenance",
+        "owner",
+        "manager",
+        "viewer",
       ],
       approval_status: ["pending", "approved", "rejected", "cancelled"],
       attendance_status: [
