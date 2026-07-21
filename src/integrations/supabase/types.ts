@@ -620,6 +620,53 @@ export type Database = {
           },
         ]
       }
+      currencies: {
+        Row: {
+          code: string
+          company_id: string
+          created_at: string
+          exchange_rate: number
+          id: string
+          is_active: boolean
+          is_base: boolean
+          name: string
+          symbol: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          company_id: string
+          created_at?: string
+          exchange_rate?: number
+          id?: string
+          is_active?: boolean
+          is_base?: boolean
+          name: string
+          symbol?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          company_id?: string
+          created_at?: string
+          exchange_rate?: number
+          id?: string
+          is_active?: boolean
+          is_base?: boolean
+          name?: string
+          symbol?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "currencies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_pricing_rules: {
         Row: {
           company_id: string
@@ -1112,6 +1159,56 @@ export type Database = {
             columns: ["entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gst_rates: {
+        Row: {
+          cgst: number
+          company_id: string
+          created_at: string
+          hsn_sac: string | null
+          id: string
+          igst: number
+          is_active: boolean
+          name: string
+          rate: number
+          sgst: number
+          updated_at: string
+        }
+        Insert: {
+          cgst?: number
+          company_id: string
+          created_at?: string
+          hsn_sac?: string | null
+          id?: string
+          igst?: number
+          is_active?: boolean
+          name: string
+          rate: number
+          sgst?: number
+          updated_at?: string
+        }
+        Update: {
+          cgst?: number
+          company_id?: string
+          created_at?: string
+          hsn_sac?: string | null
+          id?: string
+          igst?: number
+          is_active?: boolean
+          name?: string
+          rate?: number
+          sgst?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gst_rates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -2223,6 +2320,56 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_terms: {
+        Row: {
+          code: string
+          company_id: string
+          created_at: string
+          description: string | null
+          discount_days: number | null
+          discount_percent: number | null
+          id: string
+          is_active: boolean
+          name: string
+          net_days: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          company_id: string
+          created_at?: string
+          description?: string | null
+          discount_days?: number | null
+          discount_percent?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          net_days?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          discount_days?: number | null
+          discount_percent?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          net_days?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_terms_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -2427,6 +2574,56 @@ export type Database = {
           module?: string
         }
         Relationships: []
+      }
+      price_lists: {
+        Row: {
+          code: string
+          company_id: string
+          created_at: string
+          currency: string
+          id: string
+          is_active: boolean
+          list_type: string
+          name: string
+          updated_at: string
+          valid_from: string | null
+          valid_to: string | null
+        }
+        Insert: {
+          code: string
+          company_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          list_type?: string
+          name: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Update: {
+          code?: string
+          company_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          list_type?: string
+          name?: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_lists_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       production_logs: {
         Row: {
@@ -3744,6 +3941,94 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      tax_codes: {
+        Row: {
+          code: string
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          rate: number
+          tax_type: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          rate?: number
+          tax_type?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          rate?: number
+          tax_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_codes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uom: {
+        Row: {
+          code: string
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uom_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_permission_overrides: {
         Row: {
