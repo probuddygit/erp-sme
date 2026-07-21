@@ -1,41 +1,128 @@
-## Smart Maintenance & Predictive Maintenance — Module 1 (Machine Master)
 
-This is the first phase. Your message lists Module 1 (Machine Master) in detail and outlines integrations + future modules. I'll scaffold the module foundation + Machine Master now, and we can iterate on subsequent modules (work orders, breakdowns, spare consumption, technician assignments, analytics) in follow-up turns.
+# ERP Platform Revamp — Audit & Roadmap
 
-### Scope (this turn)
+## Part 1 — Current State (What's Implemented)
 
-1. **DB schema** — `machines` table (multi-tenant via `company_id`), with categories, status enum, plant link, runtime/frequency, attachments URL, notes. RLS scoped via `get_user_company` + `has_company_role` patterns already in use. Add `maintenance` to `app_module` enum if not present so module access works with existing `canAccessModule`.
-2. **Sidebar nav** — add "Maintenance" entry in `AppShell` MODULES with `Wrench` icon.
-3. **Routes**:
-   - `_authenticated.app.maintenance.tsx` — layout w/ tabs (Overview, Machines; placeholders for Work Orders, Breakdowns, Spares, Technicians, Reports — coming next)
-   - `_authenticated.app.maintenance.index.tsx` — overview cards (counts by status, low-runtime warnings)
-   - `_authenticated.app.maintenance.machines.tsx` — list + create/edit dialog + RowActions delete
-   - `_authenticated.app.maintenance.machines.$id.tsx` — machine profile page (details, status history placeholder, future linkages)
-4. **UI**:
-   - Status badges (Running / Idle / Under Maintenance / Breakdown) with color tokens
-   - Inline create/edit dialog (matches existing list-page pattern)
-   - Status quick-change action
-5. **Integrations stubs (data model only this turn)**:
-   - `production_line_id` FK → existing production line table (if present; else free text)
-   - `department` text linking to HR department naming convention
-   - Reserved fields & nullable FKs so subsequent modules (work orders, spare consumption → inventory, labour → finance JE, technician → employees) can attach without schema churn.
+### Platform Foundation
+- Multi-tenant SaaS with `companies`, per-company module toggles (`enabled_modules`), role-based access (`user_roles`), Super Admin + Company Admin hierarchy
+- Auth via Lovable Cloud (Supabase), RLS on every table, security-hardened helper functions
+- TanStack Start SSR shell, sidebar navigation (`AppShell`), module-gated routes under `/_authenticated/app/*`
 
-### Technical details
+### Modules & Features
 
-- Migration creates: enum `machine_status`, table `public.machines` with company-scoped RLS (admin/maintenance/production roles can write; viewers read), update trigger.
-- Add `'maintenance'` to existing `app_module` enum (if not already), and grant default access to admin role on company creation hook (or assume admins always have it via existing logic — verify in `auth-context`).
-- Machine list page mirrors the patterns already used in `inventory/items.tsx` and uses `RowActions`.
-- No edge functions; pure client + RLS.
+**1. Sales & CRM** (`/app/sales`)
+- Pipeline (Leads), Customers, Quotations, Sales Orders, Invoices
+- Line-item editor, status workflows, CRUD with row actions
 
-### Out of scope (next turns)
+**2. Procurement** (`/app/procurement`)
+- Suppliers, Purchase Indents, RFQs (with supplier quotes), Purchase Orders (+ detail page), GRNs, Vendor Invoices
+- Status-gated deletes, PO → GRN → invoice flow
 
-- Work orders (preventive + breakdown), spare part consumption hooks into inventory, labour cost JE posting, technician assignments from `employees`, low-stock procurement recommendations, dashboard KPI widgets, predictive analytics scaffolding.
+**3. Inventory** (`/app/inventory`)
+- Items master, Warehouses, Stock Movements (audit trail), stock batches
+- CRUD on masters; movements immutable
 
-### File changes
+**4. Production** (`/app/production`)
+- Bills of Materials (+ components), Work Orders (+ detail), Timeline view
+- Material consumption + production output tracking
 
-- **New migration**: `machines` table, `machine_status` enum, RLS, trigger, enum extension.
-- **Edit** `src/components/AppShell.tsx`: add Maintenance nav entry.
-- **Edit** `src/lib/auth-context.tsx` (only if `AppModule` type needs `"maintenance"` added).
-- **New routes**: `_authenticated.app.maintenance.tsx`, `.index.tsx`, `.machines.tsx`, `.machines.$id.tsx`.
+**5. Finance & Accounting** (`/app/finance`)
+- Chart of Accounts, Journal Entries + Lines, GST Ledger, P&L / Balance Sheet reports
+- Auto-posting triggers from invoices/payroll, `account_balances` RPC
 
-Confirm to proceed, or tell me if you'd rather I scaffold ALL planned sub-modules (machines + work orders + breakdowns + spares + technicians + analytics) end-to-end in one go (larger change, more tables).
+**6. HR & Payroll** (`/app/hr`)
+- Employees, Attendance, Salary Structures, Payroll Runs & Items
+- Restricted PII access (admin/hr only)
+
+**7. Quality** (`/app/quality`)
+- QC Inspections (incoming/in-process/finished) with checklists, NCR records, reports
+
+**8. Smart Maintenance** (`/app/maintenance`)
+- Machines master, Tickets (kanban+calendar), Preventive Plans, Runtime/Downtime logs
+- Spare parts linkage, Alerts engine, Analytics (Utilization, MTBF, MTTR)
+
+**9. Reports** (`/app/reports`)
+- Executive dashboard, Sales analytics, Procurement, Inventory reports
+
+**10. Admin** (`/admin`)
+- Companies provisioning, Users & Roles management
+
+---
+
+## Part 2 — Gaps & Refinement Opportunities
+
+### Cross-cutting gaps
+- No **document/file storage** (attachments on POs, invoices, QC certs, machine manuals)
+- No **email/PDF generation** (invoices, POs, quotations aren't sendable/printable)
+- No **approval workflows** (PO approval matrix, leave approval, JE posting approval)
+- No **audit log** of who changed what
+- No **global search** across entities
+- No **dashboards per role** (only one executive view)
+- No **import/export** (CSV/Excel) for master data
+- No **notifications delivery** (alerts exist but no email/in-app toast pipeline)
+- Limited **mobile responsiveness** review
+
+### Module-level refinements
+- **Sales**: credit limits, recurring invoices, dispatch/delivery notes, sales returns, commission tracking
+- **Procurement**: 3-way match (PO/GRN/Invoice), landed cost, supplier scorecards, contract mgmt
+- **Inventory**: multi-UOM conversions, serial/batch traceability UI, cycle counts, reorder point automation, stock valuation (FIFO/weighted avg) reports
+- **Production**: capacity planning, shop-floor operator terminal, routing/operations, scrap tracking, MRP run
+- **Finance**: bank reconciliation, cash flow statement, budgets vs actuals, fixed asset register + depreciation, TDS, e-invoicing/e-way bill (India)
+- **HR**: leave management, shift scheduling, appraisals, expense claims, loans/advances, statutory reports (PF/ESI/PT)
+- **Quality**: CAPA workflow, supplier quality (incoming reject trends), calibration register
+- **Maintenance**: work-order labour cost → finance JE, condition-based/IoT sensor hooks, predictive ML scoring (already envisioned)
+- **Reports**: custom report builder, scheduled email reports, drill-through
+
+### Technical refinements
+- Consolidate duplicated layout/tab code across module `*.tsx` layout files into a shared component
+- Introduce a **notification center** (in-app toasts + email via edge/server fn) driven by `alerts`
+- **PDF service** (server function → HTML template → PDF) for invoices/POs/quotations
+- **Storage buckets** wired to attachment fields
+- **Query performance** review (indexes on frequently-filtered columns: company_id + status combos)
+- **Consistent status enums** and reusable status-badge component
+- **Form UX**: replace ad-hoc dialogs with a shared record drawer/side-sheet pattern
+- **Empty states, skeleton loaders, error boundaries** standardized
+
+---
+
+## Part 3 — Proposed Revamp Roadmap (Phased)
+
+### Phase A — Platform polish & cross-cutting foundations
+1. Shared **module layout** component + reusable **StatusBadge**, **RecordDrawer**, **DataTable** primitives
+2. **Attachments/storage** infrastructure (bucket + reusable uploader)
+3. **PDF generation** server function + templates for invoice/PO/quotation
+4. **Notification center** UI + email delivery for `alerts`
+5. **Global search** command palette (Cmd+K)
+6. **Audit log** table + triggers on critical entities
+7. **CSV import/export** utility for masters
+
+### Phase B — Sales/Procurement/Inventory depth
+8. Approval workflows (PO matrix, credit-limit override)
+9. Sales returns, delivery notes, recurring invoices
+10. 3-way match, supplier scorecards
+11. Serial/batch traceability UI, cycle counts, reorder automation, valuation reports
+
+### Phase C — Finance maturity
+12. Bank reconciliation, cash flow, budgets
+13. Fixed assets + depreciation
+14. TDS, e-invoicing, e-way bill (India localization)
+
+### Phase D — Production & HR depth
+15. Capacity planning, shop-floor terminal, MRP
+16. Leave/shift/expense/appraisal modules, statutory reports
+
+### Phase E — Quality/Maintenance/Analytics
+17. CAPA, supplier quality, calibration
+18. Maintenance labour → finance posting, IoT sensor ingest, predictive scoring
+19. Report builder + scheduled reports; role-based dashboards
+
+---
+
+## Questions Before I Start Phase A
+
+1. **Priority order** — do you want to follow A→E, or jump to a specific module (e.g., Finance localization or Production shop-floor first)?
+2. **Localization scope** — Is India-only (GST, TDS, e-invoice) sufficient, or multi-country?
+3. **PDF/email** — OK to use Lovable AI Gateway + a server-side PDF library, and add an email provider connector (Resend) for outbound?
+4. **Approvals** — should approvals be a generic engine (reusable across modules) or hard-coded per module?
+
+Reply with priorities/answers and I'll produce a detailed Phase A build plan.
