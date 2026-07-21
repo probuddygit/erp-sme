@@ -1,76 +1,113 @@
-# Platform Revamp — Scaffold Only (No Business Logic)
+# Enterprise Authentication & RBAC
 
-Reshape the existing ERP into a modern SAP Fiori / Zoho-inspired shell for Indian MSME Trading & Distribution. This pass is **architecture, navigation, layout, auth/RBAC, empty pages, shared components, and theme** only — no CRUD logic, no data fetching in module pages.
+Leverages existing `profiles`, `companies`, `user_roles`, `app_role` schema. Adds organization, branches, financial years, invitations, permissions, audit log. New auth surfaces live under `/auth/*` and `/onboarding/*`. Legacy `/app` and `/workspace` shells remain.
 
-## Scope guardrails
-- Keep existing DB, auth-context, RLS, and Supabase integration intact.
-- Existing feature routes (`/app/*` sales/procurement/etc.) remain functional — we do **not** delete them. New scaffold lives alongside as the new primary shell.
-- No new business logic. New module pages render an `<EmptyModule />` placeholder.
+## 1. Database (single migration)
 
-## 1. Design system refresh (`src/styles.css`)
-- White background, blue primary (`hsl(217 91% 60%)` family), neutral grays, subtle borders.
-- Fiori-inspired: flat surfaces, rounded-lg cards, soft shadows, generous spacing.
-- Typography: Inter via `<link>` in `__root.tsx` head.
-- Update semantic tokens: `--background`, `--primary`, `--sidebar-*`, `--accent`, radius `0.75rem`.
+### New tables
+- **organizations** — tenant root above companies. `name`, `slug`, `owner_id`, `plan`, `status`, timestamps.
+- **companies** (extend existing) — add `organization_id`, `legal_name`, `gstin`, `pan`, `state_code`, `country`, `currency`, `address`, `logo_url`.
+- **branches** — `company_id`, `name`, `code`, `gstin`, `state_code`, `address`, `is_head_office`, `is_active`.
+- **financial_years** — `company_id`, `name` (e.g. "FY 2025-26"), `start_date`, `end_date`, `is_active`, `is_closed`.
+- **permissions** — catalog of permission keys (`module.action`, e.g. `sales.view`, `sales.create`, `sales.approve`).
+- **role_permissions** — maps `app_role` → `permission_key` (defaults per role).
+- **user_permission_overrides** — grant/revoke specific perms per user in a company (optional overlay).
+- **invitations** — `organization_id`, `company_id`, `email`, `role`, `token_hash`, `invited_by`, `status` (pending/accepted/revoked/expired), `expires_at`, `accepted_at`.
+- **audit_logs** — `organization_id`, `company_id`, `user_id`, `action`, `entity`, `entity_id`, `metadata jsonb`, `ip`, `user_agent`, `created_at`.
 
-## 2. Folder structure (DDD-lite)
-```
-src/
-  modules/
-    dashboard/    pages/  components/  index.ts
-    crm/          pages/  components/  index.ts
-    sales/        pages/  components/  index.ts
-    procurement/  ...
-    inventory/    ...
-    finance/      ...
-    gst/          ...
-    reports/      ...
-    workflow/     ...
-    administration/ ...
-  shared/
-    components/   (PageHeader, EmptyModule, StatCard, DataCard, ModuleGrid, Breadcrumbs)
-    layout/       (AppLayout, TopBar, SideNav, MobileNav)
-    hooks/
-    types/
-  lib/            (existing: auth-context, utils)
-```
-Existing `src/components/ui/*` (shadcn) stays.
+### Enum additions
+- `app_role`: add `owner`, `manager`, `viewer` (keep existing).
+- `invitation_status`, `fy_status` enums.
 
-## 3. Routing (new shell under `/workspace`)
-New pathless layout `src/routes/_authenticated.workspace.tsx` renders the new `AppLayout`. Module index routes:
-- `/workspace` → Dashboard
-- `/workspace/crm`
-- `/workspace/sales`
-- `/workspace/procurement`
-- `/workspace/inventory`
-- `/workspace/finance`
-- `/workspace/gst`
-- `/workspace/reports`
-- `/workspace/workflow`
-- `/workspace/administration`
+### Functions & policies
+- `has_permission(_user_id, _company_id, _perm_key)` — SECURITY DEFINER, checks role_permissions + overrides.
+- `current_user_orgs()`, `current_user_companies()` helpers.
+- Update `handle_new_user` to skip profile.company_id (company assigned via onboarding).
+- RLS: every new table scoped by org/company; org rows readable by members; audit_logs insert-only by service or via SECURITY DEFINER function.
+- GRANT SELECT/INSERT/UPDATE/DELETE per policy on each table.
 
-Each page renders `<EmptyModule title="..." description="..." />`. Existing `/app/*` routes are untouched.
+### Seed
+- Insert baseline permission catalog for 10 modules × common actions (view/create/update/delete/approve/export).
+- Insert default `role_permissions` mapping.
 
-## 4. Shared layout components
-- **`AppLayout`** — TopBar + collapsible SideNav + main content, mobile-first drawer.
-- **`TopBar`** — logo, company/branch/FY switcher (visual only), global search input (non-functional), notifications icon, user menu with sign-out.
-- **`SideNav`** — icon+label modules, active state, role-gated visibility via `useAuth`. Collapsible to icon rail on desktop.
-- **`MobileNav`** — bottom tab bar for top 5 modules on small screens.
-- **`PageHeader`** — title, subtitle, breadcrumbs, actions slot.
-- **`EmptyModule`** — icon, title, description, "Coming soon" chip.
-- **`StatCard`**, **`DataCard`**, **`ModuleGrid`** — reusable primitives.
+## 2. Auth routes (`src/routes/auth/*`)
 
-## 5. RBAC scaffold
-Extend `auth-context` role → module map to cover new modules (`crm`, `gst`, `workflow`, `administration`). No DB changes. `SideNav` filters by `canAccessModule`. Non-accessible modules hidden, not disabled.
+Public routes (top-level, no auth gate):
+- `/auth/login` — email+password + Google.
+- `/auth/register` — creates user + organization in same server fn.
+- `/auth/forgot-password` — `resetPasswordForEmail`.
+- `/auth/reset-password` — updates password (handles `type=recovery` hash).
+- `/auth/verify-email` — landing after email confirmation link.
+- `/auth/accept-invite` — token param → validates + creates membership.
 
-## 6. Auth
-Reuse existing `_authenticated` gate and login route. Redirect authenticated users landing on `/` to `/workspace` (keep existing dashboard `/app` as legacy alias).
+Replace legacy `/login` with redirect to `/auth/login`.
 
-## 7. Not in scope this pass
-- No new DB migrations.
-- No CRUD, no forms, no data fetching in new module pages.
-- Legacy `/app/*` UI stays as-is (can be migrated module by module in follow-ups).
-- Approvals, audit logs, branches, FY switching — UI affordances only (dropdowns render static options), no persistence.
+## 3. Onboarding wizard (`/onboarding/*`, authenticated)
 
-## Deliverable
-User navigates to `/workspace`, sees Fiori-style shell, can click through 10 modules, each showing a polished empty state. Role-based nav filtering works. Existing app continues to function.
+Multi-step for users whose organization has no company yet:
+- `/onboarding/company` — legal name, GSTIN, PAN, state, currency, logo.
+- `/onboarding/branch` — head office branch (auto-created; user may add more).
+- `/onboarding/financial-year` — FY start month/date, generates current FY.
+- `/onboarding/invite` — optional email invitations.
+- `/onboarding/complete` → `/workspace`.
+
+Gate: if `profile.company_id` null AND user owns an org without companies, force `/onboarding/company`.
+
+## 4. Server functions
+
+Under `src/features/auth/*.functions.ts` and `src/features/org/*.functions.ts`:
+- `registerOrganization({ orgName, fullName })` — post-signup finalizer.
+- `createCompany(...)`, `createBranch(...)`, `createFinancialYear(...)`.
+- `inviteUser({ email, role, companyId })` — creates invitation row, sends email via existing auth email infra (magic link with token).
+- `acceptInvitation({ token })` — validates hash, creates `user_roles` row, updates profile.
+- `revokeInvitation`, `resendInvitation`.
+- `listBranches`, `listFinancialYears`, `switchActiveFY`.
+- All use `requireSupabaseAuth`, write audit_logs.
+
+## 5. RBAC middleware & hooks
+
+- **Server**: `requirePermission(permKey)` middleware factory — chains on `requireSupabaseAuth`, resolves company from request context, throws 403 if `has_permission` returns false.
+- **Client**: `usePermission(key)` hook + `<Can permission="...">` component reading from auth context (fetched via `getMyPermissions` server fn on login, cached in React Query).
+- **Route guards**: each `_authenticated/workspace/<module>` route calls `beforeLoad` → checks permission via context; unauthorized → `/unauthorized` page.
+- Add `<Unauthorized />` route.
+
+## 6. Auth context updates
+
+Extend `AuthProvider` with:
+- `organization`, `branches[]`, `activeBranch`, `financialYears[]`, `activeFinancialYear`, `permissions: Set<string>`, `hasPermission(key)`.
+- Branch & FY switchers in TopBar (already scaffolded UI) wired to real data.
+
+## 7. Email
+
+Use existing auth email infra (already scaffolded per `authentication-emails-guide`). Add:
+- Invitation email (transactional) — accept URL with token.
+- If auth email infra not yet configured, call `email_domain--check_email_domain_status` and scaffold if missing.
+
+## 8. Files to add/edit (high level)
+
+New:
+- `src/routes/auth/login.tsx`, `register.tsx`, `forgot-password.tsx`, `reset-password.tsx`, `verify-email.tsx`, `accept-invite.tsx`, `route.tsx` (public layout).
+- `src/routes/_authenticated/onboarding.*.tsx` (5 files).
+- `src/routes/_authenticated/unauthorized.tsx`.
+- `src/features/auth/*.functions.ts`, `src/features/org/*.functions.ts`.
+- `src/features/rbac/{permissions.ts, use-permission.ts, Can.tsx, require-permission.ts}`.
+- `src/shared/components/wizard/{Stepper.tsx, WizardShell.tsx}`.
+
+Edit:
+- `src/lib/auth-context.tsx` — load org/branches/FYs/perms.
+- `src/shared/layout/TopBar.tsx` — wire real switchers.
+- `src/routes/index.tsx`, `src/routes/login.tsx` — redirect to `/auth/login`.
+- `src/routes/_authenticated/route.tsx` if needed for onboarding gate.
+
+## Out of scope (per user)
+- No business module logic.
+- No reporting/dashboard data.
+
+## Delivery order
+1. Migration (schema + permission seed).
+2. Server fns for auth/org/invitation.
+3. Auth pages (`/auth/*`).
+4. Onboarding wizard.
+5. RBAC middleware + hooks + route guards.
+6. Auth context wiring + TopBar switchers.
+7. Invitation email template.
