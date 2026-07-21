@@ -120,6 +120,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [activeBranchId, setActiveBranchIdState] = useState<string | null>(null);
+  const [financialYears, setFinancialYears] = useState<FinancialYear[]>([]);
+  const [activeFYId, setActiveFYIdState] = useState<string | null>(null);
+  const [permissions, setPermissions] = useState<Set<string>>(new Set());
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
   const sessionLoadRef = useRef(0);
@@ -127,6 +133,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearUserData = useCallback(() => {
     setProfile(null);
     setCompany(null);
+    setOrganization(null);
+    setBranches([]);
+    setActiveBranchIdState(null);
+    setFinancialYears([]);
+    setActiveFYIdState(null);
+    setPermissions(new Set());
     setRoles([]);
   }, []);
 
@@ -140,6 +152,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const roleList = (rs ?? []).map((r: { role: AppRole }) => r.role);
     let nextCompany: Company | null = null;
+    let nextOrg: Organization | null = null;
+    let nextBranches: Branch[] = [];
+    let nextFYs: FinancialYear[] = [];
     if (prof?.company_id) {
       const { data: co, error: companyError } = await supabase
         .from("companies")
@@ -148,8 +163,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
       if (companyError) throw companyError;
       nextCompany = co as Company | null;
+      const orgId = (co as unknown as { organization_id?: string | null } | null)?.organization_id ?? null;
+      const [{ data: orgRow }, { data: brRows }, { data: fyRows }] = await Promise.all([
+        orgId
+          ? supabase.from("organizations").select("*").eq("id", orgId).maybeSingle()
+          : Promise.resolve({ data: null }),
+        supabase.from("branches").select("*").eq("company_id", prof.company_id).order("is_head_office", { ascending: false }),
+        supabase.from("financial_years").select("*").eq("company_id", prof.company_id).order("start_date", { ascending: false }),
+      ]);
+      nextOrg = (orgRow as Organization | null) ?? null;
+      nextBranches = (brRows as Branch[] | null) ?? [];
+      nextFYs = (fyRows as FinancialYear[] | null) ?? [];
+    } else {
+      // Owner without a company yet — still fetch their org
+      const { data: ownerOrg } = await supabase
+        .from("organizations")
+        .select("*")
+        .eq("owner_id", uid)
+        .maybeSingle();
+      nextOrg = (ownerOrg as Organization | null) ?? null;
     }
-    return { profile: prof as Profile | null, roles: roleList, company: nextCompany };
+
+    // Permission set: union of role_permissions for all held roles + user overrides.
+    let permSet = new Set<string>();
+    if (roleList.length > 0) {
+      const { data: rpRows } = await supabase
+        .from("role_permissions")
+        .select("permission_key")
+        .in("role", roleList);
+      permSet = new Set((rpRows ?? []).map((r: { permission_key: string }) => r.permission_key));
+    }
+    if (prof?.company_id) {
+      const { data: overrides } = await supabase
+        .from("user_permission_overrides")
+        .select("permission_key, granted")
+        .eq("user_id", uid)
+        .eq("company_id", prof.company_id);
+      for (const o of overrides ?? []) {
+        if (o.granted) permSet.add(o.permission_key);
+        else permSet.delete(o.permission_key);
+      }
+    }
+
+    return {
+      profile: prof as Profile | null,
+      roles: roleList,
+      company: nextCompany,
+      organization: nextOrg,
+      branches: nextBranches,
+      financialYears: nextFYs,
+      permissions: permSet,
+    };
   }, []);
 
   const applySession = useCallback(async (nextSession: Session | null) => {
@@ -170,6 +234,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(nextUserData.profile);
       setRoles(nextUserData.roles);
       setCompany(nextUserData.company);
+      setOrganization(nextUserData.organization);
+      setBranches(nextUserData.branches);
+      setFinancialYears(nextUserData.financialYears);
+      setPermissions(nextUserData.permissions);
+      setActiveBranchIdState((prev) => prev ?? nextUserData.branches.find((b) => b.is_head_office)?.id ?? nextUserData.branches[0]?.id ?? null);
+      setActiveFYIdState((prev) => prev ?? nextUserData.financialYears.find((f) => f.is_active)?.id ?? nextUserData.financialYears[0]?.id ?? null);
     } catch (error) {
       console.error("Failed to load auth profile", error);
       if (loadId === sessionLoadRef.current) clearUserData();
@@ -240,6 +310,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(nextUserData.profile);
       setRoles(nextUserData.roles);
       setCompany(nextUserData.company);
+      setOrganization(nextUserData.organization);
+      setBranches(nextUserData.branches);
+      setFinancialYears(nextUserData.financialYears);
+      setPermissions(nextUserData.permissions);
     } finally {
       setLoading(false);
     }
@@ -254,6 +328,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!hasModule(m)) return false;
     return roles.some((r) => ROLE_MODULE_MAP[r]?.includes(m));
   };
+  const hasPermission = (key: string) => isSuperAdmin || roles.includes("owner") || permissions.has(key);
+  const activeFY = financialYears.find((f) => f.id === activeFYId) ?? null;
+  const setActiveBranchId = (id: string | null) => setActiveBranchIdState(id);
+  const setActiveFYId = (id: string | null) => setActiveFYIdState(id);
 
   return (
     <Ctx.Provider
@@ -262,6 +340,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         profile,
         company,
+        organization,
+        branches,
+        activeBranchId,
+        setActiveBranchId,
+        financialYears,
+        activeFY,
+        setActiveFYId,
+        permissions,
+        hasPermission,
         roles,
         isSuperAdmin,
         isCompanyAdmin,
