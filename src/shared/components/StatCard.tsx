@@ -6,10 +6,11 @@ interface Props {
   value: string | number;
   icon?: LucideIcon;
   trend?: { value: string; positive?: boolean };
+  hint?: string;
   className?: string;
 }
 
-export function StatCard({ label, value, icon: Icon, trend, className }: Props) {
+export function StatCard({ label, value, icon: Icon, trend, hint, className }: Props) {
   return (
     <div className={cn("rounded-xl border border-border bg-card p-5 shadow-sm", className)}>
       <div className="flex items-start justify-between">
@@ -32,6 +33,9 @@ export function StatCard({ label, value, icon: Icon, trend, className }: Props) 
         >
           {trend.value}
         </div>
+      )}
+      {hint && !trend && (
+        <div className="mt-1 text-xs text-muted-foreground">{hint}</div>
       )}
     </div>
   );
