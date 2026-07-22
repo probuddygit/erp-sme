@@ -58,6 +58,7 @@ import { Route as AuthenticatedWorkspaceSalesIndexRouteImport } from './routes/_
 import { Route as AuthenticatedWorkspaceProcurementIndexRouteImport } from './routes/_authenticated.workspace.procurement.index'
 import { Route as AuthenticatedWorkspaceMastersIndexRouteImport } from './routes/_authenticated.workspace.masters.index'
 import { Route as AuthenticatedWorkspaceInventoryIndexRouteImport } from './routes/_authenticated.workspace.inventory.index'
+import { Route as AuthenticatedWorkspaceFinanceIndexRouteImport } from './routes/_authenticated.workspace.finance.index'
 import { Route as AuthenticatedWorkspaceCrmIndexRouteImport } from './routes/_authenticated.workspace.crm.index'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
 import { Route as AuthenticatedAppReportsIndexRouteImport } from './routes/_authenticated.app.reports.index'
@@ -97,6 +98,18 @@ import { Route as AuthenticatedWorkspaceInventoryCycleCountRouteImport } from '.
 import { Route as AuthenticatedWorkspaceInventoryBinsRouteImport } from './routes/_authenticated.workspace.inventory.bins'
 import { Route as AuthenticatedWorkspaceInventoryBatchNumbersRouteImport } from './routes/_authenticated.workspace.inventory.batch-numbers'
 import { Route as AuthenticatedWorkspaceInventoryBarcodeRouteImport } from './routes/_authenticated.workspace.inventory.barcode'
+import { Route as AuthenticatedWorkspaceFinanceTrialBalanceRouteImport } from './routes/_authenticated.workspace.finance.trial-balance'
+import { Route as AuthenticatedWorkspaceFinanceReceiptsRouteImport } from './routes/_authenticated.workspace.finance.receipts'
+import { Route as AuthenticatedWorkspaceFinanceProfitLossRouteImport } from './routes/_authenticated.workspace.finance.profit-loss'
+import { Route as AuthenticatedWorkspaceFinancePaymentsRouteImport } from './routes/_authenticated.workspace.finance.payments'
+import { Route as AuthenticatedWorkspaceFinanceJournalEntriesRouteImport } from './routes/_authenticated.workspace.finance.journal-entries'
+import { Route as AuthenticatedWorkspaceFinanceGeneralLedgerRouteImport } from './routes/_authenticated.workspace.finance.general-ledger'
+import { Route as AuthenticatedWorkspaceFinanceDebitNotesRouteImport } from './routes/_authenticated.workspace.finance.debit-notes'
+import { Route as AuthenticatedWorkspaceFinanceCreditNotesRouteImport } from './routes/_authenticated.workspace.finance.credit-notes'
+import { Route as AuthenticatedWorkspaceFinanceContraRouteImport } from './routes/_authenticated.workspace.finance.contra'
+import { Route as AuthenticatedWorkspaceFinanceChartOfAccountsRouteImport } from './routes/_authenticated.workspace.finance.chart-of-accounts'
+import { Route as AuthenticatedWorkspaceFinanceCashFlowRouteImport } from './routes/_authenticated.workspace.finance.cash-flow'
+import { Route as AuthenticatedWorkspaceFinanceBalanceSheetRouteImport } from './routes/_authenticated.workspace.finance.balance-sheet'
 import { Route as AuthenticatedWorkspaceCrmPipelineRouteImport } from './routes/_authenticated.workspace.crm.pipeline'
 import { Route as AuthenticatedWorkspaceCrmOpportunitiesRouteImport } from './routes/_authenticated.workspace.crm.opportunities'
 import { Route as AuthenticatedWorkspaceCrmLeadsRouteImport } from './routes/_authenticated.workspace.crm.leads'
@@ -415,6 +428,12 @@ const AuthenticatedWorkspaceInventoryIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
   } as any)
+const AuthenticatedWorkspaceFinanceIndexRoute =
+  AuthenticatedWorkspaceFinanceIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
 const AuthenticatedWorkspaceCrmIndexRoute =
   AuthenticatedWorkspaceCrmIndexRouteImport.update({
     id: '/',
@@ -647,6 +666,78 @@ const AuthenticatedWorkspaceInventoryBarcodeRoute =
     id: '/barcode',
     path: '/barcode',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceTrialBalanceRoute =
+  AuthenticatedWorkspaceFinanceTrialBalanceRouteImport.update({
+    id: '/trial-balance',
+    path: '/trial-balance',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceReceiptsRoute =
+  AuthenticatedWorkspaceFinanceReceiptsRouteImport.update({
+    id: '/receipts',
+    path: '/receipts',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceProfitLossRoute =
+  AuthenticatedWorkspaceFinanceProfitLossRouteImport.update({
+    id: '/profit-loss',
+    path: '/profit-loss',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinancePaymentsRoute =
+  AuthenticatedWorkspaceFinancePaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceJournalEntriesRoute =
+  AuthenticatedWorkspaceFinanceJournalEntriesRouteImport.update({
+    id: '/journal-entries',
+    path: '/journal-entries',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceGeneralLedgerRoute =
+  AuthenticatedWorkspaceFinanceGeneralLedgerRouteImport.update({
+    id: '/general-ledger',
+    path: '/general-ledger',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceDebitNotesRoute =
+  AuthenticatedWorkspaceFinanceDebitNotesRouteImport.update({
+    id: '/debit-notes',
+    path: '/debit-notes',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceCreditNotesRoute =
+  AuthenticatedWorkspaceFinanceCreditNotesRouteImport.update({
+    id: '/credit-notes',
+    path: '/credit-notes',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceContraRoute =
+  AuthenticatedWorkspaceFinanceContraRouteImport.update({
+    id: '/contra',
+    path: '/contra',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceChartOfAccountsRoute =
+  AuthenticatedWorkspaceFinanceChartOfAccountsRouteImport.update({
+    id: '/chart-of-accounts',
+    path: '/chart-of-accounts',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceCashFlowRoute =
+  AuthenticatedWorkspaceFinanceCashFlowRouteImport.update({
+    id: '/cash-flow',
+    path: '/cash-flow',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceBalanceSheetRoute =
+  AuthenticatedWorkspaceFinanceBalanceSheetRouteImport.update({
+    id: '/balance-sheet',
+    path: '/balance-sheet',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
   } as any)
 const AuthenticatedWorkspaceCrmPipelineRoute =
   AuthenticatedWorkspaceCrmPipelineRouteImport.update({
@@ -995,7 +1086,7 @@ export interface FileRoutesByFullPath {
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
   '/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
-  '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
+  '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRouteWithChildren
   '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   '/workspace/masters': typeof AuthenticatedWorkspaceMastersRouteWithChildren
@@ -1054,6 +1145,18 @@ export interface FileRoutesByFullPath {
   '/workspace/crm/leads': typeof AuthenticatedWorkspaceCrmLeadsRoute
   '/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
   '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
+  '/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
+  '/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
+  '/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
+  '/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
+  '/workspace/finance/credit-notes': typeof AuthenticatedWorkspaceFinanceCreditNotesRoute
+  '/workspace/finance/debit-notes': typeof AuthenticatedWorkspaceFinanceDebitNotesRoute
+  '/workspace/finance/general-ledger': typeof AuthenticatedWorkspaceFinanceGeneralLedgerRoute
+  '/workspace/finance/journal-entries': typeof AuthenticatedWorkspaceFinanceJournalEntriesRoute
+  '/workspace/finance/payments': typeof AuthenticatedWorkspaceFinancePaymentsRoute
+  '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
+  '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
+  '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
   '/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1093,6 +1196,7 @@ export interface FileRoutesByFullPath {
   '/app/reports/': typeof AuthenticatedAppReportsIndexRoute
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
   '/workspace/crm/': typeof AuthenticatedWorkspaceCrmIndexRoute
+  '/workspace/finance/': typeof AuthenticatedWorkspaceFinanceIndexRoute
   '/workspace/inventory/': typeof AuthenticatedWorkspaceInventoryIndexRoute
   '/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/workspace/procurement/': typeof AuthenticatedWorkspaceProcurementIndexRoute
@@ -1123,7 +1227,6 @@ export interface FileRoutesByTo {
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
-  '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
   '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/workspace/workflow': typeof AuthenticatedWorkspaceWorkflowRoute
@@ -1178,6 +1281,18 @@ export interface FileRoutesByTo {
   '/workspace/crm/leads': typeof AuthenticatedWorkspaceCrmLeadsRoute
   '/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
   '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
+  '/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
+  '/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
+  '/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
+  '/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
+  '/workspace/finance/credit-notes': typeof AuthenticatedWorkspaceFinanceCreditNotesRoute
+  '/workspace/finance/debit-notes': typeof AuthenticatedWorkspaceFinanceDebitNotesRoute
+  '/workspace/finance/general-ledger': typeof AuthenticatedWorkspaceFinanceGeneralLedgerRoute
+  '/workspace/finance/journal-entries': typeof AuthenticatedWorkspaceFinanceJournalEntriesRoute
+  '/workspace/finance/payments': typeof AuthenticatedWorkspaceFinancePaymentsRoute
+  '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
+  '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
+  '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
   '/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1217,6 +1332,7 @@ export interface FileRoutesByTo {
   '/app/reports': typeof AuthenticatedAppReportsIndexRoute
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
   '/workspace/crm': typeof AuthenticatedWorkspaceCrmIndexRoute
+  '/workspace/finance': typeof AuthenticatedWorkspaceFinanceIndexRoute
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryIndexRoute
   '/workspace/masters': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/workspace/procurement': typeof AuthenticatedWorkspaceProcurementIndexRoute
@@ -1262,7 +1378,7 @@ export interface FileRoutesById {
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
   '/_authenticated/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
   '/_authenticated/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
-  '/_authenticated/workspace/finance': typeof AuthenticatedWorkspaceFinanceRoute
+  '/_authenticated/workspace/finance': typeof AuthenticatedWorkspaceFinanceRouteWithChildren
   '/_authenticated/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/_authenticated/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   '/_authenticated/workspace/masters': typeof AuthenticatedWorkspaceMastersRouteWithChildren
@@ -1321,6 +1437,18 @@ export interface FileRoutesById {
   '/_authenticated/workspace/crm/leads': typeof AuthenticatedWorkspaceCrmLeadsRoute
   '/_authenticated/workspace/crm/opportunities': typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
   '/_authenticated/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
+  '/_authenticated/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
+  '/_authenticated/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
+  '/_authenticated/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
+  '/_authenticated/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
+  '/_authenticated/workspace/finance/credit-notes': typeof AuthenticatedWorkspaceFinanceCreditNotesRoute
+  '/_authenticated/workspace/finance/debit-notes': typeof AuthenticatedWorkspaceFinanceDebitNotesRoute
+  '/_authenticated/workspace/finance/general-ledger': typeof AuthenticatedWorkspaceFinanceGeneralLedgerRoute
+  '/_authenticated/workspace/finance/journal-entries': typeof AuthenticatedWorkspaceFinanceJournalEntriesRoute
+  '/_authenticated/workspace/finance/payments': typeof AuthenticatedWorkspaceFinancePaymentsRoute
+  '/_authenticated/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
+  '/_authenticated/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
+  '/_authenticated/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
   '/_authenticated/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/_authenticated/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/_authenticated/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1360,6 +1488,7 @@ export interface FileRoutesById {
   '/_authenticated/app/reports/': typeof AuthenticatedAppReportsIndexRoute
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
   '/_authenticated/workspace/crm/': typeof AuthenticatedWorkspaceCrmIndexRoute
+  '/_authenticated/workspace/finance/': typeof AuthenticatedWorkspaceFinanceIndexRoute
   '/_authenticated/workspace/inventory/': typeof AuthenticatedWorkspaceInventoryIndexRoute
   '/_authenticated/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/_authenticated/workspace/procurement/': typeof AuthenticatedWorkspaceProcurementIndexRoute
@@ -1464,6 +1593,18 @@ export interface FileRouteTypes {
     | '/workspace/crm/leads'
     | '/workspace/crm/opportunities'
     | '/workspace/crm/pipeline'
+    | '/workspace/finance/balance-sheet'
+    | '/workspace/finance/cash-flow'
+    | '/workspace/finance/chart-of-accounts'
+    | '/workspace/finance/contra'
+    | '/workspace/finance/credit-notes'
+    | '/workspace/finance/debit-notes'
+    | '/workspace/finance/general-ledger'
+    | '/workspace/finance/journal-entries'
+    | '/workspace/finance/payments'
+    | '/workspace/finance/profit-loss'
+    | '/workspace/finance/receipts'
+    | '/workspace/finance/trial-balance'
     | '/workspace/inventory/barcode'
     | '/workspace/inventory/batch-numbers'
     | '/workspace/inventory/bins'
@@ -1503,6 +1644,7 @@ export interface FileRouteTypes {
     | '/app/reports/'
     | '/app/sales/'
     | '/workspace/crm/'
+    | '/workspace/finance/'
     | '/workspace/inventory/'
     | '/workspace/masters/'
     | '/workspace/procurement/'
@@ -1533,7 +1675,6 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/users'
     | '/workspace/administration'
-    | '/workspace/finance'
     | '/workspace/gst'
     | '/workspace/reports'
     | '/workspace/workflow'
@@ -1588,6 +1729,18 @@ export interface FileRouteTypes {
     | '/workspace/crm/leads'
     | '/workspace/crm/opportunities'
     | '/workspace/crm/pipeline'
+    | '/workspace/finance/balance-sheet'
+    | '/workspace/finance/cash-flow'
+    | '/workspace/finance/chart-of-accounts'
+    | '/workspace/finance/contra'
+    | '/workspace/finance/credit-notes'
+    | '/workspace/finance/debit-notes'
+    | '/workspace/finance/general-ledger'
+    | '/workspace/finance/journal-entries'
+    | '/workspace/finance/payments'
+    | '/workspace/finance/profit-loss'
+    | '/workspace/finance/receipts'
+    | '/workspace/finance/trial-balance'
     | '/workspace/inventory/barcode'
     | '/workspace/inventory/batch-numbers'
     | '/workspace/inventory/bins'
@@ -1627,6 +1780,7 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/sales'
     | '/workspace/crm'
+    | '/workspace/finance'
     | '/workspace/inventory'
     | '/workspace/masters'
     | '/workspace/procurement'
@@ -1730,6 +1884,18 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/crm/leads'
     | '/_authenticated/workspace/crm/opportunities'
     | '/_authenticated/workspace/crm/pipeline'
+    | '/_authenticated/workspace/finance/balance-sheet'
+    | '/_authenticated/workspace/finance/cash-flow'
+    | '/_authenticated/workspace/finance/chart-of-accounts'
+    | '/_authenticated/workspace/finance/contra'
+    | '/_authenticated/workspace/finance/credit-notes'
+    | '/_authenticated/workspace/finance/debit-notes'
+    | '/_authenticated/workspace/finance/general-ledger'
+    | '/_authenticated/workspace/finance/journal-entries'
+    | '/_authenticated/workspace/finance/payments'
+    | '/_authenticated/workspace/finance/profit-loss'
+    | '/_authenticated/workspace/finance/receipts'
+    | '/_authenticated/workspace/finance/trial-balance'
     | '/_authenticated/workspace/inventory/barcode'
     | '/_authenticated/workspace/inventory/batch-numbers'
     | '/_authenticated/workspace/inventory/bins'
@@ -1769,6 +1935,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/reports/'
     | '/_authenticated/app/sales/'
     | '/_authenticated/workspace/crm/'
+    | '/_authenticated/workspace/finance/'
     | '/_authenticated/workspace/inventory/'
     | '/_authenticated/workspace/masters/'
     | '/_authenticated/workspace/procurement/'
@@ -2132,6 +2299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryIndexRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
     }
+    '/_authenticated/workspace/finance/': {
+      id: '/_authenticated/workspace/finance/'
+      path: '/'
+      fullPath: '/workspace/finance/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
     '/_authenticated/workspace/crm/': {
       id: '/_authenticated/workspace/crm/'
       path: '/'
@@ -2404,6 +2578,90 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/inventory/barcode'
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryBarcodeRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
+    '/_authenticated/workspace/finance/trial-balance': {
+      id: '/_authenticated/workspace/finance/trial-balance'
+      path: '/trial-balance'
+      fullPath: '/workspace/finance/trial-balance'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceTrialBalanceRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/receipts': {
+      id: '/_authenticated/workspace/finance/receipts'
+      path: '/receipts'
+      fullPath: '/workspace/finance/receipts'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceReceiptsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/profit-loss': {
+      id: '/_authenticated/workspace/finance/profit-loss'
+      path: '/profit-loss'
+      fullPath: '/workspace/finance/profit-loss'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceProfitLossRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/payments': {
+      id: '/_authenticated/workspace/finance/payments'
+      path: '/payments'
+      fullPath: '/workspace/finance/payments'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinancePaymentsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/journal-entries': {
+      id: '/_authenticated/workspace/finance/journal-entries'
+      path: '/journal-entries'
+      fullPath: '/workspace/finance/journal-entries'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceJournalEntriesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/general-ledger': {
+      id: '/_authenticated/workspace/finance/general-ledger'
+      path: '/general-ledger'
+      fullPath: '/workspace/finance/general-ledger'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceGeneralLedgerRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/debit-notes': {
+      id: '/_authenticated/workspace/finance/debit-notes'
+      path: '/debit-notes'
+      fullPath: '/workspace/finance/debit-notes'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceDebitNotesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/credit-notes': {
+      id: '/_authenticated/workspace/finance/credit-notes'
+      path: '/credit-notes'
+      fullPath: '/workspace/finance/credit-notes'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceCreditNotesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/contra': {
+      id: '/_authenticated/workspace/finance/contra'
+      path: '/contra'
+      fullPath: '/workspace/finance/contra'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceContraRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/chart-of-accounts': {
+      id: '/_authenticated/workspace/finance/chart-of-accounts'
+      path: '/chart-of-accounts'
+      fullPath: '/workspace/finance/chart-of-accounts'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceChartOfAccountsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/cash-flow': {
+      id: '/_authenticated/workspace/finance/cash-flow'
+      path: '/cash-flow'
+      fullPath: '/workspace/finance/cash-flow'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceCashFlowRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/balance-sheet': {
+      id: '/_authenticated/workspace/finance/balance-sheet'
+      path: '/balance-sheet'
+      fullPath: '/workspace/finance/balance-sheet'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceBalanceSheetRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
     }
     '/_authenticated/workspace/crm/pipeline': {
       id: '/_authenticated/workspace/crm/pipeline'
@@ -3142,6 +3400,57 @@ const AuthenticatedWorkspaceCrmRouteWithChildren =
     AuthenticatedWorkspaceCrmRouteChildren,
   )
 
+interface AuthenticatedWorkspaceFinanceRouteChildren {
+  AuthenticatedWorkspaceFinanceBalanceSheetRoute: typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
+  AuthenticatedWorkspaceFinanceCashFlowRoute: typeof AuthenticatedWorkspaceFinanceCashFlowRoute
+  AuthenticatedWorkspaceFinanceChartOfAccountsRoute: typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
+  AuthenticatedWorkspaceFinanceContraRoute: typeof AuthenticatedWorkspaceFinanceContraRoute
+  AuthenticatedWorkspaceFinanceCreditNotesRoute: typeof AuthenticatedWorkspaceFinanceCreditNotesRoute
+  AuthenticatedWorkspaceFinanceDebitNotesRoute: typeof AuthenticatedWorkspaceFinanceDebitNotesRoute
+  AuthenticatedWorkspaceFinanceGeneralLedgerRoute: typeof AuthenticatedWorkspaceFinanceGeneralLedgerRoute
+  AuthenticatedWorkspaceFinanceJournalEntriesRoute: typeof AuthenticatedWorkspaceFinanceJournalEntriesRoute
+  AuthenticatedWorkspaceFinancePaymentsRoute: typeof AuthenticatedWorkspaceFinancePaymentsRoute
+  AuthenticatedWorkspaceFinanceProfitLossRoute: typeof AuthenticatedWorkspaceFinanceProfitLossRoute
+  AuthenticatedWorkspaceFinanceReceiptsRoute: typeof AuthenticatedWorkspaceFinanceReceiptsRoute
+  AuthenticatedWorkspaceFinanceTrialBalanceRoute: typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  AuthenticatedWorkspaceFinanceIndexRoute: typeof AuthenticatedWorkspaceFinanceIndexRoute
+}
+
+const AuthenticatedWorkspaceFinanceRouteChildren: AuthenticatedWorkspaceFinanceRouteChildren =
+  {
+    AuthenticatedWorkspaceFinanceBalanceSheetRoute:
+      AuthenticatedWorkspaceFinanceBalanceSheetRoute,
+    AuthenticatedWorkspaceFinanceCashFlowRoute:
+      AuthenticatedWorkspaceFinanceCashFlowRoute,
+    AuthenticatedWorkspaceFinanceChartOfAccountsRoute:
+      AuthenticatedWorkspaceFinanceChartOfAccountsRoute,
+    AuthenticatedWorkspaceFinanceContraRoute:
+      AuthenticatedWorkspaceFinanceContraRoute,
+    AuthenticatedWorkspaceFinanceCreditNotesRoute:
+      AuthenticatedWorkspaceFinanceCreditNotesRoute,
+    AuthenticatedWorkspaceFinanceDebitNotesRoute:
+      AuthenticatedWorkspaceFinanceDebitNotesRoute,
+    AuthenticatedWorkspaceFinanceGeneralLedgerRoute:
+      AuthenticatedWorkspaceFinanceGeneralLedgerRoute,
+    AuthenticatedWorkspaceFinanceJournalEntriesRoute:
+      AuthenticatedWorkspaceFinanceJournalEntriesRoute,
+    AuthenticatedWorkspaceFinancePaymentsRoute:
+      AuthenticatedWorkspaceFinancePaymentsRoute,
+    AuthenticatedWorkspaceFinanceProfitLossRoute:
+      AuthenticatedWorkspaceFinanceProfitLossRoute,
+    AuthenticatedWorkspaceFinanceReceiptsRoute:
+      AuthenticatedWorkspaceFinanceReceiptsRoute,
+    AuthenticatedWorkspaceFinanceTrialBalanceRoute:
+      AuthenticatedWorkspaceFinanceTrialBalanceRoute,
+    AuthenticatedWorkspaceFinanceIndexRoute:
+      AuthenticatedWorkspaceFinanceIndexRoute,
+  }
+
+const AuthenticatedWorkspaceFinanceRouteWithChildren =
+  AuthenticatedWorkspaceFinanceRoute._addFileChildren(
+    AuthenticatedWorkspaceFinanceRouteChildren,
+  )
+
 interface AuthenticatedWorkspaceInventoryRouteChildren {
   AuthenticatedWorkspaceInventoryBarcodeRoute: typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   AuthenticatedWorkspaceInventoryBatchNumbersRoute: typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
@@ -3292,7 +3601,7 @@ const AuthenticatedWorkspaceSalesRouteWithChildren =
 interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceAdministrationRoute: typeof AuthenticatedWorkspaceAdministrationRoute
   AuthenticatedWorkspaceCrmRoute: typeof AuthenticatedWorkspaceCrmRouteWithChildren
-  AuthenticatedWorkspaceFinanceRoute: typeof AuthenticatedWorkspaceFinanceRoute
+  AuthenticatedWorkspaceFinanceRoute: typeof AuthenticatedWorkspaceFinanceRouteWithChildren
   AuthenticatedWorkspaceGstRoute: typeof AuthenticatedWorkspaceGstRoute
   AuthenticatedWorkspaceInventoryRoute: typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   AuthenticatedWorkspaceMastersRoute: typeof AuthenticatedWorkspaceMastersRouteWithChildren
@@ -3308,7 +3617,8 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
     AuthenticatedWorkspaceAdministrationRoute:
       AuthenticatedWorkspaceAdministrationRoute,
     AuthenticatedWorkspaceCrmRoute: AuthenticatedWorkspaceCrmRouteWithChildren,
-    AuthenticatedWorkspaceFinanceRoute: AuthenticatedWorkspaceFinanceRoute,
+    AuthenticatedWorkspaceFinanceRoute:
+      AuthenticatedWorkspaceFinanceRouteWithChildren,
     AuthenticatedWorkspaceGstRoute: AuthenticatedWorkspaceGstRoute,
     AuthenticatedWorkspaceInventoryRoute:
       AuthenticatedWorkspaceInventoryRouteWithChildren,
