@@ -99,6 +99,7 @@ import { Route as AuthenticatedWorkspaceInventoryCycleCountRouteImport } from '.
 import { Route as AuthenticatedWorkspaceInventoryBinsRouteImport } from './routes/_authenticated.workspace.inventory.bins'
 import { Route as AuthenticatedWorkspaceInventoryBatchNumbersRouteImport } from './routes/_authenticated.workspace.inventory.batch-numbers'
 import { Route as AuthenticatedWorkspaceInventoryBarcodeRouteImport } from './routes/_authenticated.workspace.inventory.barcode'
+import { Route as AuthenticatedWorkspaceGstRatesRouteImport } from './routes/_authenticated.workspace.gst.rates'
 import { Route as AuthenticatedWorkspaceGstHsnRouteImport } from './routes/_authenticated.workspace.gst.hsn'
 import { Route as AuthenticatedWorkspaceGstConfigurationRouteImport } from './routes/_authenticated.workspace.gst.configuration'
 import { Route as AuthenticatedWorkspaceFinanceTrialBalanceRouteImport } from './routes/_authenticated.workspace.finance.trial-balance'
@@ -676,6 +677,12 @@ const AuthenticatedWorkspaceInventoryBarcodeRoute =
     path: '/barcode',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
   } as any)
+const AuthenticatedWorkspaceGstRatesRoute =
+  AuthenticatedWorkspaceGstRatesRouteImport.update({
+    id: '/rates',
+    path: '/rates',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
 const AuthenticatedWorkspaceGstHsnRoute =
   AuthenticatedWorkspaceGstHsnRouteImport.update({
     id: '/hsn',
@@ -1180,6 +1187,7 @@ export interface FileRoutesByFullPath {
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
   '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/workspace/gst/hsn': typeof AuthenticatedWorkspaceGstHsnRoute
+  '/workspace/gst/rates': typeof AuthenticatedWorkspaceGstRatesRoute
   '/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1318,6 +1326,7 @@ export interface FileRoutesByTo {
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
   '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/workspace/gst/hsn': typeof AuthenticatedWorkspaceGstHsnRoute
+  '/workspace/gst/rates': typeof AuthenticatedWorkspaceGstRatesRoute
   '/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1477,6 +1486,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
   '/_authenticated/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/_authenticated/workspace/gst/hsn': typeof AuthenticatedWorkspaceGstHsnRoute
+  '/_authenticated/workspace/gst/rates': typeof AuthenticatedWorkspaceGstRatesRoute
   '/_authenticated/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/_authenticated/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/_authenticated/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1636,6 +1646,7 @@ export interface FileRouteTypes {
     | '/workspace/finance/trial-balance'
     | '/workspace/gst/configuration'
     | '/workspace/gst/hsn'
+    | '/workspace/gst/rates'
     | '/workspace/inventory/barcode'
     | '/workspace/inventory/batch-numbers'
     | '/workspace/inventory/bins'
@@ -1774,6 +1785,7 @@ export interface FileRouteTypes {
     | '/workspace/finance/trial-balance'
     | '/workspace/gst/configuration'
     | '/workspace/gst/hsn'
+    | '/workspace/gst/rates'
     | '/workspace/inventory/barcode'
     | '/workspace/inventory/batch-numbers'
     | '/workspace/inventory/bins'
@@ -1932,6 +1944,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/finance/trial-balance'
     | '/_authenticated/workspace/gst/configuration'
     | '/_authenticated/workspace/gst/hsn'
+    | '/_authenticated/workspace/gst/rates'
     | '/_authenticated/workspace/inventory/barcode'
     | '/_authenticated/workspace/inventory/batch-numbers'
     | '/_authenticated/workspace/inventory/bins'
@@ -2622,6 +2635,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/inventory/barcode'
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryBarcodeRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
+    '/_authenticated/workspace/gst/rates': {
+      id: '/_authenticated/workspace/gst/rates'
+      path: '/rates'
+      fullPath: '/workspace/gst/rates'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstRatesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
     }
     '/_authenticated/workspace/gst/hsn': {
       id: '/_authenticated/workspace/gst/hsn'
@@ -3512,6 +3532,7 @@ const AuthenticatedWorkspaceFinanceRouteWithChildren =
 interface AuthenticatedWorkspaceGstRouteChildren {
   AuthenticatedWorkspaceGstConfigurationRoute: typeof AuthenticatedWorkspaceGstConfigurationRoute
   AuthenticatedWorkspaceGstHsnRoute: typeof AuthenticatedWorkspaceGstHsnRoute
+  AuthenticatedWorkspaceGstRatesRoute: typeof AuthenticatedWorkspaceGstRatesRoute
   AuthenticatedWorkspaceGstIndexRoute: typeof AuthenticatedWorkspaceGstIndexRoute
 }
 
@@ -3520,6 +3541,7 @@ const AuthenticatedWorkspaceGstRouteChildren: AuthenticatedWorkspaceGstRouteChil
     AuthenticatedWorkspaceGstConfigurationRoute:
       AuthenticatedWorkspaceGstConfigurationRoute,
     AuthenticatedWorkspaceGstHsnRoute: AuthenticatedWorkspaceGstHsnRoute,
+    AuthenticatedWorkspaceGstRatesRoute: AuthenticatedWorkspaceGstRatesRoute,
     AuthenticatedWorkspaceGstIndexRoute: AuthenticatedWorkspaceGstIndexRoute,
   }
 
