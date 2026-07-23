@@ -99,6 +99,7 @@ import { Route as AuthenticatedWorkspaceInventoryCycleCountRouteImport } from '.
 import { Route as AuthenticatedWorkspaceInventoryBinsRouteImport } from './routes/_authenticated.workspace.inventory.bins'
 import { Route as AuthenticatedWorkspaceInventoryBatchNumbersRouteImport } from './routes/_authenticated.workspace.inventory.batch-numbers'
 import { Route as AuthenticatedWorkspaceInventoryBarcodeRouteImport } from './routes/_authenticated.workspace.inventory.barcode'
+import { Route as AuthenticatedWorkspaceGstConfigurationRouteImport } from './routes/_authenticated.workspace.gst.configuration'
 import { Route as AuthenticatedWorkspaceFinanceTrialBalanceRouteImport } from './routes/_authenticated.workspace.finance.trial-balance'
 import { Route as AuthenticatedWorkspaceFinanceReceiptsRouteImport } from './routes/_authenticated.workspace.finance.receipts'
 import { Route as AuthenticatedWorkspaceFinanceProfitLossRouteImport } from './routes/_authenticated.workspace.finance.profit-loss'
@@ -674,6 +675,12 @@ const AuthenticatedWorkspaceInventoryBarcodeRoute =
     path: '/barcode',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
   } as any)
+const AuthenticatedWorkspaceGstConfigurationRoute =
+  AuthenticatedWorkspaceGstConfigurationRouteImport.update({
+    id: '/configuration',
+    path: '/configuration',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
 const AuthenticatedWorkspaceFinanceTrialBalanceRoute =
   AuthenticatedWorkspaceFinanceTrialBalanceRouteImport.update({
     id: '/trial-balance',
@@ -1164,6 +1171,7 @@ export interface FileRoutesByFullPath {
   '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1300,6 +1308,7 @@ export interface FileRoutesByTo {
   '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1457,6 +1466,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/_authenticated/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/_authenticated/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/_authenticated/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/_authenticated/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/_authenticated/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/_authenticated/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1614,6 +1624,7 @@ export interface FileRouteTypes {
     | '/workspace/finance/profit-loss'
     | '/workspace/finance/receipts'
     | '/workspace/finance/trial-balance'
+    | '/workspace/gst/configuration'
     | '/workspace/inventory/barcode'
     | '/workspace/inventory/batch-numbers'
     | '/workspace/inventory/bins'
@@ -1750,6 +1761,7 @@ export interface FileRouteTypes {
     | '/workspace/finance/profit-loss'
     | '/workspace/finance/receipts'
     | '/workspace/finance/trial-balance'
+    | '/workspace/gst/configuration'
     | '/workspace/inventory/barcode'
     | '/workspace/inventory/batch-numbers'
     | '/workspace/inventory/bins'
@@ -1906,6 +1918,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/finance/profit-loss'
     | '/_authenticated/workspace/finance/receipts'
     | '/_authenticated/workspace/finance/trial-balance'
+    | '/_authenticated/workspace/gst/configuration'
     | '/_authenticated/workspace/inventory/barcode'
     | '/_authenticated/workspace/inventory/batch-numbers'
     | '/_authenticated/workspace/inventory/bins'
@@ -2596,6 +2609,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/inventory/barcode'
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryBarcodeRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
+    '/_authenticated/workspace/gst/configuration': {
+      id: '/_authenticated/workspace/gst/configuration'
+      path: '/configuration'
+      fullPath: '/workspace/gst/configuration'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstConfigurationRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
     }
     '/_authenticated/workspace/finance/trial-balance': {
       id: '/_authenticated/workspace/finance/trial-balance'
@@ -3470,11 +3490,14 @@ const AuthenticatedWorkspaceFinanceRouteWithChildren =
   )
 
 interface AuthenticatedWorkspaceGstRouteChildren {
+  AuthenticatedWorkspaceGstConfigurationRoute: typeof AuthenticatedWorkspaceGstConfigurationRoute
   AuthenticatedWorkspaceGstIndexRoute: typeof AuthenticatedWorkspaceGstIndexRoute
 }
 
 const AuthenticatedWorkspaceGstRouteChildren: AuthenticatedWorkspaceGstRouteChildren =
   {
+    AuthenticatedWorkspaceGstConfigurationRoute:
+      AuthenticatedWorkspaceGstConfigurationRoute,
     AuthenticatedWorkspaceGstIndexRoute: AuthenticatedWorkspaceGstIndexRoute,
   }
 
