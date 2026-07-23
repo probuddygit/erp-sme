@@ -58,6 +58,7 @@ import { Route as AuthenticatedWorkspaceSalesIndexRouteImport } from './routes/_
 import { Route as AuthenticatedWorkspaceProcurementIndexRouteImport } from './routes/_authenticated.workspace.procurement.index'
 import { Route as AuthenticatedWorkspaceMastersIndexRouteImport } from './routes/_authenticated.workspace.masters.index'
 import { Route as AuthenticatedWorkspaceInventoryIndexRouteImport } from './routes/_authenticated.workspace.inventory.index'
+import { Route as AuthenticatedWorkspaceGstIndexRouteImport } from './routes/_authenticated.workspace.gst.index'
 import { Route as AuthenticatedWorkspaceFinanceIndexRouteImport } from './routes/_authenticated.workspace.finance.index'
 import { Route as AuthenticatedWorkspaceCrmIndexRouteImport } from './routes/_authenticated.workspace.crm.index'
 import { Route as AuthenticatedAppSalesIndexRouteImport } from './routes/_authenticated.app.sales.index'
@@ -98,6 +99,15 @@ import { Route as AuthenticatedWorkspaceInventoryCycleCountRouteImport } from '.
 import { Route as AuthenticatedWorkspaceInventoryBinsRouteImport } from './routes/_authenticated.workspace.inventory.bins'
 import { Route as AuthenticatedWorkspaceInventoryBatchNumbersRouteImport } from './routes/_authenticated.workspace.inventory.batch-numbers'
 import { Route as AuthenticatedWorkspaceInventoryBarcodeRouteImport } from './routes/_authenticated.workspace.inventory.barcode'
+import { Route as AuthenticatedWorkspaceGstTaxRulesRouteImport } from './routes/_authenticated.workspace.gst.tax-rules'
+import { Route as AuthenticatedWorkspaceGstReportsRouteImport } from './routes/_authenticated.workspace.gst.reports'
+import { Route as AuthenticatedWorkspaceGstRatesRouteImport } from './routes/_authenticated.workspace.gst.rates'
+import { Route as AuthenticatedWorkspaceGstHsnRouteImport } from './routes/_authenticated.workspace.gst.hsn'
+import { Route as AuthenticatedWorkspaceGstGstr3bRouteImport } from './routes/_authenticated.workspace.gst.gstr3b'
+import { Route as AuthenticatedWorkspaceGstGstr1RouteImport } from './routes/_authenticated.workspace.gst.gstr1'
+import { Route as AuthenticatedWorkspaceGstEWayBillRouteImport } from './routes/_authenticated.workspace.gst.e-way-bill'
+import { Route as AuthenticatedWorkspaceGstEInvoiceRouteImport } from './routes/_authenticated.workspace.gst.e-invoice'
+import { Route as AuthenticatedWorkspaceGstConfigurationRouteImport } from './routes/_authenticated.workspace.gst.configuration'
 import { Route as AuthenticatedWorkspaceFinanceTrialBalanceRouteImport } from './routes/_authenticated.workspace.finance.trial-balance'
 import { Route as AuthenticatedWorkspaceFinanceReceiptsRouteImport } from './routes/_authenticated.workspace.finance.receipts'
 import { Route as AuthenticatedWorkspaceFinanceProfitLossRouteImport } from './routes/_authenticated.workspace.finance.profit-loss'
@@ -428,6 +438,12 @@ const AuthenticatedWorkspaceInventoryIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
   } as any)
+const AuthenticatedWorkspaceGstIndexRoute =
+  AuthenticatedWorkspaceGstIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
 const AuthenticatedWorkspaceFinanceIndexRoute =
   AuthenticatedWorkspaceFinanceIndexRouteImport.update({
     id: '/',
@@ -666,6 +682,60 @@ const AuthenticatedWorkspaceInventoryBarcodeRoute =
     id: '/barcode',
     path: '/barcode',
     getParentRoute: () => AuthenticatedWorkspaceInventoryRoute,
+  } as any)
+const AuthenticatedWorkspaceGstTaxRulesRoute =
+  AuthenticatedWorkspaceGstTaxRulesRouteImport.update({
+    id: '/tax-rules',
+    path: '/tax-rules',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
+const AuthenticatedWorkspaceGstReportsRoute =
+  AuthenticatedWorkspaceGstReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
+const AuthenticatedWorkspaceGstRatesRoute =
+  AuthenticatedWorkspaceGstRatesRouteImport.update({
+    id: '/rates',
+    path: '/rates',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
+const AuthenticatedWorkspaceGstHsnRoute =
+  AuthenticatedWorkspaceGstHsnRouteImport.update({
+    id: '/hsn',
+    path: '/hsn',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
+const AuthenticatedWorkspaceGstGstr3bRoute =
+  AuthenticatedWorkspaceGstGstr3bRouteImport.update({
+    id: '/gstr3b',
+    path: '/gstr3b',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
+const AuthenticatedWorkspaceGstGstr1Route =
+  AuthenticatedWorkspaceGstGstr1RouteImport.update({
+    id: '/gstr1',
+    path: '/gstr1',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
+const AuthenticatedWorkspaceGstEWayBillRoute =
+  AuthenticatedWorkspaceGstEWayBillRouteImport.update({
+    id: '/e-way-bill',
+    path: '/e-way-bill',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
+const AuthenticatedWorkspaceGstEInvoiceRoute =
+  AuthenticatedWorkspaceGstEInvoiceRouteImport.update({
+    id: '/e-invoice',
+    path: '/e-invoice',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
+  } as any)
+const AuthenticatedWorkspaceGstConfigurationRoute =
+  AuthenticatedWorkspaceGstConfigurationRouteImport.update({
+    id: '/configuration',
+    path: '/configuration',
+    getParentRoute: () => AuthenticatedWorkspaceGstRoute,
   } as any)
 const AuthenticatedWorkspaceFinanceTrialBalanceRoute =
   AuthenticatedWorkspaceFinanceTrialBalanceRouteImport.update({
@@ -1087,7 +1157,7 @@ export interface FileRoutesByFullPath {
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
   '/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
   '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRouteWithChildren
-  '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
+  '/workspace/gst': typeof AuthenticatedWorkspaceGstRouteWithChildren
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   '/workspace/masters': typeof AuthenticatedWorkspaceMastersRouteWithChildren
   '/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRouteWithChildren
@@ -1157,6 +1227,15 @@ export interface FileRoutesByFullPath {
   '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
+  '/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
+  '/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
+  '/workspace/gst/gstr1': typeof AuthenticatedWorkspaceGstGstr1Route
+  '/workspace/gst/gstr3b': typeof AuthenticatedWorkspaceGstGstr3bRoute
+  '/workspace/gst/hsn': typeof AuthenticatedWorkspaceGstHsnRoute
+  '/workspace/gst/rates': typeof AuthenticatedWorkspaceGstRatesRoute
+  '/workspace/gst/reports': typeof AuthenticatedWorkspaceGstReportsRoute
+  '/workspace/gst/tax-rules': typeof AuthenticatedWorkspaceGstTaxRulesRoute
   '/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1197,6 +1276,7 @@ export interface FileRoutesByFullPath {
   '/app/sales/': typeof AuthenticatedAppSalesIndexRoute
   '/workspace/crm/': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/workspace/finance/': typeof AuthenticatedWorkspaceFinanceIndexRoute
+  '/workspace/gst/': typeof AuthenticatedWorkspaceGstIndexRoute
   '/workspace/inventory/': typeof AuthenticatedWorkspaceInventoryIndexRoute
   '/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/workspace/procurement/': typeof AuthenticatedWorkspaceProcurementIndexRoute
@@ -1227,7 +1307,6 @@ export interface FileRoutesByTo {
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
-  '/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
   '/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/workspace/workflow': typeof AuthenticatedWorkspaceWorkflowRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -1293,6 +1372,15 @@ export interface FileRoutesByTo {
   '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
+  '/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
+  '/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
+  '/workspace/gst/gstr1': typeof AuthenticatedWorkspaceGstGstr1Route
+  '/workspace/gst/gstr3b': typeof AuthenticatedWorkspaceGstGstr3bRoute
+  '/workspace/gst/hsn': typeof AuthenticatedWorkspaceGstHsnRoute
+  '/workspace/gst/rates': typeof AuthenticatedWorkspaceGstRatesRoute
+  '/workspace/gst/reports': typeof AuthenticatedWorkspaceGstReportsRoute
+  '/workspace/gst/tax-rules': typeof AuthenticatedWorkspaceGstTaxRulesRoute
   '/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1333,6 +1421,7 @@ export interface FileRoutesByTo {
   '/app/sales': typeof AuthenticatedAppSalesIndexRoute
   '/workspace/crm': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/workspace/finance': typeof AuthenticatedWorkspaceFinanceIndexRoute
+  '/workspace/gst': typeof AuthenticatedWorkspaceGstIndexRoute
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryIndexRoute
   '/workspace/masters': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/workspace/procurement': typeof AuthenticatedWorkspaceProcurementIndexRoute
@@ -1379,7 +1468,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
   '/_authenticated/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
   '/_authenticated/workspace/finance': typeof AuthenticatedWorkspaceFinanceRouteWithChildren
-  '/_authenticated/workspace/gst': typeof AuthenticatedWorkspaceGstRoute
+  '/_authenticated/workspace/gst': typeof AuthenticatedWorkspaceGstRouteWithChildren
   '/_authenticated/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   '/_authenticated/workspace/masters': typeof AuthenticatedWorkspaceMastersRouteWithChildren
   '/_authenticated/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRouteWithChildren
@@ -1449,6 +1538,15 @@ export interface FileRoutesById {
   '/_authenticated/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/_authenticated/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/_authenticated/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/_authenticated/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
+  '/_authenticated/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
+  '/_authenticated/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
+  '/_authenticated/workspace/gst/gstr1': typeof AuthenticatedWorkspaceGstGstr1Route
+  '/_authenticated/workspace/gst/gstr3b': typeof AuthenticatedWorkspaceGstGstr3bRoute
+  '/_authenticated/workspace/gst/hsn': typeof AuthenticatedWorkspaceGstHsnRoute
+  '/_authenticated/workspace/gst/rates': typeof AuthenticatedWorkspaceGstRatesRoute
+  '/_authenticated/workspace/gst/reports': typeof AuthenticatedWorkspaceGstReportsRoute
+  '/_authenticated/workspace/gst/tax-rules': typeof AuthenticatedWorkspaceGstTaxRulesRoute
   '/_authenticated/workspace/inventory/barcode': typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   '/_authenticated/workspace/inventory/batch-numbers': typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
   '/_authenticated/workspace/inventory/bins': typeof AuthenticatedWorkspaceInventoryBinsRoute
@@ -1489,6 +1587,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/': typeof AuthenticatedAppSalesIndexRoute
   '/_authenticated/workspace/crm/': typeof AuthenticatedWorkspaceCrmIndexRoute
   '/_authenticated/workspace/finance/': typeof AuthenticatedWorkspaceFinanceIndexRoute
+  '/_authenticated/workspace/gst/': typeof AuthenticatedWorkspaceGstIndexRoute
   '/_authenticated/workspace/inventory/': typeof AuthenticatedWorkspaceInventoryIndexRoute
   '/_authenticated/workspace/masters/': typeof AuthenticatedWorkspaceMastersIndexRoute
   '/_authenticated/workspace/procurement/': typeof AuthenticatedWorkspaceProcurementIndexRoute
@@ -1605,6 +1704,15 @@ export interface FileRouteTypes {
     | '/workspace/finance/profit-loss'
     | '/workspace/finance/receipts'
     | '/workspace/finance/trial-balance'
+    | '/workspace/gst/configuration'
+    | '/workspace/gst/e-invoice'
+    | '/workspace/gst/e-way-bill'
+    | '/workspace/gst/gstr1'
+    | '/workspace/gst/gstr3b'
+    | '/workspace/gst/hsn'
+    | '/workspace/gst/rates'
+    | '/workspace/gst/reports'
+    | '/workspace/gst/tax-rules'
     | '/workspace/inventory/barcode'
     | '/workspace/inventory/batch-numbers'
     | '/workspace/inventory/bins'
@@ -1645,6 +1753,7 @@ export interface FileRouteTypes {
     | '/app/sales/'
     | '/workspace/crm/'
     | '/workspace/finance/'
+    | '/workspace/gst/'
     | '/workspace/inventory/'
     | '/workspace/masters/'
     | '/workspace/procurement/'
@@ -1675,7 +1784,6 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/users'
     | '/workspace/administration'
-    | '/workspace/gst'
     | '/workspace/reports'
     | '/workspace/workflow'
     | '/admin'
@@ -1741,6 +1849,15 @@ export interface FileRouteTypes {
     | '/workspace/finance/profit-loss'
     | '/workspace/finance/receipts'
     | '/workspace/finance/trial-balance'
+    | '/workspace/gst/configuration'
+    | '/workspace/gst/e-invoice'
+    | '/workspace/gst/e-way-bill'
+    | '/workspace/gst/gstr1'
+    | '/workspace/gst/gstr3b'
+    | '/workspace/gst/hsn'
+    | '/workspace/gst/rates'
+    | '/workspace/gst/reports'
+    | '/workspace/gst/tax-rules'
     | '/workspace/inventory/barcode'
     | '/workspace/inventory/batch-numbers'
     | '/workspace/inventory/bins'
@@ -1781,6 +1898,7 @@ export interface FileRouteTypes {
     | '/app/sales'
     | '/workspace/crm'
     | '/workspace/finance'
+    | '/workspace/gst'
     | '/workspace/inventory'
     | '/workspace/masters'
     | '/workspace/procurement'
@@ -1896,6 +2014,15 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/finance/profit-loss'
     | '/_authenticated/workspace/finance/receipts'
     | '/_authenticated/workspace/finance/trial-balance'
+    | '/_authenticated/workspace/gst/configuration'
+    | '/_authenticated/workspace/gst/e-invoice'
+    | '/_authenticated/workspace/gst/e-way-bill'
+    | '/_authenticated/workspace/gst/gstr1'
+    | '/_authenticated/workspace/gst/gstr3b'
+    | '/_authenticated/workspace/gst/hsn'
+    | '/_authenticated/workspace/gst/rates'
+    | '/_authenticated/workspace/gst/reports'
+    | '/_authenticated/workspace/gst/tax-rules'
     | '/_authenticated/workspace/inventory/barcode'
     | '/_authenticated/workspace/inventory/batch-numbers'
     | '/_authenticated/workspace/inventory/bins'
@@ -1936,6 +2063,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/'
     | '/_authenticated/workspace/crm/'
     | '/_authenticated/workspace/finance/'
+    | '/_authenticated/workspace/gst/'
     | '/_authenticated/workspace/inventory/'
     | '/_authenticated/workspace/masters/'
     | '/_authenticated/workspace/procurement/'
@@ -2299,6 +2427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryIndexRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
     }
+    '/_authenticated/workspace/gst/': {
+      id: '/_authenticated/workspace/gst/'
+      path: '/'
+      fullPath: '/workspace/gst/'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
     '/_authenticated/workspace/finance/': {
       id: '/_authenticated/workspace/finance/'
       path: '/'
@@ -2578,6 +2713,69 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/inventory/barcode'
       preLoaderRoute: typeof AuthenticatedWorkspaceInventoryBarcodeRouteImport
       parentRoute: typeof AuthenticatedWorkspaceInventoryRoute
+    }
+    '/_authenticated/workspace/gst/tax-rules': {
+      id: '/_authenticated/workspace/gst/tax-rules'
+      path: '/tax-rules'
+      fullPath: '/workspace/gst/tax-rules'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstTaxRulesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/gst/reports': {
+      id: '/_authenticated/workspace/gst/reports'
+      path: '/reports'
+      fullPath: '/workspace/gst/reports'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstReportsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/gst/rates': {
+      id: '/_authenticated/workspace/gst/rates'
+      path: '/rates'
+      fullPath: '/workspace/gst/rates'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstRatesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/gst/hsn': {
+      id: '/_authenticated/workspace/gst/hsn'
+      path: '/hsn'
+      fullPath: '/workspace/gst/hsn'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstHsnRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/gst/gstr3b': {
+      id: '/_authenticated/workspace/gst/gstr3b'
+      path: '/gstr3b'
+      fullPath: '/workspace/gst/gstr3b'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstGstr3bRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/gst/gstr1': {
+      id: '/_authenticated/workspace/gst/gstr1'
+      path: '/gstr1'
+      fullPath: '/workspace/gst/gstr1'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstGstr1RouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/gst/e-way-bill': {
+      id: '/_authenticated/workspace/gst/e-way-bill'
+      path: '/e-way-bill'
+      fullPath: '/workspace/gst/e-way-bill'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstEWayBillRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/gst/e-invoice': {
+      id: '/_authenticated/workspace/gst/e-invoice'
+      path: '/e-invoice'
+      fullPath: '/workspace/gst/e-invoice'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstEInvoiceRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/gst/configuration': {
+      id: '/_authenticated/workspace/gst/configuration'
+      path: '/configuration'
+      fullPath: '/workspace/gst/configuration'
+      preLoaderRoute: typeof AuthenticatedWorkspaceGstConfigurationRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceGstRoute
     }
     '/_authenticated/workspace/finance/trial-balance': {
       id: '/_authenticated/workspace/finance/trial-balance'
@@ -3451,6 +3649,43 @@ const AuthenticatedWorkspaceFinanceRouteWithChildren =
     AuthenticatedWorkspaceFinanceRouteChildren,
   )
 
+interface AuthenticatedWorkspaceGstRouteChildren {
+  AuthenticatedWorkspaceGstConfigurationRoute: typeof AuthenticatedWorkspaceGstConfigurationRoute
+  AuthenticatedWorkspaceGstEInvoiceRoute: typeof AuthenticatedWorkspaceGstEInvoiceRoute
+  AuthenticatedWorkspaceGstEWayBillRoute: typeof AuthenticatedWorkspaceGstEWayBillRoute
+  AuthenticatedWorkspaceGstGstr1Route: typeof AuthenticatedWorkspaceGstGstr1Route
+  AuthenticatedWorkspaceGstGstr3bRoute: typeof AuthenticatedWorkspaceGstGstr3bRoute
+  AuthenticatedWorkspaceGstHsnRoute: typeof AuthenticatedWorkspaceGstHsnRoute
+  AuthenticatedWorkspaceGstRatesRoute: typeof AuthenticatedWorkspaceGstRatesRoute
+  AuthenticatedWorkspaceGstReportsRoute: typeof AuthenticatedWorkspaceGstReportsRoute
+  AuthenticatedWorkspaceGstTaxRulesRoute: typeof AuthenticatedWorkspaceGstTaxRulesRoute
+  AuthenticatedWorkspaceGstIndexRoute: typeof AuthenticatedWorkspaceGstIndexRoute
+}
+
+const AuthenticatedWorkspaceGstRouteChildren: AuthenticatedWorkspaceGstRouteChildren =
+  {
+    AuthenticatedWorkspaceGstConfigurationRoute:
+      AuthenticatedWorkspaceGstConfigurationRoute,
+    AuthenticatedWorkspaceGstEInvoiceRoute:
+      AuthenticatedWorkspaceGstEInvoiceRoute,
+    AuthenticatedWorkspaceGstEWayBillRoute:
+      AuthenticatedWorkspaceGstEWayBillRoute,
+    AuthenticatedWorkspaceGstGstr1Route: AuthenticatedWorkspaceGstGstr1Route,
+    AuthenticatedWorkspaceGstGstr3bRoute: AuthenticatedWorkspaceGstGstr3bRoute,
+    AuthenticatedWorkspaceGstHsnRoute: AuthenticatedWorkspaceGstHsnRoute,
+    AuthenticatedWorkspaceGstRatesRoute: AuthenticatedWorkspaceGstRatesRoute,
+    AuthenticatedWorkspaceGstReportsRoute:
+      AuthenticatedWorkspaceGstReportsRoute,
+    AuthenticatedWorkspaceGstTaxRulesRoute:
+      AuthenticatedWorkspaceGstTaxRulesRoute,
+    AuthenticatedWorkspaceGstIndexRoute: AuthenticatedWorkspaceGstIndexRoute,
+  }
+
+const AuthenticatedWorkspaceGstRouteWithChildren =
+  AuthenticatedWorkspaceGstRoute._addFileChildren(
+    AuthenticatedWorkspaceGstRouteChildren,
+  )
+
 interface AuthenticatedWorkspaceInventoryRouteChildren {
   AuthenticatedWorkspaceInventoryBarcodeRoute: typeof AuthenticatedWorkspaceInventoryBarcodeRoute
   AuthenticatedWorkspaceInventoryBatchNumbersRoute: typeof AuthenticatedWorkspaceInventoryBatchNumbersRoute
@@ -3602,7 +3837,7 @@ interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceAdministrationRoute: typeof AuthenticatedWorkspaceAdministrationRoute
   AuthenticatedWorkspaceCrmRoute: typeof AuthenticatedWorkspaceCrmRouteWithChildren
   AuthenticatedWorkspaceFinanceRoute: typeof AuthenticatedWorkspaceFinanceRouteWithChildren
-  AuthenticatedWorkspaceGstRoute: typeof AuthenticatedWorkspaceGstRoute
+  AuthenticatedWorkspaceGstRoute: typeof AuthenticatedWorkspaceGstRouteWithChildren
   AuthenticatedWorkspaceInventoryRoute: typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   AuthenticatedWorkspaceMastersRoute: typeof AuthenticatedWorkspaceMastersRouteWithChildren
   AuthenticatedWorkspaceProcurementRoute: typeof AuthenticatedWorkspaceProcurementRouteWithChildren
@@ -3619,7 +3854,7 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
     AuthenticatedWorkspaceCrmRoute: AuthenticatedWorkspaceCrmRouteWithChildren,
     AuthenticatedWorkspaceFinanceRoute:
       AuthenticatedWorkspaceFinanceRouteWithChildren,
-    AuthenticatedWorkspaceGstRoute: AuthenticatedWorkspaceGstRoute,
+    AuthenticatedWorkspaceGstRoute: AuthenticatedWorkspaceGstRouteWithChildren,
     AuthenticatedWorkspaceInventoryRoute:
       AuthenticatedWorkspaceInventoryRouteWithChildren,
     AuthenticatedWorkspaceMastersRoute:
