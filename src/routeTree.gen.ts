@@ -71,6 +71,7 @@ import { Route as AuthenticatedAppMaintenanceIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_authenticated.app.inventory.index'
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
+import { Route as AuthenticatedWorkspaceWorkflowTemplatesRouteImport } from './routes/_authenticated.workspace.workflow.templates'
 import { Route as AuthenticatedWorkspaceWorkflowNotificationsRouteImport } from './routes/_authenticated.workspace.workflow.notifications'
 import { Route as AuthenticatedWorkspaceWorkflowHistoryRouteImport } from './routes/_authenticated.workspace.workflow.history'
 import { Route as AuthenticatedWorkspaceWorkflowEscalationRouteImport } from './routes/_authenticated.workspace.workflow.escalation'
@@ -521,6 +522,12 @@ const AuthenticatedAppFinanceIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedAppFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceWorkflowTemplatesRoute =
+  AuthenticatedWorkspaceWorkflowTemplatesRouteImport.update({
+    id: '/templates',
+    path: '/templates',
+    getParentRoute: () => AuthenticatedWorkspaceWorkflowRoute,
   } as any)
 const AuthenticatedWorkspaceWorkflowNotificationsRoute =
   AuthenticatedWorkspaceWorkflowNotificationsRouteImport.update({
@@ -1320,6 +1327,7 @@ export interface FileRoutesByFullPath {
   '/workspace/workflow/escalation': typeof AuthenticatedWorkspaceWorkflowEscalationRoute
   '/workspace/workflow/history': typeof AuthenticatedWorkspaceWorkflowHistoryRoute
   '/workspace/workflow/notifications': typeof AuthenticatedWorkspaceWorkflowNotificationsRoute
+  '/workspace/workflow/templates': typeof AuthenticatedWorkspaceWorkflowTemplatesRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
@@ -1471,6 +1479,7 @@ export interface FileRoutesByTo {
   '/workspace/workflow/escalation': typeof AuthenticatedWorkspaceWorkflowEscalationRoute
   '/workspace/workflow/history': typeof AuthenticatedWorkspaceWorkflowHistoryRoute
   '/workspace/workflow/notifications': typeof AuthenticatedWorkspaceWorkflowNotificationsRoute
+  '/workspace/workflow/templates': typeof AuthenticatedWorkspaceWorkflowTemplatesRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory': typeof AuthenticatedAppInventoryIndexRoute
@@ -1644,6 +1653,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/workflow/escalation': typeof AuthenticatedWorkspaceWorkflowEscalationRoute
   '/_authenticated/workspace/workflow/history': typeof AuthenticatedWorkspaceWorkflowHistoryRoute
   '/_authenticated/workspace/workflow/notifications': typeof AuthenticatedWorkspaceWorkflowNotificationsRoute
+  '/_authenticated/workspace/workflow/templates': typeof AuthenticatedWorkspaceWorkflowTemplatesRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/_authenticated/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
@@ -1817,6 +1827,7 @@ export interface FileRouteTypes {
     | '/workspace/workflow/escalation'
     | '/workspace/workflow/history'
     | '/workspace/workflow/notifications'
+    | '/workspace/workflow/templates'
     | '/app/finance/'
     | '/app/hr/'
     | '/app/inventory/'
@@ -1968,6 +1979,7 @@ export interface FileRouteTypes {
     | '/workspace/workflow/escalation'
     | '/workspace/workflow/history'
     | '/workspace/workflow/notifications'
+    | '/workspace/workflow/templates'
     | '/app/finance'
     | '/app/hr'
     | '/app/inventory'
@@ -2140,6 +2152,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/workflow/escalation'
     | '/_authenticated/workspace/workflow/history'
     | '/_authenticated/workspace/workflow/notifications'
+    | '/_authenticated/workspace/workflow/templates'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
     | '/_authenticated/app/inventory/'
@@ -2606,6 +2619,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/finance/'
       preLoaderRoute: typeof AuthenticatedAppFinanceIndexRouteImport
       parentRoute: typeof AuthenticatedAppFinanceRoute
+    }
+    '/_authenticated/workspace/workflow/templates': {
+      id: '/_authenticated/workspace/workflow/templates'
+      path: '/templates'
+      fullPath: '/workspace/workflow/templates'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowTemplatesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkflowRoute
     }
     '/_authenticated/workspace/workflow/notifications': {
       id: '/_authenticated/workspace/workflow/notifications'
@@ -3978,6 +3998,7 @@ interface AuthenticatedWorkspaceWorkflowRouteChildren {
   AuthenticatedWorkspaceWorkflowEscalationRoute: typeof AuthenticatedWorkspaceWorkflowEscalationRoute
   AuthenticatedWorkspaceWorkflowHistoryRoute: typeof AuthenticatedWorkspaceWorkflowHistoryRoute
   AuthenticatedWorkspaceWorkflowNotificationsRoute: typeof AuthenticatedWorkspaceWorkflowNotificationsRoute
+  AuthenticatedWorkspaceWorkflowTemplatesRoute: typeof AuthenticatedWorkspaceWorkflowTemplatesRoute
   AuthenticatedWorkspaceWorkflowIndexRoute: typeof AuthenticatedWorkspaceWorkflowIndexRoute
 }
 
@@ -3995,6 +4016,8 @@ const AuthenticatedWorkspaceWorkflowRouteChildren: AuthenticatedWorkspaceWorkflo
       AuthenticatedWorkspaceWorkflowHistoryRoute,
     AuthenticatedWorkspaceWorkflowNotificationsRoute:
       AuthenticatedWorkspaceWorkflowNotificationsRoute,
+    AuthenticatedWorkspaceWorkflowTemplatesRoute:
+      AuthenticatedWorkspaceWorkflowTemplatesRoute,
     AuthenticatedWorkspaceWorkflowIndexRoute:
       AuthenticatedWorkspaceWorkflowIndexRoute,
   }
