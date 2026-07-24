@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { SideNav } from "./SideNav";
 import { TopBar } from "./TopBar";
+import { CopilotFab } from "@/features/copilot/CopilotFab";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,6 +15,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-8">{children}</div>
         </main>
       </div>
+      <CopilotFab />
     </div>
   );
 }
