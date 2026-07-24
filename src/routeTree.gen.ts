@@ -72,6 +72,7 @@ import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
 import { Route as AuthenticatedWorkspaceWorkflowDesignerRouteImport } from './routes/_authenticated.workspace.workflow.designer'
+import { Route as AuthenticatedWorkspaceWorkflowApprovalRulesRouteImport } from './routes/_authenticated.workspace.workflow.approval-rules'
 import { Route as AuthenticatedWorkspaceSalesSalesOrdersRouteImport } from './routes/_authenticated.workspace.sales.sales-orders'
 import { Route as AuthenticatedWorkspaceSalesReturnsRouteImport } from './routes/_authenticated.workspace.sales.returns'
 import { Route as AuthenticatedWorkspaceSalesQuotationsRouteImport } from './routes/_authenticated.workspace.sales.quotations'
@@ -521,6 +522,12 @@ const AuthenticatedWorkspaceWorkflowDesignerRoute =
   AuthenticatedWorkspaceWorkflowDesignerRouteImport.update({
     id: '/designer',
     path: '/designer',
+    getParentRoute: () => AuthenticatedWorkspaceWorkflowRoute,
+  } as any)
+const AuthenticatedWorkspaceWorkflowApprovalRulesRoute =
+  AuthenticatedWorkspaceWorkflowApprovalRulesRouteImport.update({
+    id: '/approval-rules',
+    path: '/approval-rules',
     getParentRoute: () => AuthenticatedWorkspaceWorkflowRoute,
   } as any)
 const AuthenticatedWorkspaceSalesSalesOrdersRoute =
@@ -1279,6 +1286,7 @@ export interface FileRoutesByFullPath {
   '/workspace/sales/quotations': typeof AuthenticatedWorkspaceSalesQuotationsRoute
   '/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
+  '/workspace/workflow/approval-rules': typeof AuthenticatedWorkspaceWorkflowApprovalRulesRoute
   '/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -1425,6 +1433,7 @@ export interface FileRoutesByTo {
   '/workspace/sales/quotations': typeof AuthenticatedWorkspaceSalesQuotationsRoute
   '/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
+  '/workspace/workflow/approval-rules': typeof AuthenticatedWorkspaceWorkflowApprovalRulesRoute
   '/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
@@ -1593,6 +1602,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/sales/quotations': typeof AuthenticatedWorkspaceSalesQuotationsRoute
   '/_authenticated/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/_authenticated/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
+  '/_authenticated/workspace/workflow/approval-rules': typeof AuthenticatedWorkspaceWorkflowApprovalRulesRoute
   '/_authenticated/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -1761,6 +1771,7 @@ export interface FileRouteTypes {
     | '/workspace/sales/quotations'
     | '/workspace/sales/returns'
     | '/workspace/sales/sales-orders'
+    | '/workspace/workflow/approval-rules'
     | '/workspace/workflow/designer'
     | '/app/finance/'
     | '/app/hr/'
@@ -1907,6 +1918,7 @@ export interface FileRouteTypes {
     | '/workspace/sales/quotations'
     | '/workspace/sales/returns'
     | '/workspace/sales/sales-orders'
+    | '/workspace/workflow/approval-rules'
     | '/workspace/workflow/designer'
     | '/app/finance'
     | '/app/hr'
@@ -2074,6 +2086,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/sales/quotations'
     | '/_authenticated/workspace/sales/returns'
     | '/_authenticated/workspace/sales/sales-orders'
+    | '/_authenticated/workspace/workflow/approval-rules'
     | '/_authenticated/workspace/workflow/designer'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
@@ -2547,6 +2560,13 @@ declare module '@tanstack/react-router' {
       path: '/designer'
       fullPath: '/workspace/workflow/designer'
       preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowDesignerRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkflowRoute
+    }
+    '/_authenticated/workspace/workflow/approval-rules': {
+      id: '/_authenticated/workspace/workflow/approval-rules'
+      path: '/approval-rules'
+      fullPath: '/workspace/workflow/approval-rules'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowApprovalRulesRouteImport
       parentRoute: typeof AuthenticatedWorkspaceWorkflowRoute
     }
     '/_authenticated/workspace/sales/sales-orders': {
@@ -3872,12 +3892,15 @@ const AuthenticatedWorkspaceSalesRouteWithChildren =
   )
 
 interface AuthenticatedWorkspaceWorkflowRouteChildren {
+  AuthenticatedWorkspaceWorkflowApprovalRulesRoute: typeof AuthenticatedWorkspaceWorkflowApprovalRulesRoute
   AuthenticatedWorkspaceWorkflowDesignerRoute: typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   AuthenticatedWorkspaceWorkflowIndexRoute: typeof AuthenticatedWorkspaceWorkflowIndexRoute
 }
 
 const AuthenticatedWorkspaceWorkflowRouteChildren: AuthenticatedWorkspaceWorkflowRouteChildren =
   {
+    AuthenticatedWorkspaceWorkflowApprovalRulesRoute:
+      AuthenticatedWorkspaceWorkflowApprovalRulesRoute,
     AuthenticatedWorkspaceWorkflowDesignerRoute:
       AuthenticatedWorkspaceWorkflowDesignerRoute,
     AuthenticatedWorkspaceWorkflowIndexRoute:
