@@ -31,7 +31,6 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedWorkspaceIndexRouteImport } from './routes/_authenticated.workspace.index'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
-import { Route as AuthenticatedWorkspaceWorkflowRouteImport } from './routes/_authenticated.workspace.workflow'
 import { Route as AuthenticatedWorkspaceSalesRouteImport } from './routes/_authenticated.workspace.sales'
 import { Route as AuthenticatedWorkspaceReportsRouteImport } from './routes/_authenticated.workspace.reports'
 import { Route as AuthenticatedWorkspaceProcurementRouteImport } from './routes/_authenticated.workspace.procurement'
@@ -284,12 +283,6 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedWorkspaceWorkflowRoute =
-  AuthenticatedWorkspaceWorkflowRouteImport.update({
-    id: '/workflow',
-    path: '/workflow',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
 const AuthenticatedWorkspaceSalesRoute =
   AuthenticatedWorkspaceSalesRouteImport.update({
     id: '/sales',
@@ -1163,7 +1156,6 @@ export interface FileRoutesByFullPath {
   '/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRouteWithChildren
   '/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/workspace/sales': typeof AuthenticatedWorkspaceSalesRouteWithChildren
-  '/workspace/workflow': typeof AuthenticatedWorkspaceWorkflowRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/workspace/': typeof AuthenticatedWorkspaceIndexRoute
@@ -1308,7 +1300,6 @@ export interface FileRoutesByTo {
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
   '/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
-  '/workspace/workflow': typeof AuthenticatedWorkspaceWorkflowRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/workspace': typeof AuthenticatedWorkspaceIndexRoute
@@ -1474,7 +1465,6 @@ export interface FileRoutesById {
   '/_authenticated/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRouteWithChildren
   '/_authenticated/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/_authenticated/workspace/sales': typeof AuthenticatedWorkspaceSalesRouteWithChildren
-  '/_authenticated/workspace/workflow': typeof AuthenticatedWorkspaceWorkflowRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/workspace/': typeof AuthenticatedWorkspaceIndexRoute
@@ -1640,7 +1630,6 @@ export interface FileRouteTypes {
     | '/workspace/procurement'
     | '/workspace/reports'
     | '/workspace/sales'
-    | '/workspace/workflow'
     | '/admin/'
     | '/app/'
     | '/workspace/'
@@ -1785,7 +1774,6 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/workspace/administration'
     | '/workspace/reports'
-    | '/workspace/workflow'
     | '/admin'
     | '/app'
     | '/workspace'
@@ -1950,7 +1938,6 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/procurement'
     | '/_authenticated/workspace/reports'
     | '/_authenticated/workspace/sales'
-    | '/_authenticated/workspace/workflow'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/workspace/'
@@ -2237,13 +2224,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/workspace/workflow': {
-      id: '/_authenticated/workspace/workflow'
-      path: '/workflow'
-      fullPath: '/workspace/workflow'
-      preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowRouteImport
-      parentRoute: typeof AuthenticatedWorkspaceRoute
     }
     '/_authenticated/workspace/sales': {
       id: '/_authenticated/workspace/sales'
@@ -3843,7 +3823,6 @@ interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceProcurementRoute: typeof AuthenticatedWorkspaceProcurementRouteWithChildren
   AuthenticatedWorkspaceReportsRoute: typeof AuthenticatedWorkspaceReportsRoute
   AuthenticatedWorkspaceSalesRoute: typeof AuthenticatedWorkspaceSalesRouteWithChildren
-  AuthenticatedWorkspaceWorkflowRoute: typeof AuthenticatedWorkspaceWorkflowRoute
   AuthenticatedWorkspaceIndexRoute: typeof AuthenticatedWorkspaceIndexRoute
 }
 
@@ -3864,7 +3843,6 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
     AuthenticatedWorkspaceReportsRoute: AuthenticatedWorkspaceReportsRoute,
     AuthenticatedWorkspaceSalesRoute:
       AuthenticatedWorkspaceSalesRouteWithChildren,
-    AuthenticatedWorkspaceWorkflowRoute: AuthenticatedWorkspaceWorkflowRoute,
     AuthenticatedWorkspaceIndexRoute: AuthenticatedWorkspaceIndexRoute,
   }
 
@@ -3939,13 +3917,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
