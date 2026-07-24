@@ -72,6 +72,7 @@ import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
 import { Route as AuthenticatedWorkspaceWorkflowDesignerRouteImport } from './routes/_authenticated.workspace.workflow.designer'
+import { Route as AuthenticatedWorkspaceWorkflowConditionalRouteImport } from './routes/_authenticated.workspace.workflow.conditional'
 import { Route as AuthenticatedWorkspaceWorkflowApprovalRulesRouteImport } from './routes/_authenticated.workspace.workflow.approval-rules'
 import { Route as AuthenticatedWorkspaceSalesSalesOrdersRouteImport } from './routes/_authenticated.workspace.sales.sales-orders'
 import { Route as AuthenticatedWorkspaceSalesReturnsRouteImport } from './routes/_authenticated.workspace.sales.returns'
@@ -522,6 +523,12 @@ const AuthenticatedWorkspaceWorkflowDesignerRoute =
   AuthenticatedWorkspaceWorkflowDesignerRouteImport.update({
     id: '/designer',
     path: '/designer',
+    getParentRoute: () => AuthenticatedWorkspaceWorkflowRoute,
+  } as any)
+const AuthenticatedWorkspaceWorkflowConditionalRoute =
+  AuthenticatedWorkspaceWorkflowConditionalRouteImport.update({
+    id: '/conditional',
+    path: '/conditional',
     getParentRoute: () => AuthenticatedWorkspaceWorkflowRoute,
   } as any)
 const AuthenticatedWorkspaceWorkflowApprovalRulesRoute =
@@ -1287,6 +1294,7 @@ export interface FileRoutesByFullPath {
   '/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
   '/workspace/workflow/approval-rules': typeof AuthenticatedWorkspaceWorkflowApprovalRulesRoute
+  '/workspace/workflow/conditional': typeof AuthenticatedWorkspaceWorkflowConditionalRoute
   '/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -1434,6 +1442,7 @@ export interface FileRoutesByTo {
   '/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
   '/workspace/workflow/approval-rules': typeof AuthenticatedWorkspaceWorkflowApprovalRulesRoute
+  '/workspace/workflow/conditional': typeof AuthenticatedWorkspaceWorkflowConditionalRoute
   '/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
@@ -1603,6 +1612,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/_authenticated/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
   '/_authenticated/workspace/workflow/approval-rules': typeof AuthenticatedWorkspaceWorkflowApprovalRulesRoute
+  '/_authenticated/workspace/workflow/conditional': typeof AuthenticatedWorkspaceWorkflowConditionalRoute
   '/_authenticated/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -1772,6 +1782,7 @@ export interface FileRouteTypes {
     | '/workspace/sales/returns'
     | '/workspace/sales/sales-orders'
     | '/workspace/workflow/approval-rules'
+    | '/workspace/workflow/conditional'
     | '/workspace/workflow/designer'
     | '/app/finance/'
     | '/app/hr/'
@@ -1919,6 +1930,7 @@ export interface FileRouteTypes {
     | '/workspace/sales/returns'
     | '/workspace/sales/sales-orders'
     | '/workspace/workflow/approval-rules'
+    | '/workspace/workflow/conditional'
     | '/workspace/workflow/designer'
     | '/app/finance'
     | '/app/hr'
@@ -2087,6 +2099,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/sales/returns'
     | '/_authenticated/workspace/sales/sales-orders'
     | '/_authenticated/workspace/workflow/approval-rules'
+    | '/_authenticated/workspace/workflow/conditional'
     | '/_authenticated/workspace/workflow/designer'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
@@ -2560,6 +2573,13 @@ declare module '@tanstack/react-router' {
       path: '/designer'
       fullPath: '/workspace/workflow/designer'
       preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowDesignerRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkflowRoute
+    }
+    '/_authenticated/workspace/workflow/conditional': {
+      id: '/_authenticated/workspace/workflow/conditional'
+      path: '/conditional'
+      fullPath: '/workspace/workflow/conditional'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowConditionalRouteImport
       parentRoute: typeof AuthenticatedWorkspaceWorkflowRoute
     }
     '/_authenticated/workspace/workflow/approval-rules': {
@@ -3893,6 +3913,7 @@ const AuthenticatedWorkspaceSalesRouteWithChildren =
 
 interface AuthenticatedWorkspaceWorkflowRouteChildren {
   AuthenticatedWorkspaceWorkflowApprovalRulesRoute: typeof AuthenticatedWorkspaceWorkflowApprovalRulesRoute
+  AuthenticatedWorkspaceWorkflowConditionalRoute: typeof AuthenticatedWorkspaceWorkflowConditionalRoute
   AuthenticatedWorkspaceWorkflowDesignerRoute: typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   AuthenticatedWorkspaceWorkflowIndexRoute: typeof AuthenticatedWorkspaceWorkflowIndexRoute
 }
@@ -3901,6 +3922,8 @@ const AuthenticatedWorkspaceWorkflowRouteChildren: AuthenticatedWorkspaceWorkflo
   {
     AuthenticatedWorkspaceWorkflowApprovalRulesRoute:
       AuthenticatedWorkspaceWorkflowApprovalRulesRoute,
+    AuthenticatedWorkspaceWorkflowConditionalRoute:
+      AuthenticatedWorkspaceWorkflowConditionalRoute,
     AuthenticatedWorkspaceWorkflowDesignerRoute:
       AuthenticatedWorkspaceWorkflowDesignerRoute,
     AuthenticatedWorkspaceWorkflowIndexRoute:
