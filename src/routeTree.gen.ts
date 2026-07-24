@@ -71,6 +71,7 @@ import { Route as AuthenticatedAppMaintenanceIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_authenticated.app.inventory.index'
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
+import { Route as AuthenticatedWorkspaceWorkflowDesignerRouteImport } from './routes/_authenticated.workspace.workflow.designer'
 import { Route as AuthenticatedWorkspaceSalesSalesOrdersRouteImport } from './routes/_authenticated.workspace.sales.sales-orders'
 import { Route as AuthenticatedWorkspaceSalesReturnsRouteImport } from './routes/_authenticated.workspace.sales.returns'
 import { Route as AuthenticatedWorkspaceSalesQuotationsRouteImport } from './routes/_authenticated.workspace.sales.quotations'
@@ -515,6 +516,12 @@ const AuthenticatedAppFinanceIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedAppFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceWorkflowDesignerRoute =
+  AuthenticatedWorkspaceWorkflowDesignerRouteImport.update({
+    id: '/designer',
+    path: '/designer',
+    getParentRoute: () => AuthenticatedWorkspaceWorkflowRoute,
   } as any)
 const AuthenticatedWorkspaceSalesSalesOrdersRoute =
   AuthenticatedWorkspaceSalesSalesOrdersRouteImport.update({
@@ -1272,6 +1279,7 @@ export interface FileRoutesByFullPath {
   '/workspace/sales/quotations': typeof AuthenticatedWorkspaceSalesQuotationsRoute
   '/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
+  '/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
@@ -1417,6 +1425,7 @@ export interface FileRoutesByTo {
   '/workspace/sales/quotations': typeof AuthenticatedWorkspaceSalesQuotationsRoute
   '/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
+  '/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
   '/app/inventory': typeof AuthenticatedAppInventoryIndexRoute
@@ -1584,6 +1593,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/sales/quotations': typeof AuthenticatedWorkspaceSalesQuotationsRoute
   '/_authenticated/workspace/sales/returns': typeof AuthenticatedWorkspaceSalesReturnsRoute
   '/_authenticated/workspace/sales/sales-orders': typeof AuthenticatedWorkspaceSalesSalesOrdersRoute
+  '/_authenticated/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
   '/_authenticated/app/inventory/': typeof AuthenticatedAppInventoryIndexRoute
@@ -1751,6 +1761,7 @@ export interface FileRouteTypes {
     | '/workspace/sales/quotations'
     | '/workspace/sales/returns'
     | '/workspace/sales/sales-orders'
+    | '/workspace/workflow/designer'
     | '/app/finance/'
     | '/app/hr/'
     | '/app/inventory/'
@@ -1896,6 +1907,7 @@ export interface FileRouteTypes {
     | '/workspace/sales/quotations'
     | '/workspace/sales/returns'
     | '/workspace/sales/sales-orders'
+    | '/workspace/workflow/designer'
     | '/app/finance'
     | '/app/hr'
     | '/app/inventory'
@@ -2062,6 +2074,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/sales/quotations'
     | '/_authenticated/workspace/sales/returns'
     | '/_authenticated/workspace/sales/sales-orders'
+    | '/_authenticated/workspace/workflow/designer'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
     | '/_authenticated/app/inventory/'
@@ -2528,6 +2541,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/finance/'
       preLoaderRoute: typeof AuthenticatedAppFinanceIndexRouteImport
       parentRoute: typeof AuthenticatedAppFinanceRoute
+    }
+    '/_authenticated/workspace/workflow/designer': {
+      id: '/_authenticated/workspace/workflow/designer'
+      path: '/designer'
+      fullPath: '/workspace/workflow/designer'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowDesignerRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkflowRoute
     }
     '/_authenticated/workspace/sales/sales-orders': {
       id: '/_authenticated/workspace/sales/sales-orders'
@@ -3852,11 +3872,14 @@ const AuthenticatedWorkspaceSalesRouteWithChildren =
   )
 
 interface AuthenticatedWorkspaceWorkflowRouteChildren {
+  AuthenticatedWorkspaceWorkflowDesignerRoute: typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   AuthenticatedWorkspaceWorkflowIndexRoute: typeof AuthenticatedWorkspaceWorkflowIndexRoute
 }
 
 const AuthenticatedWorkspaceWorkflowRouteChildren: AuthenticatedWorkspaceWorkflowRouteChildren =
   {
+    AuthenticatedWorkspaceWorkflowDesignerRoute:
+      AuthenticatedWorkspaceWorkflowDesignerRoute,
     AuthenticatedWorkspaceWorkflowIndexRoute:
       AuthenticatedWorkspaceWorkflowIndexRoute,
   }
