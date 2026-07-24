@@ -72,6 +72,7 @@ import { Route as AuthenticatedAppInventoryIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppHrIndexRouteImport } from './routes/_authenticated.app.hr.index'
 import { Route as AuthenticatedAppFinanceIndexRouteImport } from './routes/_authenticated.app.finance.index'
 import { Route as AuthenticatedWorkspaceWorkflowNotificationsRouteImport } from './routes/_authenticated.workspace.workflow.notifications'
+import { Route as AuthenticatedWorkspaceWorkflowHistoryRouteImport } from './routes/_authenticated.workspace.workflow.history'
 import { Route as AuthenticatedWorkspaceWorkflowEscalationRouteImport } from './routes/_authenticated.workspace.workflow.escalation'
 import { Route as AuthenticatedWorkspaceWorkflowDesignerRouteImport } from './routes/_authenticated.workspace.workflow.designer'
 import { Route as AuthenticatedWorkspaceWorkflowConditionalRouteImport } from './routes/_authenticated.workspace.workflow.conditional'
@@ -525,6 +526,12 @@ const AuthenticatedWorkspaceWorkflowNotificationsRoute =
   AuthenticatedWorkspaceWorkflowNotificationsRouteImport.update({
     id: '/notifications',
     path: '/notifications',
+    getParentRoute: () => AuthenticatedWorkspaceWorkflowRoute,
+  } as any)
+const AuthenticatedWorkspaceWorkflowHistoryRoute =
+  AuthenticatedWorkspaceWorkflowHistoryRouteImport.update({
+    id: '/history',
+    path: '/history',
     getParentRoute: () => AuthenticatedWorkspaceWorkflowRoute,
   } as any)
 const AuthenticatedWorkspaceWorkflowEscalationRoute =
@@ -1311,6 +1318,7 @@ export interface FileRoutesByFullPath {
   '/workspace/workflow/conditional': typeof AuthenticatedWorkspaceWorkflowConditionalRoute
   '/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/workspace/workflow/escalation': typeof AuthenticatedWorkspaceWorkflowEscalationRoute
+  '/workspace/workflow/history': typeof AuthenticatedWorkspaceWorkflowHistoryRoute
   '/workspace/workflow/notifications': typeof AuthenticatedWorkspaceWorkflowNotificationsRoute
   '/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -1461,6 +1469,7 @@ export interface FileRoutesByTo {
   '/workspace/workflow/conditional': typeof AuthenticatedWorkspaceWorkflowConditionalRoute
   '/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/workspace/workflow/escalation': typeof AuthenticatedWorkspaceWorkflowEscalationRoute
+  '/workspace/workflow/history': typeof AuthenticatedWorkspaceWorkflowHistoryRoute
   '/workspace/workflow/notifications': typeof AuthenticatedWorkspaceWorkflowNotificationsRoute
   '/app/finance': typeof AuthenticatedAppFinanceIndexRoute
   '/app/hr': typeof AuthenticatedAppHrIndexRoute
@@ -1633,6 +1642,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/workflow/conditional': typeof AuthenticatedWorkspaceWorkflowConditionalRoute
   '/_authenticated/workspace/workflow/designer': typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   '/_authenticated/workspace/workflow/escalation': typeof AuthenticatedWorkspaceWorkflowEscalationRoute
+  '/_authenticated/workspace/workflow/history': typeof AuthenticatedWorkspaceWorkflowHistoryRoute
   '/_authenticated/workspace/workflow/notifications': typeof AuthenticatedWorkspaceWorkflowNotificationsRoute
   '/_authenticated/app/finance/': typeof AuthenticatedAppFinanceIndexRoute
   '/_authenticated/app/hr/': typeof AuthenticatedAppHrIndexRoute
@@ -1805,6 +1815,7 @@ export interface FileRouteTypes {
     | '/workspace/workflow/conditional'
     | '/workspace/workflow/designer'
     | '/workspace/workflow/escalation'
+    | '/workspace/workflow/history'
     | '/workspace/workflow/notifications'
     | '/app/finance/'
     | '/app/hr/'
@@ -1955,6 +1966,7 @@ export interface FileRouteTypes {
     | '/workspace/workflow/conditional'
     | '/workspace/workflow/designer'
     | '/workspace/workflow/escalation'
+    | '/workspace/workflow/history'
     | '/workspace/workflow/notifications'
     | '/app/finance'
     | '/app/hr'
@@ -2126,6 +2138,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/workflow/conditional'
     | '/_authenticated/workspace/workflow/designer'
     | '/_authenticated/workspace/workflow/escalation'
+    | '/_authenticated/workspace/workflow/history'
     | '/_authenticated/workspace/workflow/notifications'
     | '/_authenticated/app/finance/'
     | '/_authenticated/app/hr/'
@@ -2599,6 +2612,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/workspace/workflow/notifications'
       preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowNotificationsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceWorkflowRoute
+    }
+    '/_authenticated/workspace/workflow/history': {
+      id: '/_authenticated/workspace/workflow/history'
+      path: '/history'
+      fullPath: '/workspace/workflow/history'
+      preLoaderRoute: typeof AuthenticatedWorkspaceWorkflowHistoryRouteImport
       parentRoute: typeof AuthenticatedWorkspaceWorkflowRoute
     }
     '/_authenticated/workspace/workflow/escalation': {
@@ -3956,6 +3976,7 @@ interface AuthenticatedWorkspaceWorkflowRouteChildren {
   AuthenticatedWorkspaceWorkflowConditionalRoute: typeof AuthenticatedWorkspaceWorkflowConditionalRoute
   AuthenticatedWorkspaceWorkflowDesignerRoute: typeof AuthenticatedWorkspaceWorkflowDesignerRoute
   AuthenticatedWorkspaceWorkflowEscalationRoute: typeof AuthenticatedWorkspaceWorkflowEscalationRoute
+  AuthenticatedWorkspaceWorkflowHistoryRoute: typeof AuthenticatedWorkspaceWorkflowHistoryRoute
   AuthenticatedWorkspaceWorkflowNotificationsRoute: typeof AuthenticatedWorkspaceWorkflowNotificationsRoute
   AuthenticatedWorkspaceWorkflowIndexRoute: typeof AuthenticatedWorkspaceWorkflowIndexRoute
 }
@@ -3970,6 +3991,8 @@ const AuthenticatedWorkspaceWorkflowRouteChildren: AuthenticatedWorkspaceWorkflo
       AuthenticatedWorkspaceWorkflowDesignerRoute,
     AuthenticatedWorkspaceWorkflowEscalationRoute:
       AuthenticatedWorkspaceWorkflowEscalationRoute,
+    AuthenticatedWorkspaceWorkflowHistoryRoute:
+      AuthenticatedWorkspaceWorkflowHistoryRoute,
     AuthenticatedWorkspaceWorkflowNotificationsRoute:
       AuthenticatedWorkspaceWorkflowNotificationsRoute,
     AuthenticatedWorkspaceWorkflowIndexRoute:
