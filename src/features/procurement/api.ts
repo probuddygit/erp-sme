@@ -126,7 +126,7 @@ export function useSaveIndent() {
       }
       const rows = input.lines.filter(l => l.item_name.trim() && l.quantity > 0).map((l, i) => ({
         company_id: companyId, indent_id: id!, item_name: l.item_name, item_code: l.item_code ?? null,
-        unit: l.unit ?? null, quantity: l.quantity, notes: l.notes ?? null, position: i,
+        unit: l.unit || "Nos", quantity: l.quantity, notes: l.notes ?? null, position: i,
       }));
       if (rows.length) {
         const { error } = await supabase.from("purchase_indent_items").insert(rows as any);
@@ -181,7 +181,7 @@ export function useSaveRFQ() {
         id = data.id;
       }
       const rows = input.lines.filter(l => l.item_name.trim() && l.quantity > 0).map((l, i) => ({
-        company_id: companyId, rfq_id: id!, item_name: l.item_name, item_code: l.item_code ?? null, unit: l.unit ?? null, quantity: l.quantity, position: i,
+        company_id: companyId, rfq_id: id!, item_name: l.item_name, item_code: l.item_code ?? null, unit: l.unit || "Nos", quantity: l.quantity, position: i,
       }));
       if (rows.length) {
         const { error } = await supabase.from("rfq_items").insert(rows as any);
@@ -309,7 +309,7 @@ export function useSavePurchaseOrder() {
         const c = computeLine({ quantity: l.quantity, unit_price: l.unit_price, discount_percent: 0, tax_percent: l.tax_percent }, input.tax_type);
         return {
           company_id: companyId, po_id: id!, item_name: l.item_name, item_code: l.item_code ?? null,
-          unit: l.unit ?? null, quantity: l.quantity, unit_price: l.unit_price, tax_percent: l.tax_percent,
+          unit: l.unit || "Nos", quantity: l.quantity, unit_price: l.unit_price, tax_percent: l.tax_percent,
           line_total: c.line_total, position: i,
         };
       });
@@ -373,7 +373,7 @@ export function useSaveGRN() {
       }
       const rows = input.lines.filter(l => l.item_name.trim() && l.quantity > 0).map((l, i) => ({
         company_id: companyId, grn_id: id!, item_id: l.item_id ?? null, item_name: l.item_name,
-        unit: l.unit ?? null, quantity: l.quantity, unit_cost: l.unit_cost,
+        unit: l.unit || "Nos", quantity: l.quantity, unit_cost: l.unit_cost,
         warehouse_id: input.warehouse_id ?? null, batch_no: l.batch_no ?? null, position: i,
       }));
       if (rows.length) {
@@ -443,7 +443,7 @@ export function useSaveVendorInvoice() {
       const rows = input.lines.filter(l => l.item_name.trim() && l.quantity > 0).map((l, i) => {
         const c = computeLine({ quantity: l.quantity, unit_price: l.unit_price, discount_percent: 0, tax_percent: l.tax_percent }, input.tax_type);
         return {
-          company_id: companyId, vinv_id: id!, item_name: l.item_name, unit: l.unit ?? null,
+          company_id: companyId, vinv_id: id!, item_name: l.item_name, unit: l.unit || "Nos",
           quantity: l.quantity, unit_price: l.unit_price, tax_percent: l.tax_percent,
           line_total: c.line_total, position: i,
         };
@@ -563,7 +563,7 @@ export function useSaveVendorReturn() {
         const c = computeLine({ quantity: l.quantity, unit_price: l.rate, discount_percent: 0, tax_percent: l.tax_rate }, input.tax_type);
         return {
           company_id: companyId, vret_id: id!, item_id: l.item_id ?? null, description: l.description,
-          unit: l.unit ?? null, quantity: l.quantity, rate: l.rate, tax_rate: l.tax_rate,
+          unit: l.unit || "Nos", quantity: l.quantity, rate: l.rate, tax_rate: l.tax_rate,
           amount: c.line_total, position: i,
         };
       });
