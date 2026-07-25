@@ -140,6 +140,10 @@ import { Route as AuthenticatedWorkspaceCrmContactsRouteImport } from './routes/
 import { Route as AuthenticatedWorkspaceCrmActivitiesRouteImport } from './routes/_authenticated.workspace.crm.activities'
 import { Route as AuthenticatedWorkspaceCrmAccountsRouteImport } from './routes/_authenticated.workspace.crm.accounts'
 import { Route as AuthenticatedWorkspaceAdministrationOrganizationRouteImport } from './routes/_authenticated.workspace.administration.organization'
+import { Route as AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport } from './routes/_authenticated.workspace.administration.financial-years'
+import { Route as AuthenticatedWorkspaceAdministrationCurrenciesRouteImport } from './routes/_authenticated.workspace.administration.currencies'
+import { Route as AuthenticatedWorkspaceAdministrationCompaniesRouteImport } from './routes/_authenticated.workspace.administration.companies'
+import { Route as AuthenticatedWorkspaceAdministrationBranchesRouteImport } from './routes/_authenticated.workspace.administration.branches'
 import { Route as AuthenticatedAppSalesReturnsRouteImport } from './routes/_authenticated.app.sales.returns'
 import { Route as AuthenticatedAppSalesRecurringRouteImport } from './routes/_authenticated.app.sales.recurring'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
@@ -942,6 +946,30 @@ const AuthenticatedWorkspaceAdministrationOrganizationRoute =
     path: '/organization',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
+const AuthenticatedWorkspaceAdministrationFinancialYearsRoute =
+  AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport.update({
+    id: '/financial-years',
+    path: '/financial-years',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
+const AuthenticatedWorkspaceAdministrationCurrenciesRoute =
+  AuthenticatedWorkspaceAdministrationCurrenciesRouteImport.update({
+    id: '/currencies',
+    path: '/currencies',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
+const AuthenticatedWorkspaceAdministrationCompaniesRoute =
+  AuthenticatedWorkspaceAdministrationCompaniesRouteImport.update({
+    id: '/companies',
+    path: '/companies',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
+const AuthenticatedWorkspaceAdministrationBranchesRoute =
+  AuthenticatedWorkspaceAdministrationBranchesRouteImport.update({
+    id: '/branches',
+    path: '/branches',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
 const AuthenticatedAppSalesReturnsRoute =
   AuthenticatedAppSalesReturnsRouteImport.update({
     id: '/returns',
@@ -1298,6 +1326,10 @@ export interface FileRoutesByFullPath {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
+  '/workspace/administration/companies': typeof AuthenticatedWorkspaceAdministrationCompaniesRoute
+  '/workspace/administration/currencies': typeof AuthenticatedWorkspaceAdministrationCurrenciesRoute
+  '/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
   '/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
@@ -1453,6 +1485,10 @@ export interface FileRoutesByTo {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
+  '/workspace/administration/companies': typeof AuthenticatedWorkspaceAdministrationCompaniesRoute
+  '/workspace/administration/currencies': typeof AuthenticatedWorkspaceAdministrationCurrenciesRoute
+  '/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
   '/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
@@ -1632,6 +1668,10 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/_authenticated/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/_authenticated/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/_authenticated/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
+  '/_authenticated/workspace/administration/companies': typeof AuthenticatedWorkspaceAdministrationCompaniesRoute
+  '/_authenticated/workspace/administration/currencies': typeof AuthenticatedWorkspaceAdministrationCurrenciesRoute
+  '/_authenticated/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
   '/_authenticated/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/_authenticated/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/_authenticated/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
@@ -1811,6 +1851,10 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/administration/branches'
+    | '/workspace/administration/companies'
+    | '/workspace/administration/currencies'
+    | '/workspace/administration/financial-years'
     | '/workspace/administration/organization'
     | '/workspace/crm/accounts'
     | '/workspace/crm/activities'
@@ -1966,6 +2010,10 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/administration/branches'
+    | '/workspace/administration/companies'
+    | '/workspace/administration/currencies'
+    | '/workspace/administration/financial-years'
     | '/workspace/administration/organization'
     | '/workspace/crm/accounts'
     | '/workspace/crm/activities'
@@ -2144,6 +2192,10 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/quotations'
     | '/_authenticated/app/sales/recurring'
     | '/_authenticated/app/sales/returns'
+    | '/_authenticated/workspace/administration/branches'
+    | '/_authenticated/workspace/administration/companies'
+    | '/_authenticated/workspace/administration/currencies'
+    | '/_authenticated/workspace/administration/financial-years'
     | '/_authenticated/workspace/administration/organization'
     | '/_authenticated/workspace/crm/accounts'
     | '/_authenticated/workspace/crm/activities'
@@ -3164,6 +3216,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationOrganizationRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
+    '/_authenticated/workspace/administration/financial-years': {
+      id: '/_authenticated/workspace/administration/financial-years'
+      path: '/financial-years'
+      fullPath: '/workspace/administration/financial-years'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
+    '/_authenticated/workspace/administration/currencies': {
+      id: '/_authenticated/workspace/administration/currencies'
+      path: '/currencies'
+      fullPath: '/workspace/administration/currencies'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationCurrenciesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
+    '/_authenticated/workspace/administration/companies': {
+      id: '/_authenticated/workspace/administration/companies'
+      path: '/companies'
+      fullPath: '/workspace/administration/companies'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationCompaniesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
+    '/_authenticated/workspace/administration/branches': {
+      id: '/_authenticated/workspace/administration/branches'
+      path: '/branches'
+      fullPath: '/workspace/administration/branches'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationBranchesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
     '/_authenticated/app/sales/returns': {
       id: '/_authenticated/app/sales/returns'
       path: '/returns'
@@ -3816,12 +3896,24 @@ const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 interface AuthenticatedWorkspaceAdministrationRouteChildren {
+  AuthenticatedWorkspaceAdministrationBranchesRoute: typeof AuthenticatedWorkspaceAdministrationBranchesRoute
+  AuthenticatedWorkspaceAdministrationCompaniesRoute: typeof AuthenticatedWorkspaceAdministrationCompaniesRoute
+  AuthenticatedWorkspaceAdministrationCurrenciesRoute: typeof AuthenticatedWorkspaceAdministrationCurrenciesRoute
+  AuthenticatedWorkspaceAdministrationFinancialYearsRoute: typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
   AuthenticatedWorkspaceAdministrationOrganizationRoute: typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   AuthenticatedWorkspaceAdministrationIndexRoute: typeof AuthenticatedWorkspaceAdministrationIndexRoute
 }
 
 const AuthenticatedWorkspaceAdministrationRouteChildren: AuthenticatedWorkspaceAdministrationRouteChildren =
   {
+    AuthenticatedWorkspaceAdministrationBranchesRoute:
+      AuthenticatedWorkspaceAdministrationBranchesRoute,
+    AuthenticatedWorkspaceAdministrationCompaniesRoute:
+      AuthenticatedWorkspaceAdministrationCompaniesRoute,
+    AuthenticatedWorkspaceAdministrationCurrenciesRoute:
+      AuthenticatedWorkspaceAdministrationCurrenciesRoute,
+    AuthenticatedWorkspaceAdministrationFinancialYearsRoute:
+      AuthenticatedWorkspaceAdministrationFinancialYearsRoute,
     AuthenticatedWorkspaceAdministrationOrganizationRoute:
       AuthenticatedWorkspaceAdministrationOrganizationRoute,
     AuthenticatedWorkspaceAdministrationIndexRoute:
