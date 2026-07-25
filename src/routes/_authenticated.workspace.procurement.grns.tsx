@@ -16,7 +16,8 @@ function GRNsPage() {
 
   const openEdit = (r: any) => {
     setEditing({
-      id: r.id, supplier_id: r.supplier_id ?? undefined, warehouse_id: r.warehouse_id ?? undefined,
+      id: r.id, supplier_id: r.supplier_id ?? undefined, po_id: r.po_id ?? undefined,
+      warehouse_id: r.warehouse_id ?? undefined,
       status: r.status, primary_date: r.received_date, notes: r.notes ?? "",
       freight: Number(r.freight ?? 0),
       lines: (r.items ?? []).map((i: any) => ({
@@ -53,11 +54,12 @@ function GRNsPage() {
         statuses={[
           { value: "draft", label: "Draft" }, { value: "posted", label: "Posted" }, { value: "cancelled", label: "Cancelled" },
         ]}
-        showWarehouse showPricing showFreight
+        showWarehouse showPurchaseOrder showPricing showFreight
         attachmentsType="grn" initial={editing}
         onSubmit={async (v) => {
           const input: GRNInput = {
-            id: v.id, supplier_id: v.supplier_id ?? null, warehouse_id: v.warehouse_id ?? null,
+            id: v.id, supplier_id: v.supplier_id ?? null, po_id: v.po_id ?? null,
+            warehouse_id: v.warehouse_id ?? null,
             received_date: v.primary_date, status: v.status, freight: v.freight, notes: v.notes,
             lines: v.lines.map(l => ({ item_id: l.item_id ?? null, item_name: l.item_name, unit: l.unit, quantity: l.quantity, unit_cost: l.unit_price ?? 0, batch_no: l.batch_no ?? null })),
           };
