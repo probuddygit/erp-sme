@@ -741,8 +741,8 @@ export const getSystemHealth = createServerFn({ method: 'GET' })
       { count: totalCompanies },
       { count: activeCompanies },
       { data: recentAudit },
-      { data: recentLogins },
-      { data: recentSignups },
+      { count: recentLogins },
+      { count: recentSignups },
     ] = await Promise.all([
       admin.from('profiles').select('id', { count: 'exact', head: true }),
       admin.from('companies').select('id', { count: 'exact', head: true }),
