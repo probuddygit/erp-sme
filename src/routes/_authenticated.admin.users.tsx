@@ -53,7 +53,7 @@ function UsersPage() {
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
@@ -66,7 +66,7 @@ function UsersPage() {
       const res = await fetchUsers({
         data: {
           search: search || undefined,
-          role: roleFilter || undefined,
+          role: roleFilter !== "all" ? roleFilter : undefined,
           page,
           limit: 20,
         },
@@ -151,10 +151,10 @@ function UsersPage() {
           </div>
           <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v)}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="All roles" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All roles</SelectItem>
+              <SelectItem value="all">All roles</SelectItem>
               {ROLES.map((r) => (
                 <SelectItem key={r} value={r} className="capitalize">
                   {r}
