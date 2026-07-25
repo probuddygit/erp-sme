@@ -178,6 +178,7 @@ import { Route as AuthenticatedAppFinanceReportsRouteImport } from './routes/_au
 import { Route as AuthenticatedAppFinanceLedgerRouteImport } from './routes/_authenticated.app.finance.ledger'
 import { Route as AuthenticatedAppFinanceGstRouteImport } from './routes/_authenticated.app.finance.gst'
 import { Route as AuthenticatedAppFinanceAccountsRouteImport } from './routes/_authenticated.app.finance.accounts'
+import { Route as AuthenticatedWorkspaceReportsCategoryReportIdRouteImport } from './routes/_authenticated.workspace.reports.$category.$reportId'
 import { Route as AuthenticatedAppProductionWorkOrdersIdRouteImport } from './routes/_authenticated.app.production.work-orders.$id'
 import { Route as AuthenticatedAppProductionBomsIdRouteImport } from './routes/_authenticated.app.production.boms.$id'
 import { Route as AuthenticatedAppProcurementPurchaseOrdersIdRouteImport } from './routes/_authenticated.app.procurement.purchase-orders.$id'
@@ -1167,6 +1168,12 @@ const AuthenticatedAppFinanceAccountsRoute =
     path: '/accounts',
     getParentRoute: () => AuthenticatedAppFinanceRoute,
   } as any)
+const AuthenticatedWorkspaceReportsCategoryReportIdRoute =
+  AuthenticatedWorkspaceReportsCategoryReportIdRouteImport.update({
+    id: '/$reportId',
+    path: '/$reportId',
+    getParentRoute: () => AuthenticatedWorkspaceReportsCategoryRoute,
+  } as any)
 const AuthenticatedAppProductionWorkOrdersIdRoute =
   AuthenticatedAppProductionWorkOrdersIdRouteImport.update({
     id: '/$id',
@@ -1329,7 +1336,7 @@ export interface FileRoutesByFullPath {
   '/workspace/procurement/vendor-payments': typeof AuthenticatedWorkspaceProcurementVendorPaymentsRoute
   '/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
-  '/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRoute
+  '/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRouteWithChildren
   '/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -1365,6 +1372,7 @@ export interface FileRoutesByFullPath {
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
   '/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
+  '/workspace/reports/$category/$reportId': typeof AuthenticatedWorkspaceReportsCategoryReportIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1482,7 +1490,7 @@ export interface FileRoutesByTo {
   '/workspace/procurement/vendor-payments': typeof AuthenticatedWorkspaceProcurementVendorPaymentsRoute
   '/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
-  '/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRoute
+  '/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRouteWithChildren
   '/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -1518,6 +1526,7 @@ export interface FileRoutesByTo {
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
   '/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
+  '/workspace/reports/$category/$reportId': typeof AuthenticatedWorkspaceReportsCategoryReportIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1658,7 +1667,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/procurement/vendor-payments': typeof AuthenticatedWorkspaceProcurementVendorPaymentsRoute
   '/_authenticated/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/_authenticated/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
-  '/_authenticated/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRoute
+  '/_authenticated/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRouteWithChildren
   '/_authenticated/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/_authenticated/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/_authenticated/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -1694,6 +1703,7 @@ export interface FileRoutesById {
   '/_authenticated/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/_authenticated/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
   '/_authenticated/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
+  '/_authenticated/workspace/reports/$category/$reportId': typeof AuthenticatedWorkspaceReportsCategoryReportIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1870,6 +1880,7 @@ export interface FileRouteTypes {
     | '/app/procurement/purchase-orders/$id'
     | '/app/production/boms/$id'
     | '/app/production/work-orders/$id'
+    | '/workspace/reports/$category/$reportId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -2023,6 +2034,7 @@ export interface FileRouteTypes {
     | '/app/procurement/purchase-orders/$id'
     | '/app/production/boms/$id'
     | '/app/production/work-orders/$id'
+    | '/workspace/reports/$category/$reportId'
   id:
     | '__root__'
     | '/'
@@ -2198,6 +2210,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/procurement/purchase-orders/$id'
     | '/_authenticated/app/production/boms/$id'
     | '/_authenticated/app/production/work-orders/$id'
+    | '/_authenticated/workspace/reports/$category/$reportId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -3393,6 +3406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppFinanceAccountsRouteImport
       parentRoute: typeof AuthenticatedAppFinanceRoute
     }
+    '/_authenticated/workspace/reports/$category/$reportId': {
+      id: '/_authenticated/workspace/reports/$category/$reportId'
+      path: '/$reportId'
+      fullPath: '/workspace/reports/$category/$reportId'
+      preLoaderRoute: typeof AuthenticatedWorkspaceReportsCategoryReportIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceReportsCategoryRoute
+    }
     '/_authenticated/app/production/work-orders/$id': {
       id: '/_authenticated/app/production/work-orders/$id'
       path: '/$id'
@@ -3996,15 +4016,30 @@ const AuthenticatedWorkspaceProcurementRouteWithChildren =
     AuthenticatedWorkspaceProcurementRouteChildren,
   )
 
+interface AuthenticatedWorkspaceReportsCategoryRouteChildren {
+  AuthenticatedWorkspaceReportsCategoryReportIdRoute: typeof AuthenticatedWorkspaceReportsCategoryReportIdRoute
+}
+
+const AuthenticatedWorkspaceReportsCategoryRouteChildren: AuthenticatedWorkspaceReportsCategoryRouteChildren =
+  {
+    AuthenticatedWorkspaceReportsCategoryReportIdRoute:
+      AuthenticatedWorkspaceReportsCategoryReportIdRoute,
+  }
+
+const AuthenticatedWorkspaceReportsCategoryRouteWithChildren =
+  AuthenticatedWorkspaceReportsCategoryRoute._addFileChildren(
+    AuthenticatedWorkspaceReportsCategoryRouteChildren,
+  )
+
 interface AuthenticatedWorkspaceReportsRouteChildren {
-  AuthenticatedWorkspaceReportsCategoryRoute: typeof AuthenticatedWorkspaceReportsCategoryRoute
+  AuthenticatedWorkspaceReportsCategoryRoute: typeof AuthenticatedWorkspaceReportsCategoryRouteWithChildren
   AuthenticatedWorkspaceReportsIndexRoute: typeof AuthenticatedWorkspaceReportsIndexRoute
 }
 
 const AuthenticatedWorkspaceReportsRouteChildren: AuthenticatedWorkspaceReportsRouteChildren =
   {
     AuthenticatedWorkspaceReportsCategoryRoute:
-      AuthenticatedWorkspaceReportsCategoryRoute,
+      AuthenticatedWorkspaceReportsCategoryRouteWithChildren,
     AuthenticatedWorkspaceReportsIndexRoute:
       AuthenticatedWorkspaceReportsIndexRoute,
   }
