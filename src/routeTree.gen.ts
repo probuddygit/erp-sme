@@ -54,6 +54,7 @@ import { Route as AuthenticatedAppHrRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedAppFinanceRouteImport } from './routes/_authenticated.app.finance'
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
+import { Route as AuthenticatedAdminTenantsRouteImport } from './routes/_authenticated.admin.tenants'
 import { Route as AuthenticatedWorkspaceWorkflowIndexRouteImport } from './routes/_authenticated.workspace.workflow.index'
 import { Route as AuthenticatedWorkspaceSalesIndexRouteImport } from './routes/_authenticated.workspace.sales.index'
 import { Route as AuthenticatedWorkspaceReportsIndexRouteImport } from './routes/_authenticated.workspace.reports.index'
@@ -453,6 +454,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminTenantsRoute =
+  AuthenticatedAdminTenantsRouteImport.update({
+    id: '/tenants',
+    path: '/tenants',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedWorkspaceWorkflowIndexRoute =
   AuthenticatedWorkspaceWorkflowIndexRouteImport.update({
     id: '/',
@@ -1414,6 +1421,7 @@ export interface FileRoutesByFullPath {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/admin/tenants': typeof AuthenticatedAdminTenantsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
   '/app/finance': typeof AuthenticatedAppFinanceRouteWithChildren
@@ -1614,6 +1622,7 @@ export interface FileRoutesByTo {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/admin/tenants': typeof AuthenticatedAdminTenantsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
@@ -1800,6 +1809,7 @@ export interface FileRoutesById {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/_authenticated/admin/tenants': typeof AuthenticatedAdminTenantsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
   '/_authenticated/app/finance': typeof AuthenticatedAppFinanceRouteWithChildren
@@ -2005,6 +2015,7 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/admin/tenants'
     | '/admin/users'
     | '/app/$module'
     | '/app/finance'
@@ -2205,6 +2216,7 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/admin/tenants'
     | '/admin/users'
     | '/app/$module'
     | '/app/settings'
@@ -2390,6 +2402,7 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/_authenticated/admin/tenants'
     | '/_authenticated/admin/users'
     | '/_authenticated/app/$module'
     | '/_authenticated/app/finance'
@@ -2898,6 +2911,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/tenants': {
+      id: '/_authenticated/admin/tenants'
+      path: '/tenants'
+      fullPath: '/admin/tenants'
+      preLoaderRoute: typeof AuthenticatedAdminTenantsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/workspace/workflow/': {
@@ -4003,11 +4023,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminTenantsRoute: typeof AuthenticatedAdminTenantsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminTenantsRoute: AuthenticatedAdminTenantsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
