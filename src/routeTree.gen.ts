@@ -55,6 +55,7 @@ import { Route as AuthenticatedAppFinanceRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAdminTenantsRouteImport } from './routes/_authenticated.admin.tenants'
+import { Route as AuthenticatedAdminSubscriptionsRouteImport } from './routes/_authenticated.admin.subscriptions'
 import { Route as AuthenticatedWorkspaceWorkflowIndexRouteImport } from './routes/_authenticated.workspace.workflow.index'
 import { Route as AuthenticatedWorkspaceSalesIndexRouteImport } from './routes/_authenticated.workspace.sales.index'
 import { Route as AuthenticatedWorkspaceReportsIndexRouteImport } from './routes/_authenticated.workspace.reports.index'
@@ -459,6 +460,12 @@ const AuthenticatedAdminTenantsRoute =
   AuthenticatedAdminTenantsRouteImport.update({
     id: '/tenants',
     path: '/tenants',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSubscriptionsRoute =
+  AuthenticatedAdminSubscriptionsRouteImport.update({
+    id: '/subscriptions',
+    path: '/subscriptions',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedWorkspaceWorkflowIndexRoute =
@@ -1428,6 +1435,7 @@ export interface FileRoutesByFullPath {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
   '/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
@@ -1630,6 +1638,7 @@ export interface FileRoutesByTo {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
   '/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
@@ -1818,6 +1827,7 @@ export interface FileRoutesById {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/_authenticated/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
   '/_authenticated/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
@@ -2025,6 +2035,7 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/admin/subscriptions'
     | '/admin/tenants'
     | '/admin/users'
     | '/app/$module'
@@ -2227,6 +2238,7 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/admin/subscriptions'
     | '/admin/tenants'
     | '/admin/users'
     | '/app/$module'
@@ -2414,6 +2426,7 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/_authenticated/admin/subscriptions'
     | '/_authenticated/admin/tenants'
     | '/_authenticated/admin/users'
     | '/_authenticated/app/$module'
@@ -2931,6 +2944,13 @@ declare module '@tanstack/react-router' {
       path: '/tenants'
       fullPath: '/admin/tenants'
       preLoaderRoute: typeof AuthenticatedAdminTenantsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/subscriptions': {
+      id: '/_authenticated/admin/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/admin/subscriptions'
+      preLoaderRoute: typeof AuthenticatedAdminSubscriptionsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/workspace/workflow/': {
@@ -4057,12 +4077,14 @@ const AuthenticatedAdminTenantsRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminSubscriptionsRoute: typeof AuthenticatedAdminSubscriptionsRoute
   AuthenticatedAdminTenantsRoute: typeof AuthenticatedAdminTenantsRouteWithChildren
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminSubscriptionsRoute: AuthenticatedAdminSubscriptionsRoute,
   AuthenticatedAdminTenantsRoute: AuthenticatedAdminTenantsRouteWithChildren,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
