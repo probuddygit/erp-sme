@@ -251,7 +251,7 @@ export const createTenant = createServerFn({ method: 'POST' })
       due_date: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
     });
 
-    await logAudit(context, 'TENANT_CREATED', 'company', company.id, {
+    await logAudit(context.supabase, context.userId, 'TENANT_CREATED', 'company', company.id, {
       name: data.name,
       slug: data.slug,
       plan: data.plan,
@@ -296,7 +296,7 @@ export const updateTenant = createServerFn({ method: 'POST' })
         .eq('company_id', data.companyId);
     }
 
-    await logAudit(context, 'TENANT_UPDATED', 'company', data.companyId, {
+    await logAudit(context.supabase, context.userId, 'TENANT_UPDATED', 'company', data.companyId, {
       plan: data.plan,
       isActive: data.isActive,
       enabledModules: data.enabledModules,
@@ -323,7 +323,7 @@ export const suspendTenant = createServerFn({ method: 'POST' })
       .update({ status: 'suspended' })
       .eq('company_id', data.companyId);
 
-    await logAudit(context, 'TENANT_SUSPENDED', 'company', data.companyId, { reason: data.reason });
+    await logAudit(context.supabase, context.userId, 'TENANT_SUSPENDED', 'company', data.companyId, { reason: data.reason });
     return { ok: true };
   });
 
@@ -427,7 +427,7 @@ export const updateUserRoles = createServerFn({ method: 'POST' })
     const { error } = await admin.from('user_roles').insert(inserts);
     if (error) throw new Error(error.message);
 
-    await logAudit(context, 'USER_ROLES_UPDATED', 'user', data.userId, { roles: data.roles, companyId: targetCompanyId });
+    await logAudit(context.supabase, context.userId, 'USER_ROLES_UPDATED', 'user', data.userId, { roles: data.roles, companyId: targetCompanyId });
     return { ok: true };
   });
 
@@ -450,7 +450,7 @@ export const resetUserPassword = createServerFn({ method: 'POST' })
     });
     if (error) throw new Error(error.message);
 
-    await logAudit(context, 'USER_PASSWORD_RESET', 'user', data.userId, {});
+    await logAudit(context.supabase, context.userId, 'USER_PASSWORD_RESET', 'user', data.userId, {});
     return { email: profile.email, recoveryLink: linkData?.properties?.action_link ?? null };
   });
 
@@ -473,7 +473,7 @@ export const impersonateUser = createServerFn({ method: 'POST' })
     });
     if (error) throw new Error(error.message);
 
-    await logAudit(context, 'USER_IMPERSONATED', 'user', data.userId, {});
+    await logAudit(context.supabase, context.userId, 'USER_IMPERSONATED', 'user', data.userId, {});
     return { email: profile.email, magicLink: linkData?.properties?.action_link ?? null };
   });
 
@@ -537,7 +537,7 @@ export const updateSubscription = createServerFn({ method: 'POST' })
     if (error) throw new Error(error.message);
 
     await admin.from('companies').update({ plan: sub.plan }).eq('id', sub.company_id);
-    await logAudit(context, 'SUBSCRIPTION_UPDATED', 'platform_subscriptions', data.subscriptionId, { plan: data.plan, status: data.status });
+    await logAudit(context.supabase, context.userId, 'SUBSCRIPTION_UPDATED', 'platform_subscriptions', data.subscriptionId, { plan: data.plan, status: data.status });
     return sub;
   });
 
@@ -601,7 +601,7 @@ export const createInvoice = createServerFn({ method: 'POST' })
       .single();
     if (error) throw new Error(error.message);
 
-    await logAudit(context, 'INVOICE_CREATED', 'platform_invoices', invoice.id, { amount: data.amount, companyId: data.companyId });
+    await logAudit(context.supabase, context.userId, 'INVOICE_CREATED', 'platform_invoices', invoice.id, { amount: data.amount, companyId: data.companyId });
     return invoice;
   });
 
@@ -622,7 +622,7 @@ export const markInvoicePaid = createServerFn({ method: 'POST' })
       .single();
     if (error) throw new Error(error.message);
 
-    await logAudit(context, 'INVOICE_MARKED_PAID', 'platform_invoices', data.invoiceId, {});
+    await logAudit(context.supabase, context.userId, 'INVOICE_MARKED_PAID', 'platform_invoices', data.invoiceId, {});
     return invoice;
   });
 
@@ -656,7 +656,7 @@ export const updatePlatformSetting = createServerFn({ method: 'POST' })
       .single();
     if (error) throw new Error(error.message);
 
-    await logAudit(context, 'SETTING_UPDATED', 'platform_settings', data.key, { value: data.value });
+    await logAudit(context.supabase, context.userId, 'SETTING_UPDATED', 'platform_settings', data.key, { value: data.value });
     return setting;
   });
 
@@ -696,7 +696,7 @@ export const updateFeatureFlag = createServerFn({ method: 'POST' })
       .single();
     if (error) throw new Error(error.message);
 
-    await logAudit(context, 'FEATURE_FLAG_UPDATED', 'feature_flags', data.key, { enabled: data.enabled, target: data.target });
+    await logAudit(context.supabase, context.userId, 'FEATURE_FLAG_UPDATED', 'feature_flags', data.key, { enabled: data.enabled, target: data.target });
     return flag;
   });
 
