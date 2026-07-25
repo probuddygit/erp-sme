@@ -620,6 +620,250 @@ export type Database = {
           },
         ]
       }
+      crm_activities: {
+        Row: {
+          activity_type: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          owner_id: string | null
+          related_id: string | null
+          related_type: string | null
+          scheduled_at: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          activity_type?: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          owner_id?: string | null
+          related_id?: string | null
+          related_type?: string | null
+          scheduled_at?: string
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          activity_type?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          owner_id?: string | null
+          related_id?: string | null
+          related_type?: string | null
+          scheduled_at?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_activities_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_contacts: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          email: string | null
+          id: string
+          last_contacted_at: string | null
+          name: string
+          notes: string | null
+          owner_id: string | null
+          phone: string | null
+          tags: string[]
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          email?: string | null
+          id?: string
+          last_contacted_at?: string | null
+          name: string
+          notes?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          tags?: string[]
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          email?: string | null
+          id?: string
+          last_contacted_at?: string | null
+          name?: string
+          notes?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          tags?: string[]
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_contacts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_email_history: {
+        Row: {
+          body: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          direction: string
+          from_addr: string
+          id: string
+          opened: boolean
+          preview: string | null
+          related_id: string | null
+          related_type: string | null
+          sent_at: string
+          subject: string
+          to_addr: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          from_addr: string
+          id?: string
+          opened?: boolean
+          preview?: string | null
+          related_id?: string | null
+          related_type?: string | null
+          sent_at?: string
+          subject: string
+          to_addr: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          from_addr?: string
+          id?: string
+          opened?: boolean
+          preview?: string | null
+          related_id?: string | null
+          related_type?: string | null
+          sent_at?: string
+          subject?: string
+          to_addr?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_email_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_follow_ups: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          done: boolean
+          due_date: string
+          id: string
+          lead_id: string | null
+          notes: string | null
+          owner_id: string | null
+          priority: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          done?: boolean
+          due_date: string
+          id?: string
+          lead_id?: string | null
+          notes?: string | null
+          owner_id?: string | null
+          priority?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          done?: boolean
+          due_date?: string
+          id?: string
+          lead_id?: string | null
+          notes?: string | null
+          owner_id?: string | null
+          priority?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_follow_ups_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_follow_ups_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       currencies: {
         Row: {
           code: string
