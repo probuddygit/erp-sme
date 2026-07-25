@@ -421,10 +421,10 @@ export const updateUserRoles = createServerFn({ method: 'POST' })
 
     const inserts = data.roles.map((role) => ({
       user_id: data.userId,
-      role,
+      role: role as AppRole,
       company_id: targetCompanyId,
     }));
-    const { error } = await admin.from('user_roles').insert(inserts);
+    const { error } = await admin.from('user_roles').insert(inserts as any);
     if (error) throw new Error(error.message);
 
     await logAudit(context.supabase, context.userId, 'USER_ROLES_UPDATED', 'user', data.userId, { roles: data.roles, companyId: targetCompanyId });
