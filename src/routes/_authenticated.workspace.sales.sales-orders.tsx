@@ -1,22 +1,77 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ClipboardList } from "lucide-react";
-import { TransactionsPage } from "@/features/sales/components/TransactionsPage";
-import { SALES_ORDERS, formatDate } from "@/features/sales/data";
+import { useState } from "react";
+import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
+import { DocumentFormDialog, type DocFormValue } from "@/features/sales/components/DocumentFormDialog";
+import { useSalesOrders, useSaveSalesOrder, useDeleteSalesOrder, type SalesOrderInput } from "@/features/sales/api";
+import { inr } from "@/lib/sales-utils";
 
 export const Route = createFileRoute("/_authenticated/workspace/sales/sales-orders")({
-  component: () => (
-    <TransactionsPage
-      title="Sales Orders"
-      description="Confirmed customer orders ready for fulfillment. Track dispatch, approvals and pricing."
-      icon={ClipboardList}
-      data={SALES_ORDERS}
-      statuses={["draft", "confirmed", "processing", "fulfilled", "cancelled"]}
-      extraColumns={[
-        {
-          header: "Delivery",
-          render: (t) => (t.deliveryDate ? formatDate(t.deliveryDate) : "—"),
-        },
-      ]}
-    />
-  ),
+  component: SalesOrdersPage,
 });
+
+function SalesOrdersPage() {
+  const { data = [], isLoading } = useSalesOrders();
+  const save = useSaveSalesOrder();
+  const del = useDeleteSalesOrder();
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<DocFormValue | null>(null);
+
+  const openEdit = (row: any) => {
+    setEditing({
+      id: row.id, customer_id: row.customer_id, primary_date: row.order_date,
+      secondary_date: row.delivery_date, status: row.status, tax_type: row.tax_type,
+      notes: row.notes ?? "",
+      lines: (row.items ?? []).map((i: any) => ({
+        product_name: i.product_name, description: i.description ?? "",
+        quantity: Number(i.quantity), unit_price: Number(i.unit_price),
+        discount_percent: Number(i.discount_percent), tax_percent: Number(i.tax_percent),
+      })),
+    });
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <SalesDocList
+        title="Sales Orders"
+        description="Confirmed customer orders ready for fulfillment."
+        icon={ClipboardList}
+        rows={data as any[]} isLoading={isLoading}
+        searchable={(r: any) => `${r.order_number} ${r.customer?.name ?? ""} ${r.status}`}
+        totalOf={(r: any) => Number(r.grand_total ?? 0)}
+        onCreate={() => { setEditing(null); setOpen(true); }}
+        onEdit={openEdit}
+        onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
+        columns={[
+          { header: "Number", cell: (r: any) => <span className="font-medium">{r.order_number}</span> },
+          { header: "Customer", cell: (r: any) => r.customer?.name ?? "—" },
+          { header: "Order Date", cell: (r: any) => fmtDate(r.order_date) },
+          { header: "Delivery", cell: (r: any) => fmtDate(r.delivery_date) },
+          { header: "Status", cell: (r: any) => <StatusChip value={r.status} tone={toneForStatus(r.status)} /> },
+          { header: "Total", className: "text-right", cell: (r: any) => <span className="tabular-nums">{inr(r.grand_total)}</span> },
+        ]}
+      />
+      <DocumentFormDialog
+        open={open} onOpenChange={setOpen}
+        title={editing?.id ? "Edit Sales Order" : "New Sales Order"}
+        primaryDateLabel="Order Date" secondaryDateLabel="Delivery Date"
+        statuses={[
+          { value: "draft", label: "Draft" },
+          { value: "confirmed", label: "Confirmed" },
+          { value: "processing", label: "Processing" },
+          { value: "fulfilled", label: "Fulfilled" },
+          { value: "cancelled", label: "Cancelled" },
+        ]}
+        initial={editing}
+        onSubmit={async (v) => {
+          const input: SalesOrderInput = {
+            id: v.id, customer_id: v.customer_id, order_date: v.primary_date, delivery_date: v.secondary_date ?? null,
+            status: v.status as any, tax_type: v.tax_type, notes: v.notes, lines: v.lines,
+          };
+          await save.mutateAsync(input);
+        }}
+      />
+    </>
+  );
+}
