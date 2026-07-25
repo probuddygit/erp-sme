@@ -246,9 +246,15 @@ export function ProcurementFormDialog({
                 const lineTotal = (l.quantity ?? 0) * (l.unit_price ?? 0) * (1 + (l.tax_percent ?? 0) / 100);
                 return (
                   <div key={i} className={`px-3 py-2 grid gap-2 items-center ${showPricing ? "grid-cols-12" : "grid-cols-8"}`}>
-                    <Input list={`items-${i}`} className={`h-8 ${showPricing ? "col-span-4" : "col-span-5"}`} placeholder="Item name / SKU" value={l.item_name} onChange={(e) => updateLine(i, { item_name: e.target.value })} />
+                    <Input list={`items-${i}`} className={`h-8 ${showPricing ? "col-span-4" : "col-span-5"}`} placeholder="Item name / SKU" value={l.item_name} onChange={(e) => {
+                      const name = e.target.value;
+                      const match = items.find((it: any) => it.name === name || it.sku === name);
+                      updateLine(i, match
+                        ? { item_name: match.name, item_id: match.id, item_code: match.sku ?? undefined, unit: l.unit || match.unit || "Nos" }
+                        : { item_name: name, item_id: null });
+                    }} />
                     <datalist id={`items-${i}`}>
-                      {items.map((it) => <option key={it.id} value={it.name} />)}
+                      {items.map((it: any) => <option key={it.id} value={it.name}>{it.sku ? `${it.sku} — ${it.name}` : it.name}</option>)}
                     </datalist>
                     <Input className="col-span-1 h-8 text-right" type="number" min={0} step="0.01" value={l.quantity} onChange={(e) => updateLine(i, { quantity: Number(e.target.value) })} />
                     <Input className="col-span-1 h-8" placeholder="Nos" value={l.unit ?? ""} onChange={(e) => updateLine(i, { unit: e.target.value })} />
