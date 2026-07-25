@@ -33,6 +33,7 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
 import { Route as AuthenticatedWorkspaceWorkflowRouteImport } from './routes/_authenticated.workspace.workflow'
 import { Route as AuthenticatedWorkspaceSalesRouteImport } from './routes/_authenticated.workspace.sales'
+import { Route as AuthenticatedWorkspaceReportsRouteImport } from './routes/_authenticated.workspace.reports'
 import { Route as AuthenticatedWorkspaceProcurementRouteImport } from './routes/_authenticated.workspace.procurement'
 import { Route as AuthenticatedWorkspaceMastersRouteImport } from './routes/_authenticated.workspace.masters'
 import { Route as AuthenticatedWorkspaceInventoryRouteImport } from './routes/_authenticated.workspace.inventory'
@@ -301,6 +302,12 @@ const AuthenticatedWorkspaceSalesRoute =
   AuthenticatedWorkspaceSalesRouteImport.update({
     id: '/sales',
     path: '/sales',
+    getParentRoute: () => AuthenticatedWorkspaceRoute,
+  } as any)
+const AuthenticatedWorkspaceReportsRoute =
+  AuthenticatedWorkspaceReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
     getParentRoute: () => AuthenticatedWorkspaceRoute,
   } as any)
 const AuthenticatedWorkspaceProcurementRoute =
@@ -1210,6 +1217,7 @@ export interface FileRoutesByFullPath {
   '/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   '/workspace/masters': typeof AuthenticatedWorkspaceMastersRouteWithChildren
   '/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRouteWithChildren
+  '/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/workspace/sales': typeof AuthenticatedWorkspaceSalesRouteWithChildren
   '/workspace/workflow': typeof AuthenticatedWorkspaceWorkflowRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -1363,6 +1371,7 @@ export interface FileRoutesByTo {
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
   '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
+  '/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/workspace': typeof AuthenticatedWorkspaceIndexRoute
@@ -1534,6 +1543,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/inventory': typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   '/_authenticated/workspace/masters': typeof AuthenticatedWorkspaceMastersRouteWithChildren
   '/_authenticated/workspace/procurement': typeof AuthenticatedWorkspaceProcurementRouteWithChildren
+  '/_authenticated/workspace/reports': typeof AuthenticatedWorkspaceReportsRoute
   '/_authenticated/workspace/sales': typeof AuthenticatedWorkspaceSalesRouteWithChildren
   '/_authenticated/workspace/workflow': typeof AuthenticatedWorkspaceWorkflowRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -1707,6 +1717,7 @@ export interface FileRouteTypes {
     | '/workspace/inventory'
     | '/workspace/masters'
     | '/workspace/procurement'
+    | '/workspace/reports'
     | '/workspace/sales'
     | '/workspace/workflow'
     | '/admin/'
@@ -1860,6 +1871,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/users'
     | '/workspace/administration'
+    | '/workspace/reports'
     | '/admin'
     | '/app'
     | '/workspace'
@@ -2030,6 +2042,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/inventory'
     | '/_authenticated/workspace/masters'
     | '/_authenticated/workspace/procurement'
+    | '/_authenticated/workspace/reports'
     | '/_authenticated/workspace/sales'
     | '/_authenticated/workspace/workflow'
     | '/_authenticated/admin/'
@@ -2339,6 +2352,13 @@ declare module '@tanstack/react-router' {
       path: '/sales'
       fullPath: '/workspace/sales'
       preLoaderRoute: typeof AuthenticatedWorkspaceSalesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceRoute
+    }
+    '/_authenticated/workspace/reports': {
+      id: '/_authenticated/workspace/reports'
+      path: '/reports'
+      fullPath: '/workspace/reports'
+      preLoaderRoute: typeof AuthenticatedWorkspaceReportsRouteImport
       parentRoute: typeof AuthenticatedWorkspaceRoute
     }
     '/_authenticated/workspace/procurement': {
@@ -4015,6 +4035,7 @@ interface AuthenticatedWorkspaceRouteChildren {
   AuthenticatedWorkspaceInventoryRoute: typeof AuthenticatedWorkspaceInventoryRouteWithChildren
   AuthenticatedWorkspaceMastersRoute: typeof AuthenticatedWorkspaceMastersRouteWithChildren
   AuthenticatedWorkspaceProcurementRoute: typeof AuthenticatedWorkspaceProcurementRouteWithChildren
+  AuthenticatedWorkspaceReportsRoute: typeof AuthenticatedWorkspaceReportsRoute
   AuthenticatedWorkspaceSalesRoute: typeof AuthenticatedWorkspaceSalesRouteWithChildren
   AuthenticatedWorkspaceWorkflowRoute: typeof AuthenticatedWorkspaceWorkflowRouteWithChildren
   AuthenticatedWorkspaceIndexRoute: typeof AuthenticatedWorkspaceIndexRoute
@@ -4034,6 +4055,7 @@ const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
       AuthenticatedWorkspaceMastersRouteWithChildren,
     AuthenticatedWorkspaceProcurementRoute:
       AuthenticatedWorkspaceProcurementRouteWithChildren,
+    AuthenticatedWorkspaceReportsRoute: AuthenticatedWorkspaceReportsRoute,
     AuthenticatedWorkspaceSalesRoute:
       AuthenticatedWorkspaceSalesRouteWithChildren,
     AuthenticatedWorkspaceWorkflowRoute:
