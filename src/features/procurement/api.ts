@@ -113,7 +113,7 @@ export function useSaveIndent() {
       };
       let id = input.id;
       if (id) {
-        const { error } = await supabase.from("purchase_indents").update(header).eq("id", id);
+        const { error } = await supabase.from("purchase_indents").update(header as any).eq("id", id);
         if (error) throw error;
         await supabase.from("purchase_indent_items").delete().eq("indent_id", id);
       } else {
@@ -171,12 +171,12 @@ export function useSaveRFQ() {
       };
       let id = input.id;
       if (id) {
-        const { error } = await supabase.from("rfqs").update(header).eq("id", id);
+        const { error } = await supabase.from("rfqs").update(header as any).eq("id", id);
         if (error) throw error;
         await supabase.from("rfq_items").delete().eq("rfq_id", id);
       } else {
         const rfq_number = await nextNumber(companyId, "RFQ");
-        const { data, error } = await supabase.from("rfqs").insert({ ...header, rfq_number, created_by: profile!.id }).select("id").single();
+        const { data, error } = await supabase.from("rfqs").insert({ ...header, rfq_number, created_by: profile!.id } as any).select("id").single();
         if (error) throw error;
         id = data.id;
       }
@@ -296,12 +296,12 @@ export function useSavePurchaseOrder() {
       };
       let id = input.id;
       if (id) {
-        const { error } = await supabase.from("purchase_orders").update(header).eq("id", id);
+        const { error } = await supabase.from("purchase_orders").update(header as any).eq("id", id);
         if (error) throw error;
         await supabase.from("purchase_order_items").delete().eq("po_id", id);
       } else {
         const po_number = await nextNumber(companyId, "PO");
-        const { data, error } = await supabase.from("purchase_orders").insert({ ...header, po_number, created_by: profile!.id }).select("id").single();
+        const { data, error } = await supabase.from("purchase_orders").insert({ ...header, po_number, created_by: profile!.id } as any).select("id").single();
         if (error) throw error;
         id = data.id;
       }
@@ -362,12 +362,12 @@ export function useSaveGRN() {
       };
       let id = input.id;
       if (id) {
-        const { error } = await supabase.from("grns").update(header).eq("id", id);
+        const { error } = await supabase.from("grns").update(header as any).eq("id", id);
         if (error) throw error;
         await supabase.from("grn_items").delete().eq("grn_id", id);
       } else {
         const grn_number = await nextNumber(companyId, "GRN");
-        const { data, error } = await supabase.from("grns" as any).insert({ ...header, grn_number, created_by: profile!.id }).select("id").single();
+        const { data, error } = await supabase.from("grns" as any).insert({ ...header, grn_number, created_by: profile!.id } as any).select("id").single();
         if (error) throw error;
         id = data.id;
       }
@@ -431,12 +431,12 @@ export function useSaveVendorInvoice() {
       };
       let id = input.id;
       if (id) {
-        const { error } = await supabase.from("vendor_invoices").update(header).eq("id", id);
+        const { error } = await supabase.from("vendor_invoices").update(header as any).eq("id", id);
         if (error) throw error;
         await supabase.from("vendor_invoice_items").delete().eq("vinv_id", id);
       } else {
         const vinv_number = await nextNumber(companyId, "VINV");
-        const { data, error } = await supabase.from("vendor_invoices").insert({ ...header, vinv_number, created_by: profile!.id }).select("id").single();
+        const { data, error } = await supabase.from("vendor_invoices").insert({ ...header, vinv_number, created_by: profile!.id } as any).select("id").single();
         if (error) throw error;
         id = data.id;
       }
@@ -493,11 +493,11 @@ export function useSaveVendorPayment() {
         reference: input.reference ?? null, notes: input.notes ?? null,
       };
       if (input.id) {
-        const { error } = await supabase.from("supplier_payments").update(row).eq("id", input.id);
+        const { error } = await supabase.from("supplier_payments").update(row as any).eq("id", input.id);
         if (error) throw error;
       } else {
         const payment_number = await nextNumber(companyId, "PAY");
-        const { error } = await supabase.from("supplier_payments").insert({ ...row, payment_number, created_by: profile!.id });
+        const { error } = await supabase.from("supplier_payments").insert({ ...row, payment_number, created_by: profile!.id } as any);
         if (error) throw error;
       }
     },
@@ -550,12 +550,12 @@ export function useSaveVendorReturn() {
       };
       let id = input.id;
       if (id) {
-        const { error } = await supabase.from("vendor_returns").update(header).eq("id", id);
+        const { error } = await supabase.from("vendor_returns").update(header as any).eq("id", id);
         if (error) throw error;
         await supabase.from("vendor_return_items").delete().eq("vret_id", id);
       } else {
         const vret_number = await nextNumber(companyId, "VRET");
-        const { data, error } = await supabase.from("vendor_returns").insert({ ...header, vret_number, created_by: profile!.id }).select("id").single();
+        const { data, error } = await supabase.from("vendor_returns").insert({ ...header, vret_number, created_by: profile!.id } as any).select("id").single();
         if (error) throw error;
         id = data.id;
       }
