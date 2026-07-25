@@ -253,6 +253,53 @@ export type Database = {
           },
         ]
       }
+      attachments: {
+        Row: {
+          bucket_path: string
+          company_id: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          id: string
+          mime_type: string | null
+          size_bytes: number
+          uploaded_by: string | null
+        }
+        Insert: {
+          bucket_path: string
+          company_id: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number
+          uploaded_by?: string | null
+        }
+        Update: {
+          bucket_path?: string
+          company_id?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          file_name?: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attachments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendance: {
         Row: {
           attendance_date: string
@@ -4688,6 +4735,167 @@ export type Database = {
           vinv_number?: string
         }
         Relationships: []
+      }
+      vendor_return_items: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          description: string
+          discount_pct: number
+          hsn: string | null
+          id: string
+          item_id: string | null
+          position: number
+          quantity: number
+          rate: number
+          tax_rate: number
+          unit: string | null
+          vret_id: string
+        }
+        Insert: {
+          amount?: number
+          company_id: string
+          created_at?: string
+          description: string
+          discount_pct?: number
+          hsn?: string | null
+          id?: string
+          item_id?: string | null
+          position?: number
+          quantity?: number
+          rate?: number
+          tax_rate?: number
+          unit?: string | null
+          vret_id: string
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          description?: string
+          discount_pct?: number
+          hsn?: string | null
+          id?: string
+          item_id?: string | null
+          position?: number
+          quantity?: number
+          rate?: number
+          tax_rate?: number
+          unit?: string | null
+          vret_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_return_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_return_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_return_items_vret_id_fkey"
+            columns: ["vret_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_returns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_returns: {
+        Row: {
+          cgst_total: number
+          company_id: string
+          created_at: string
+          created_by: string | null
+          discount_total: number
+          grand_total: number
+          grn_id: string | null
+          id: string
+          igst_total: number
+          notes: string | null
+          reason: string | null
+          return_date: string
+          sgst_total: number
+          status: string
+          subtotal: number
+          supplier_id: string | null
+          tax_total: number
+          updated_at: string
+          vret_number: string
+        }
+        Insert: {
+          cgst_total?: number
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          discount_total?: number
+          grand_total?: number
+          grn_id?: string | null
+          id?: string
+          igst_total?: number
+          notes?: string | null
+          reason?: string | null
+          return_date?: string
+          sgst_total?: number
+          status?: string
+          subtotal?: number
+          supplier_id?: string | null
+          tax_total?: number
+          updated_at?: string
+          vret_number: string
+        }
+        Update: {
+          cgst_total?: number
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          discount_total?: number
+          grand_total?: number
+          grn_id?: string | null
+          id?: string
+          igst_total?: number
+          notes?: string | null
+          reason?: string | null
+          return_date?: string
+          sgst_total?: number
+          status?: string
+          subtotal?: number
+          supplier_id?: string | null
+          tax_total?: number
+          updated_at?: string
+          vret_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_returns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_returns_grn_id_fkey"
+            columns: ["grn_id"]
+            isOneToOne: false
+            referencedRelation: "grns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_returns_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       warehouses: {
         Row: {
