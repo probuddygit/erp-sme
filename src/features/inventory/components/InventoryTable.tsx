@@ -25,11 +25,14 @@ interface Props<T> {
   newLabel?: string;
   pageSize?: number;
   onRowClick?: (row: T) => void;
+  onNew?: () => void;
+  onExport?: () => void;
+  loading?: boolean;
 }
 
 export function InventoryTable<T extends { id: string }>({
   title, description, icon: Icon, data, columns, searchable, filters,
-  kpis, newLabel = "New", pageSize = 8, onRowClick,
+  kpis, newLabel = "New", pageSize = 8, onRowClick, onNew, onExport, loading,
 }: Props<T>) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -62,8 +65,12 @@ export function InventoryTable<T extends { id: string }>({
             filters={filters}
             actions={
               <>
-                <Button size="sm" variant="outline"><Download className="mr-1.5 h-4 w-4" /> Export</Button>
-                <Button size="sm"><Plus className="mr-1.5 h-4 w-4" /> {newLabel}</Button>
+                {onExport && (
+                  <Button size="sm" variant="outline" onClick={onExport}><Download className="mr-1.5 h-4 w-4" /> Export</Button>
+                )}
+                {onNew && (
+                  <Button size="sm" onClick={onNew}><Plus className="mr-1.5 h-4 w-4" /> {newLabel}</Button>
+                )}
               </>
             }
           />
@@ -83,7 +90,13 @@ export function InventoryTable<T extends { id: string }>({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pageData.length === 0 ? (
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="py-10 text-center text-muted-foreground">
+                      Loading…
+                    </TableCell>
+                  </TableRow>
+                ) : pageData.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="py-10 text-center text-muted-foreground">
                       No records match your filters.
