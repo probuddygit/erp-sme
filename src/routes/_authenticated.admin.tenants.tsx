@@ -55,7 +55,7 @@ function TenantsPage() {
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [planFilter, setPlanFilter] = useState<string>("");
+  const [planFilter, setPlanFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -75,7 +75,7 @@ function TenantsPage() {
       const res = await fetchTenants({
         data: {
           search: search || undefined,
-          plan: planFilter as any || undefined,
+          plan: planFilter !== "all" ? (planFilter as any) : undefined,
           page,
           limit: 20,
         },
@@ -152,10 +152,10 @@ function TenantsPage() {
           </div>
           <Select value={planFilter} onValueChange={(v) => setPlanFilter(v)}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="All plans" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All plans</SelectItem>
+              <SelectItem value="all">All plans</SelectItem>
               {PLANS.map((p) => (
                 <SelectItem key={p} value={p} className="capitalize">
                   {p}
