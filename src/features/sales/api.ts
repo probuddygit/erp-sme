@@ -609,3 +609,27 @@ export function useSavePayment() {
     onError: (e: any) => toast.error(e?.message ?? "Save failed"),
   });
 }
+
+// ---------- Delete mutations ----------
+function useDelete(table: "quotations" | "sales_orders" | "invoices" | "delivery_notes" | "sales_returns" | "payments", key: string, label: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from(table).delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["sales", key] });
+      if (table === "payments") qc.invalidateQueries({ queryKey: ["sales", "invoices"] });
+      toast.success(`${label} deleted`);
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Delete failed"),
+  });
+}
+
+export const useDeleteQuotation = () => useDelete("quotations", "quotations", "Quotation");
+export const useDeleteSalesOrder = () => useDelete("sales_orders", "sales_orders", "Sales order");
+export const useDeleteInvoice = () => useDelete("invoices", "invoices", "Invoice");
+export const useDeleteDeliveryNote = () => useDelete("delivery_notes", "delivery_notes", "Delivery note");
+export const useDeleteSalesReturn = () => useDelete("sales_returns", "returns", "Return");
+export const useDeletePayment = () => useDelete("payments", "payments", "Payment");
