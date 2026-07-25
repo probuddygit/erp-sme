@@ -21,16 +21,19 @@ async function loadAdminClient() {
   return supabaseAdmin;
 }
 
-function logAudit(supabase: any, actorId: string, action: string, entity: string, entityId: string | null, metadata: Record<string, unknown> = {}) {
-  return supabase.rpc('log_platform_audit', {
-    _actor_id: actorId,
-    _action: action,
-    _entity: entity,
-    _entity_id: entityId ?? null,
-    _metadata: metadata,
-  }).catch((err: any) => {
+async function logAudit(supabase: any, actorId: string, action: string, entity: string, entityId: string | null, metadata: Record<string, unknown> = {}) {
+  try {
+    const { error } = await supabase.rpc('log_platform_audit', {
+      _actor_id: actorId,
+      _action: action,
+      _entity: entity,
+      _entity_id: entityId ?? null,
+      _metadata: metadata,
+    });
+    if (error) console.error('Failed to log platform audit', error);
+  } catch (err) {
     console.error('Failed to log platform audit', err);
-  });
+  }
 }
 
 export const getPlatformDashboardMetrics = createServerFn({ method: 'GET' })
@@ -715,7 +718,7 @@ export const listPlatformAuditLogs = createServerFn({ method: 'POST' })
 
     let query = admin
       .from('platform_audit_logs')
-      .select('*, auth.users!platform_audit_logs_actor_id_fkey(email)')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(data.limit);
     if (data.action) query = query.eq('action', data.action);
@@ -724,7 +727,13 @@ export const listPlatformAuditLogs = createServerFn({ method: 'POST' })
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
 
-    return rows ?? [];
+    const actorIds = Array.from(new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)));
+    let emailMap = new Map<string, string>();
+    if (actorIds.length > 0) {
+      const { data: profs } = await admin.from('profiles').select('id, email').in('id', actorIds);
+      emailMap = new Map((profs ?? []).map((p: any) => [p.id, p.email]));
+    }
+    return (rows ?? []).map((r: any) => ({ ...r, actor_email: emailMap.get(r.actor_id) ?? null }));
   });
 
 export const getSystemHealth = createServerFn({ method: 'GET' })
