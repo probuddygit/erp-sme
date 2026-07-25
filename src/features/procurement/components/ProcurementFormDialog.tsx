@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2 } from "lucide-react";
-import { useSuppliers, useItemsMaster, useWarehouses } from "@/features/procurement/api";
+import { useSuppliers, useItemsMaster, useWarehouses, usePurchaseOrders } from "@/features/procurement/api";
 import { AttachmentsPanel } from "@/features/attachments/components/AttachmentsPanel";
 import type { EntityType } from "@/features/attachments/api";
 import { computeTotals, inr, type TaxType } from "@/lib/sales-utils";
@@ -26,6 +26,7 @@ export interface FormLine {
 export interface ProcurementFormValue {
   id?: string;
   supplier_id?: string;
+  po_id?: string | null;
   warehouse_id?: string;
   primary_date: string;
   secondary_date?: string | null;
@@ -47,6 +48,7 @@ interface Props {
   statuses: { value: string; label: string }[];
   showSupplier?: boolean;
   showWarehouse?: boolean;
+  showPurchaseOrder?: boolean;
   showTaxType?: boolean;
   showPricing?: boolean;
   showFreight?: boolean;
@@ -69,12 +71,13 @@ function emptyLine(showPricing?: boolean): FormLine {
 
 export function ProcurementFormDialog({
   open, onOpenChange, title, primaryDateLabel, secondaryDateLabel, statuses,
-  showSupplier = true, showWarehouse, showTaxType, showPricing, showFreight, showReason,
+  showSupplier = true, showWarehouse, showPurchaseOrder, showTaxType, showPricing, showFreight, showReason,
   attachmentsType, initial, onSubmit,
 }: Props) {
   const { data: suppliers = [] } = useSuppliers();
   const { data: items = [] } = useItemsMaster();
   const { data: warehouses = [] } = useWarehouses();
+  const { data: pos = [] } = usePurchaseOrders();
   const [value, setValue] = useState<ProcurementFormValue>(() => initial ?? {
     primary_date: today(), status: statuses[0]?.value ?? "draft",
     tax_type: "intra_state", lines: [emptyLine(showPricing)],
@@ -133,6 +136,43 @@ export function ProcurementFormDialog({
                 <SelectTrigger><SelectValue placeholder="Select supplier" /></SelectTrigger>
                 <SelectContent>
                   {suppliers.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}{s.code ? ` · ${s.code}` : ""}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
+          {showPurchaseOrder && (
+            <Field label="Purchase order">
+              <Select
+                value={value.po_id ?? ""}
+                onValueChange={(v) => {
+                  const po = (pos as any[]).find((p) => p.id === v);
+                  if (!po) { setValue({ ...value, po_id: v }); return; }
+                  const poLines: FormLine[] = (po.items ?? []).map((it: any) => ({
+                    item_id: it.item_id ?? null,
+                    item_name: it.item_name ?? "",
+                    item_code: it.item_code ?? undefined,
+                    unit: it.unit ?? "Nos",
+                    quantity: Math.max(Number(it.quantity ?? 0) - Number(it.received_quantity ?? 0), 0) || Number(it.quantity ?? 1),
+                    unit_price: Number(it.unit_price ?? 0),
+                    tax_percent: Number(it.tax_percent ?? 0),
+                  }));
+                  setValue({
+                    ...value,
+                    po_id: v,
+                    supplier_id: po.supplier_id ?? value.supplier_id,
+                    lines: poLines.length ? poLines : value.lines,
+                  });
+                }}
+              >
+                <SelectTrigger><SelectValue placeholder="Link to purchase order (optional)" /></SelectTrigger>
+                <SelectContent>
+                  {(pos as any[])
+                    .filter((p) => !value.supplier_id || p.supplier_id === value.supplier_id)
+                    .map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.po_number}{p.supplier?.name ? ` · ${p.supplier.name}` : ""}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </Field>
