@@ -1,56 +1,72 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeftRight, MoreHorizontal, Eye, Pencil, Trash2, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ArrowLeftRight, ArrowRight } from "lucide-react";
 import { InventoryTable, type Column } from "@/features/inventory/components/InventoryTable";
 import { StatusBadge } from "@/features/sales/components/StatusBadge";
-import { TRANSFERS, STATUS_TONES, formatDate, type StockTransfer } from "@/features/inventory/data";
-import { useState } from "react";
+import { TransferDialog } from "@/features/inventory/components/TransferDialog";
+import { useStockTransactions, fmtINR, fmtDateTime } from "@/features/inventory/api";
+import { STATUS_TONES } from "@/features/inventory/data";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/workspace/inventory/stock-transfer")({
   component: TransferPage,
 });
 
+interface TxnRow {
+  id: string; occurred_at: string; txn_type: string; quantity: number;
+  total_value: number; notes: string | null; reference_type: string | null; reference_id: string | null;
+  item: { name: string; sku: string } | null;
+  warehouse: { name: string; code: string } | null;
+}
+
+interface Pair { id: string; date: string; item: string; from: string; to: string; qty: number; value: number; }
+
 function TransferPage() {
-  const [status, setStatus] = useState("");
-  const data = TRANSFERS.filter((t) => !status || t.status === status);
-  const columns: Column<StockTransfer>[] = [
-    { header: "Transfer #", cell: (r) => <span className="font-medium">{r.number}</span> },
-    { header: "Date", cell: (r) => formatDate(r.date) },
-    { header: "From → To", cell: (r) => <div className="flex items-center gap-1 text-sm"><span>{r.fromWh}</span><ArrowRight className="h-3 w-3 text-muted-foreground" /><span>{r.toWh}</span></div> },
-    { header: "Lines", align: "right", cell: (r) => r.lines },
+  const { data: rows = [], isLoading } = useStockTransactions() as { data: TxnRow[]; isLoading: boolean };
+  const [open, setOpen] = useState(false);
+
+  // Pair transfer_out + transfer_in by (item, close occurred_at, ~equal qty)
+  const pairs = useMemo<Pair[]>(() => {
+    const outs = rows.filter((r) => r.txn_type === "transfer_out");
+    const ins = rows.filter((r) => r.txn_type === "transfer_in");
+    return outs.map((o) => {
+      const match = ins.find((i) => i.item?.sku === o.item?.sku && Math.abs(new Date(i.occurred_at).getTime() - new Date(o.occurred_at).getTime()) < 5000 && Math.abs(Number(i.quantity)) === Math.abs(Number(o.quantity)));
+      return {
+        id: o.id,
+        date: o.occurred_at,
+        item: o.item ? `${o.item.name} (${o.item.sku})` : "—",
+        from: o.warehouse?.name ?? "—",
+        to: match?.warehouse?.name ?? "—",
+        qty: Math.abs(Number(o.quantity)),
+        value: Math.abs(Number(o.total_value)),
+      };
+    });
+  }, [rows]);
+
+  const columns: Column<Pair>[] = [
+    { header: "Date", cell: (r) => fmtDateTime(r.date) },
+    { header: "Item", cell: (r) => <span className="font-medium">{r.item}</span> },
+    { header: "From → To", cell: (r) => <div className="flex items-center gap-1 text-sm"><span>{r.from}</span><ArrowRight className="h-3 w-3 text-muted-foreground" /><span>{r.to}</span></div> },
     { header: "Qty",   align: "right", cell: (r) => r.qty },
-    { header: "Requested By", cell: (r) => r.requestedBy },
-    { header: "Approver", cell: (r) => r.approver },
-    { header: "Status", cell: (r) => <StatusBadge label={r.status.replace(/_/g, " ")} tone={STATUS_TONES[r.status]} /> },
-    { header: "", align: "right", cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem><Eye className="mr-2 h-4 w-4" /> View</DropdownMenuItem>
-          <DropdownMenuItem><Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
-          <DropdownMenuItem className="text-rose-600"><Trash2 className="mr-2 h-4 w-4" /> Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ) },
+    { header: "Value", align: "right", cell: (r) => fmtINR(r.value) },
+    { header: "Status", cell: () => <StatusBadge label="posted" tone={STATUS_TONES.posted} /> },
   ];
+
   return (
-    <InventoryTable<StockTransfer>
-      title="Stock Transfers" description="Move stock between warehouses with approval." icon={ArrowLeftRight}
-      data={data} columns={columns}
-      searchable={(r) => `${r.number} ${r.fromWh} ${r.toWh} ${r.requestedBy}`}
-      filters={[{ key: "s", label: "Status", value: status, onChange: setStatus,
-        options: [
-          { value: "draft", label: "Draft" }, { value: "in_transit", label: "In Transit" },
-          { value: "received", label: "Received" }, { value: "posted", label: "Posted" },
-        ] }]}
-      kpis={[
-        { label: "Transfers", value: String(data.length) },
-        { label: "In transit", value: String(data.filter((d) => d.status === "in_transit").length) },
-        { label: "Received", value: String(data.filter((d) => d.status === "received").length) },
-        { label: "Posted", value: String(data.filter((d) => d.status === "posted").length) },
-      ]}
-      newLabel="New Transfer"
-    />
+    <>
+      <InventoryTable<Pair>
+        title="Stock Transfers" description="Move stock between warehouses (issue + receipt posted in one action)." icon={ArrowLeftRight}
+        data={pairs} columns={columns} loading={isLoading}
+        searchable={(r) => `${r.item} ${r.from} ${r.to}`}
+        kpis={[
+          { label: "Transfers", value: String(pairs.length) },
+          { label: "Units moved", value: String(pairs.reduce((s, p) => s + p.qty, 0)) },
+          { label: "Value moved", value: fmtINR(pairs.reduce((s, p) => s + p.value, 0)) },
+          { label: "Warehouses", value: String(new Set([...pairs.map((p) => p.from), ...pairs.map((p) => p.to)]).size) },
+        ]}
+        newLabel="New Transfer"
+        onNew={() => setOpen(true)}
+      />
+      <TransferDialog open={open} onOpenChange={setOpen} />
+    </>
   );
 }

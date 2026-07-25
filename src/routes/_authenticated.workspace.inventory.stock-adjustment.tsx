@@ -1,49 +1,56 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Sliders, MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sliders } from "lucide-react";
 import { InventoryTable, type Column } from "@/features/inventory/components/InventoryTable";
 import { StatusBadge } from "@/features/sales/components/StatusBadge";
-import { ADJUSTMENTS, STATUS_TONES, formatDate, type StockAdjustment } from "@/features/inventory/data";
+import { AdjustmentDialog } from "@/features/inventory/components/AdjustmentDialog";
+import { useStockTransactions, fmtINR, fmtDateTime } from "@/features/inventory/api";
+import { STATUS_TONES } from "@/features/inventory/data";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/workspace/inventory/stock-adjustment")({
   component: AdjustmentPage,
 });
 
+interface Row {
+  id: string; occurred_at: string; txn_type: string; quantity: number;
+  unit_cost: number; total_value: number; notes: string | null;
+  item: { name: string; sku: string } | null;
+  warehouse: { name: string; code: string } | null;
+}
+
 function AdjustmentPage() {
-  const columns: Column<StockAdjustment>[] = [
-    { header: "Adj #", cell: (r) => <span className="font-medium">{r.number}</span> },
-    { header: "Date", cell: (r) => formatDate(r.date) },
-    { header: "Item", cell: (r) => <div><div className="font-medium">{r.itemName}</div><div className="text-xs text-muted-foreground">{r.itemCode}</div></div> },
-    { header: "Warehouse", cell: (r) => r.warehouse },
-    { header: "System", align: "right", cell: (r) => r.systemQty },
-    { header: "Physical", align: "right", cell: (r) => r.physicalQty },
-    { header: "Variance", align: "right", cell: (r) => <span className={r.variance < 0 ? "font-medium text-rose-600" : "font-medium text-emerald-600"}>{r.variance > 0 ? `+${r.variance}` : r.variance}</span> },
-    { header: "Reason", cell: (r) => <span className="text-sm">{r.reason}</span> },
-    { header: "Status", cell: (r) => <StatusBadge label={r.status} tone={STATUS_TONES[r.status]} /> },
-    { header: "", align: "right", cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem><Eye className="mr-2 h-4 w-4" /> View</DropdownMenuItem>
-          <DropdownMenuItem><Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
-          <DropdownMenuItem className="text-rose-600"><Trash2 className="mr-2 h-4 w-4" /> Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ) },
+  const { data: rows = [], isLoading } = useStockTransactions() as { data: Row[]; isLoading: boolean };
+  const adjustments = rows.filter((r) => r.txn_type === "adjustment");
+  const [open, setOpen] = useState(false);
+
+  const columns: Column<Row>[] = [
+    { header: "Date", cell: (r) => fmtDateTime(r.occurred_at) },
+    { header: "Item", cell: (r) => <div><div className="font-medium">{r.item?.name ?? "—"}</div><div className="text-xs text-muted-foreground">{r.item?.sku}</div></div> },
+    { header: "Warehouse", cell: (r) => r.warehouse?.name ?? "—" },
+    { header: "Variance", align: "right", cell: (r) => <span className={Number(r.quantity) < 0 ? "font-medium text-rose-600" : "font-medium text-emerald-600"}>{Number(r.quantity) > 0 ? `+${r.quantity}` : r.quantity}</span> },
+    { header: "Value", align: "right", cell: (r) => fmtINR(Math.abs(Number(r.total_value))) },
+    { header: "Reason", cell: (r) => <span className="text-sm">{r.notes?.replace(/^Adjustment:\s*/, "") ?? "—"}</span> },
+    { header: "Status", cell: () => <StatusBadge label="posted" tone={STATUS_TONES.posted} /> },
   ];
+
+  const netVariance = adjustments.reduce((s, a) => s + Number(a.quantity), 0);
+
   return (
-    <InventoryTable<StockAdjustment>
-      title="Stock Adjustments" description="Post variances between system and physical stock." icon={Sliders}
-      data={ADJUSTMENTS} columns={columns}
-      searchable={(r) => `${r.number} ${r.itemCode} ${r.itemName} ${r.reason}`}
-      kpis={[
-        { label: "Adjustments", value: String(ADJUSTMENTS.length) },
-        { label: "Draft", value: String(ADJUSTMENTS.filter((a) => a.status === "draft").length) },
-        { label: "Posted", value: String(ADJUSTMENTS.filter((a) => a.status === "posted").length) },
-        { label: "Net variance", value: String(ADJUSTMENTS.reduce((s, a) => s + a.variance, 0)) },
-      ]}
-      newLabel="New Adjustment"
-    />
+    <>
+      <InventoryTable<Row>
+        title="Stock Adjustments" description="Post variances between system and physical stock." icon={Sliders}
+        data={adjustments} columns={columns} loading={isLoading}
+        searchable={(r) => `${r.item?.name ?? ""} ${r.item?.sku ?? ""} ${r.notes ?? ""}`}
+        kpis={[
+          { label: "Adjustments", value: String(adjustments.length) },
+          { label: "Increases", value: String(adjustments.filter((a) => Number(a.quantity) > 0).length) },
+          { label: "Decreases", value: String(adjustments.filter((a) => Number(a.quantity) < 0).length) },
+          { label: "Net variance", value: String(netVariance) },
+        ]}
+        newLabel="New Adjustment"
+        onNew={() => setOpen(true)}
+      />
+      <AdjustmentDialog open={open} onOpenChange={setOpen} />
+    </>
   );
 }
