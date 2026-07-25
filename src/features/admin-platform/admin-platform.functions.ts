@@ -266,6 +266,8 @@ export const createTenant = createServerFn({ method: 'POST' })
 
 const updateTenantSchema = z.object({
   companyId: z.string().uuid(),
+  name: z.string().min(2).optional(),
+  slug: z.string().min(2).optional(),
   plan: z.enum(PLANS).optional(),
   isActive: z.boolean().optional(),
   enabledModules: z.array(z.string()).optional(),
@@ -279,9 +281,16 @@ export const updateTenant = createServerFn({ method: 'POST' })
     const admin = await loadAdminClient();
 
     const update: any = {};
+    if (data.name !== undefined) update.name = data.name;
+    if (data.slug !== undefined) update.slug = data.slug;
     if (data.plan !== undefined) update.plan = data.plan;
     if (data.isActive !== undefined) update.is_active = data.isActive;
     if (data.enabledModules !== undefined) update.enabled_modules = data.enabledModules;
+
+    if (data.slug !== undefined) {
+      const { data: dup } = await admin.from('companies').select('id').eq('slug', data.slug).neq('id', data.companyId).maybeSingle();
+      if (dup) throw new Error('Slug already taken');
+    }
 
     const { data: company, error } = await admin
       .from('companies')
@@ -300,12 +309,58 @@ export const updateTenant = createServerFn({ method: 'POST' })
     }
 
     await logAudit(context.supabase, context.userId, 'TENANT_UPDATED', 'company', data.companyId, {
+      name: data.name,
+      slug: data.slug,
       plan: data.plan,
       isActive: data.isActive,
       enabledModules: data.enabledModules,
     });
 
     return company;
+  });
+
+const deleteTenantSchema = z.object({ companyId: z.string().uuid(), confirmSlug: z.string().min(1) });
+
+export const deleteTenant = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => deleteTenantSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    await requireSuperAdmin(context);
+    const admin = await loadAdminClient();
+
+    const { data: company } = await admin.from('companies').select('id, slug, organization_id').eq('id', data.companyId).maybeSingle();
+    if (!company) throw new Response('Tenant not found', { status: 404 });
+    if (company.slug !== data.confirmSlug) throw new Error('Slug confirmation does not match');
+
+    // Delete platform-owned rows first (no FK cascade guarantee across all)
+    await admin.from('platform_invoices').delete().eq('company_id', data.companyId);
+    await admin.from('platform_subscriptions').delete().eq('company_id', data.companyId);
+    await admin.from('user_roles').delete().eq('company_id', data.companyId);
+
+    const { error } = await admin.from('companies').delete().eq('id', data.companyId);
+    if (error) throw new Error(error.message);
+
+    if (company.organization_id) {
+      const { count } = await admin.from('companies').select('id', { count: 'exact', head: true }).eq('organization_id', company.organization_id);
+      if (!count) await admin.from('organizations').delete().eq('id', company.organization_id);
+    }
+
+    await logAudit(context.supabase, context.userId, 'TENANT_DELETED', 'company', data.companyId, { slug: company.slug });
+    return { ok: true };
+  });
+
+const deleteInvoiceSchema = z.object({ invoiceId: z.string().uuid() });
+
+export const deleteInvoice = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => deleteInvoiceSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    await requireSuperAdmin(context);
+    const admin = await loadAdminClient();
+    const { error } = await admin.from('platform_invoices').delete().eq('id', data.invoiceId);
+    if (error) throw new Error(error.message);
+    await logAudit(context.supabase, context.userId, 'INVOICE_DELETED', 'platform_invoices', data.invoiceId, {});
+    return { ok: true };
   });
 
 const suspendTenantSchema = z.object({

@@ -6,6 +6,7 @@ import {
   createTenant,
   updateTenant,
   suspendTenant,
+  deleteTenant,
 } from "@/features/admin-platform/admin-platform.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -36,7 +49,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Building2, Plus, Search, Eye } from "lucide-react";
+import { Building2, Plus, Search, Eye, Pencil, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_authenticated/admin/tenants")({
@@ -50,6 +63,7 @@ function TenantsPage() {
   const createTenantFn = useServerFn(createTenant);
   const updateTenantFn = useServerFn(updateTenant);
   const suspendTenantFn = useServerFn(suspendTenant);
+  const deleteTenantFn = useServerFn(deleteTenant);
 
   const [rows, setRows] = useState<any[]>([]);
   const [count, setCount] = useState(0);
@@ -59,6 +73,12 @@ function TenantsPage() {
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [editRow, setEditRow] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", slug: "" });
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deleteRow, setDeleteRow] = useState<any | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -134,6 +154,43 @@ function TenantsPage() {
       load();
     } catch (e: any) {
       toast.error(e.message || "Failed to update status");
+    }
+  };
+
+  const openEdit = (row: any) => {
+    setEditRow(row);
+    setEditForm({ name: row.name, slug: row.slug });
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editRow) return;
+    setSavingEdit(true);
+    try {
+      await updateTenantFn({ data: { companyId: editRow.id, name: editForm.name, slug: editForm.slug } });
+      toast.success("Tenant updated");
+      setEditRow(null);
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to update tenant");
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteRow) return;
+    setDeleting(true);
+    try {
+      await deleteTenantFn({ data: { companyId: deleteRow.id, confirmSlug: deleteConfirm } });
+      toast.success("Tenant deleted");
+      setDeleteRow(null);
+      setDeleteConfirm("");
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to delete tenant");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -296,6 +353,12 @@ function TenantsPage() {
                               View
                             </Button>
                           </Link>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(row)} aria-label="Edit tenant">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => { setDeleteRow(row); setDeleteConfirm(""); }} aria-label="Delete tenant">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -315,6 +378,50 @@ function TenantsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={!!editRow} onOpenChange={(v) => !v && setEditRow(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit tenant</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveEdit} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Company name</Label>
+              <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} required />
+            </div>
+            <div className="space-y-2">
+              <Label>Slug</Label>
+              <Input value={editForm.slug} onChange={(e) => setEditForm({ ...editForm, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-") })} required />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditRow(null)} disabled={savingEdit}>Cancel</Button>
+              <Button type="submit" disabled={savingEdit}>{savingEdit ? "Saving…" : "Save changes"}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteRow} onOpenChange={(v) => { if (!v) { setDeleteRow(null); setDeleteConfirm(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete tenant "{deleteRow?.name}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes the company, its subscription, invoices, branches, warehouses and all associated data. Type the slug <span className="font-mono font-semibold">{deleteRow?.slug}</span> to confirm.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input value={deleteConfirm} onChange={(e) => setDeleteConfirm(e.target.value)} placeholder="Enter slug" />
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDelete(); }}
+              disabled={deleting || deleteConfirm !== deleteRow?.slug}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting…" : "Delete tenant"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
