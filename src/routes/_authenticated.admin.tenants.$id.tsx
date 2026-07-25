@@ -6,13 +6,15 @@ import {
   updateTenant,
   createInvoice,
   listInvoices,
+  markInvoicePaid,
+  deleteInvoice,
 } from "@/features/admin-platform/admin-platform.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { ArrowLeft, Building2, Users, Receipt, MapPin } from "lucide-react";
+import { ArrowLeft, Building2, Users, Receipt, MapPin, CheckCircle2, Trash2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -47,6 +49,8 @@ function TenantDetailPage() {
   const updateTenantFn = useServerFn(updateTenant);
   const createInvoiceFn = useServerFn(createInvoice);
   const fetchInvoices = useServerFn(listInvoices);
+  const markPaidFn = useServerFn(markInvoicePaid);
+  const deleteInvoiceFn = useServerFn(deleteInvoice);
 
   const [detail, setDetail] = useState<Awaited<ReturnType<typeof getTenantDetails>> | null>(null);
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -115,6 +119,27 @@ function TenantDetailPage() {
       toast.error(e.message || "Failed to create invoice");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleMarkPaid = async (invoiceId: string) => {
+    try {
+      await markPaidFn({ data: { invoiceId } });
+      toast.success("Invoice marked paid");
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Failed");
+    }
+  };
+
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (!confirm("Delete this invoice?")) return;
+    try {
+      await deleteInvoiceFn({ data: { invoiceId } });
+      toast.success("Invoice deleted");
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Failed");
     }
   };
 
@@ -290,6 +315,7 @@ function TenantDetailPage() {
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Due date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -303,6 +329,18 @@ function TenantDetailPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>{new Date(inv.due_date).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="inline-flex items-center gap-1">
+                        {inv.status !== "paid" && (
+                          <Button variant="ghost" size="sm" onClick={() => handleMarkPaid(inv.id)}>
+                            <CheckCircle2 className="h-4 w-4 mr-1" />Mark paid
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDeleteInvoice(inv.id)} aria-label="Delete invoice">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
