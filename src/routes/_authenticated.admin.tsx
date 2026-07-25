@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { PlatformAdminLayout } from "@/features/admin-platform/PlatformAdminLayout";
@@ -19,9 +19,6 @@ function AdminGuard() {
 
   if (!isSuperAdmin) return null;
 
-  return (
-    <PlatformAdminLayout>
-      <Outlet />
-    </PlatformAdminLayout>
-  );
+  return <PlatformAdminLayout />;
 }
+
