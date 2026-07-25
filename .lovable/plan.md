@@ -1,67 +1,67 @@
+# Turn 3 — Procurement wiring + Global Files feature
 
-# Prioritized Pass: Make All Module CTAs Functional (Real Backend)
+## A. Procurement backend wiring (all 8 doc types)
 
-Goal: replace dummy data with Supabase-backed CRUD on the primary entity of each module. Advanced flows (PDF, email send, kanban DnD persistence, workflow execution) stay as follow-ups.
+Doc types → tables (already exist in schema):
+1. Purchase Requests → `purchase_indents` + `purchase_indent_items`
+2. RFQs → `rfqs` + `rfq_items`
+3. Vendor Quotations → `rfq_supplier_quotes` (per-supplier quote header) + `rfq_items` (linked)
+4. Purchase Orders → `purchase_orders` + `purchase_order_items`
+5. Goods Receipts (GRN) → `grns` + `grn_items`
+6. Vendor Invoices → `vendor_invoices` + `vendor_invoice_items`
+7. Vendor Payments → `supplier_payments`
+8. Vendor Returns → new `vendor_returns` + `vendor_return_items` (schema doesn't have these yet)
 
-## Ground rules per module
-- **Create / Edit / Delete / View** on the primary list page, backed by Supabase.
-- Tenant isolation via `company_id` from `AuthContext`; RLS scoped to `has_company_role(auth.uid(), company_id, ...)`.
-- Server functions in `src/features/<module>/*.functions.ts` with `requireSupabaseAuth`.
-- React Query for reads; `useMutation` + `invalidateQueries` for writes.
-- Toasts on success/error; confirmation dialog on delete (reuse `RowActions`).
-- Existing dummy data files kept only as seed reference, not imported by pages.
+Deliverables (mirrors Sales pattern from Turn 2):
+- `src/features/procurement/api.ts` — React Query hooks per doc type: `useList`, `useGet`, `useSave` (insert or update + line-item diff), `useDelete`, all tenant-scoped via `useAuth().company.id`.
+- Doc numbering: reuse `next_proc_number(company_id, prefix)` DB function for INDENT/RFQ/PO/GRN/VINV/PAY. Add `VRET` case in a small migration.
+- Shared UI:
+  - `ProcurementDocFormDialog.tsx` — vendor picker, dates, line items (reuse `LineItemsEditor`), GST totals via `sales-utils` (works for both directions).
+  - `GRNFormDialog.tsx` — PO picker + receipt lines + landed cost (freight/duty/other).
+  - `VendorPaymentFormDialog.tsx` — vendor + invoice picker + amount + method.
+  - `VendorReturnFormDialog.tsx` — GRN picker + return lines + reason.
+  - `ProcurementDocList.tsx` — search, filters, stats, `RowActions`, Files column (see B).
+- Refactor 8 route files under `src/routes/_authenticated.workspace.procurement.*.tsx` to use live data via the new list component.
+- Status-gated actions: no delete once posted/paid/received (matches Sales rules).
+- Auto-post side effects already handled by existing DB triggers (`tg_post_grn`, `tg_grn_item_to_stock`, `tg_post_vinv`, `tg_post_sup_payment`).
 
-## Order of delivery (one module per turn to stay reviewable)
+## B. Global Files/Attachments feature
 
-**Turn 1 — CRM** (this turn)
-- Tables already partly exist (`leads`, `customers`). Add: `crm_contacts`, `crm_activities`, `crm_follow_ups`, `crm_email_history`.
-- Wire pages: Leads, Contacts, Accounts (customers), Follow-ups, Activities, Opportunities (leads with stage), Email History.
-- Kanban/Calendar keep current UI, read from live data (DnD to update stage/date).
+Schema (new migration):
+- `public.attachments` table: `id`, `company_id`, `entity_type` (text, e.g. `purchase_indent`, `invoice`, `crm_lead`), `entity_id` (uuid), `bucket_path` (text — key inside storage bucket), `file_name`, `mime_type`, `size_bytes`, `uploaded_by`, `created_at`.
+- Indexes on `(company_id, entity_type, entity_id)`.
+- Grants + RLS: `authenticated` can `SELECT/INSERT/DELETE` rows where `company_id = get_user_company(auth.uid())`.
+- View `attachment_counts` (or just query): return `entity_type, entity_id, file_count` — used for list column.
 
-**Turn 2 — Sales**
-- Use existing `quotations`, `sales_orders`, `invoices`, `delivery_notes`, `sales_returns`, `payments`.
-- CRUD on headers + line items via `LineItemsEditor`. Status transitions gated (draft→sent→…).
+Storage:
+- Private bucket `attachments` created via `storage_create_bucket` tool.
+- RLS on `storage.objects`: path pattern `{company_id}/{entity_type}/{entity_id}/{uuid}-{filename}`; policies allow authenticated members of that company to read/write/delete only when the first path segment equals their `company_id`.
+- Signed URLs (5-min TTL) for downloads via `supabase.storage.from('attachments').createSignedUrl(path, 300)`.
 
-**Turn 3 — Procurement**
-- Existing `purchase_indents`, `rfqs`, `purchase_orders`, `grns`, `vendor_invoices`, `supplier_payments`.
-- Same header/lines pattern; approval placeholder writes to `approvals`.
+App layer:
+- `src/features/attachments/api.ts` — `useAttachments(entityType, entityId)`, `useUploadAttachment()`, `useDeleteAttachment()`, `useAttachmentCounts(entityType, ids[])` (single grouped query for list column).
+- `src/features/attachments/components/AttachmentsPanel.tsx` — drop zone + list with signed-url download + delete confirm. Reusable in any drawer.
+- `src/features/attachments/components/FilesCountCell.tsx` — paperclip icon + count for list rows (matches screenshot).
+- Wire into:
+  - Procurement drawer (`PurchaseDrawer.tsx`) — replace the mock Files tab with `<AttachmentsPanel entityType={docType} entityId={id} />`.
+  - Procurement list (`ProcurementDocList.tsx`) — add Files column using `FilesCountCell`.
+  - Sales drawer (`TransactionDrawer.tsx`) + `SalesDocList.tsx` — same panel + column.
+  - CRM `RecordDrawer.tsx` — Files tab.
+  - Quality `NCRDrawer`, Inventory `InventoryTable` details, etc. — add Files tab where a drawer exists.
 
-**Turn 4 — Inventory**
-- Items, Warehouses (masters already partially wired). Add live Stock Ledger from `stock_transactions`, Stock Transfer + Adjustment forms that call existing RPCs (`post_stock_issue`, `post_stock_receipt`).
+## Technical details
 
-**Turn 5 — Finance + GST**
-- Chart of Accounts, Journal Entry (uses `post_journal`), Payments/Receipts. Reports read from `account_balances`. GST reads from `gst_ledger`.
+- Attachments query returns rows filtered by company via RLS, so client passes only `entity_type` + `entity_id`.
+- Uploads go directly from browser via `supabase.storage.from('attachments').upload(path, file)` — no server function needed.
+- List-view counts: `select entity_id, count(*) from attachments where entity_type=? and entity_id in (...) group by entity_id`.
+- Comment count in screenshot: reuse existing `comments` field on `PurchaseTx` (already mocked); for now, mirror in a small `entity_comments` table only if we later persist comments — this plan leaves that as data-only (existing mock retained for Procurement list until backend comments are wired in a later turn).
 
-**Turn 6 — Reports + Workflow**
-- Reports: saved report definitions table, list/run/save/delete. Chart/pivot config persisted.
-- Workflow: `approval_rules` + `approval_steps` CRUD, enable/disable, order steps.
+## Rollout order (single turn if all approved)
 
-**Turn 7 — Administration**
-- Companies, Branches, FY, Users/Roles, Invitations, Doc Numbering, Notification Prefs, Feature Flags, Audit Log viewer — all backed by existing tables + `admin-platform.functions.ts`-style server fns scoped to tenant.
-
-## Technical shape (applies to every turn)
-
-```text
-src/features/<module>/
-  <entity>.functions.ts   # list/get/create/update/delete server fns
-  hooks/use<Entity>.ts    # useQuery + useMutation wrappers
-  components/<Entity>Form.tsx
-```
-
-- Server fns use `context.supabase` (RLS as user), never `supabaseAdmin`.
-- Missing tables added via one migration per turn, with GRANTs + RLS + `company_id` scoping + `updated_at` trigger.
-- Deletes are hard delete when no downstream refs, soft (status='cancelled') when linked to posted docs.
-
-## What is explicitly deferred
-- PDF generation, outbound email sending, e-invoice/e-way-bill NIC calls.
-- Real workflow execution engine (only rule CRUD in turn 6).
-- Attachments to Supabase Storage (UI stays, upload wiring later).
-- Bulk import/export.
-
-## This turn's deliverable (CRM)
-1. Migration: `crm_contacts`, `crm_activities`, `crm_follow_ups`, `crm_email_history` with RLS + GRANTs.
-2. `src/features/crm/crm.functions.ts` — server fns for leads, contacts, accounts (customers), activities, follow-ups, emails.
-3. Refactor 7 CRM route files to fetch/mutate via React Query; add Create/Edit dialogs and delete actions.
-4. Kanban stage change and follow-up toggle persist to DB.
-
-Proceed?
+1. Migration: add `vendor_returns` + `vendor_return_items`; add `VRET` to `next_proc_number`; add `attachments` table + RLS + grants.
+2. Create `attachments` storage bucket + storage.objects RLS.
+3. Build `src/features/attachments/**`.
+4. Build `src/features/procurement/api.ts` + shared dialogs + `ProcurementDocList`.
+5. Refactor 8 procurement routes.
+6. Retrofit `PurchaseDrawer` + `TransactionDrawer` + `SalesDocList` + CRM `RecordDrawer` with `AttachmentsPanel` and Files column.
+7. Typecheck; verify preview.

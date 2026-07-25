@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, type LucideIcon } from "lucide-react";
+import { FilesCountCell } from "@/features/attachments/components/FilesCountCell";
+import type { EntityType } from "@/features/attachments/api";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { StatCard } from "@/shared/components/StatCard";
 import { RowActions } from "@/components/RowActions";
@@ -31,11 +33,12 @@ interface Props<T extends { id: string }> {
   canEdit?: (row: T) => boolean;
   canDelete?: (row: T) => boolean;
   headerActions?: React.ReactNode;
+  entityType?: EntityType;
 }
 
 export function SalesDocList<T extends { id: string }>({
   title, description, icon: Icon, rows, isLoading, searchable, columns,
-  totalOf, onCreate, onEdit, onDelete, canEdit, canDelete, headerActions,
+  totalOf, onCreate, onEdit, onDelete, canEdit, canDelete, headerActions, entityType,
 }: Props<T>) {
   const [q, setQ] = useState("");
 
@@ -46,6 +49,7 @@ export function SalesDocList<T extends { id: string }>({
   }, [rows, q, searchable]);
 
   const total = useMemo(() => filtered.reduce((s, r) => s + (totalOf?.(r) ?? 0), 0), [filtered, totalOf]);
+  const ids = useMemo(() => filtered.map((r) => r.id), [filtered]);
 
   return (
     <div className="space-y-4">
@@ -77,20 +81,26 @@ export function SalesDocList<T extends { id: string }>({
                   {columns.map((c) => (
                     <TableHead key={c.header} className={c.className}>{c.header}</TableHead>
                   ))}
+                  {entityType && <TableHead className="text-center w-20">Files</TableHead>}
                   <TableHead className="text-right w-28">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={columns.length + 1} className="py-10 text-center text-muted-foreground">Loading…</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={columns.length + (entityType ? 2 : 1)} className="py-10 text-center text-muted-foreground">Loading…</TableCell></TableRow>
                 ) : filtered.length === 0 ? (
-                  <TableRow><TableCell colSpan={columns.length + 1} className="py-10 text-center text-muted-foreground">No records yet. Click “New {title.replace(/s$/, "")}” to add one.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={columns.length + (entityType ? 2 : 1)} className="py-10 text-center text-muted-foreground">No records yet. Click “New {title.replace(/s$/, "")}” to add one.</TableCell></TableRow>
                 ) : (
                   filtered.map((row) => (
                     <TableRow key={row.id}>
                       {columns.map((c) => (
                         <TableCell key={c.header} className={c.className}>{c.cell(row)}</TableCell>
                       ))}
+                      {entityType && (
+                        <TableCell className="text-center">
+                          <FilesCountCell entityType={entityType} entityIds={ids} entityId={row.id} />
+                        </TableCell>
+                      )}
                       <TableCell className="text-right">
                         <RowActions
                           onEdit={() => onEdit(row)}
