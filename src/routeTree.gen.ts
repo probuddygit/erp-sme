@@ -40,7 +40,6 @@ import { Route as AuthenticatedWorkspaceInventoryRouteImport } from './routes/_a
 import { Route as AuthenticatedWorkspaceGstRouteImport } from './routes/_authenticated.workspace.gst'
 import { Route as AuthenticatedWorkspaceFinanceRouteImport } from './routes/_authenticated.workspace.finance'
 import { Route as AuthenticatedWorkspaceCrmRouteImport } from './routes/_authenticated.workspace.crm'
-import { Route as AuthenticatedWorkspaceAdministrationRouteImport } from './routes/_authenticated.workspace.administration'
 import { Route as AuthenticatedAppUsersRouteImport } from './routes/_authenticated.app.users'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated.app.settings'
 import { Route as AuthenticatedAppSalesRouteImport } from './routes/_authenticated.app.sales'
@@ -347,12 +346,6 @@ const AuthenticatedWorkspaceCrmRoute =
   AuthenticatedWorkspaceCrmRouteImport.update({
     id: '/crm',
     path: '/crm',
-    getParentRoute: () => AuthenticatedWorkspaceRoute,
-  } as any)
-const AuthenticatedWorkspaceAdministrationRoute =
-  AuthenticatedWorkspaceAdministrationRouteImport.update({
-    id: '/administration',
-    path: '/administration',
     getParentRoute: () => AuthenticatedWorkspaceRoute,
   } as any)
 const AuthenticatedAppUsersRoute = AuthenticatedAppUsersRouteImport.update({
@@ -1231,7 +1224,6 @@ export interface FileRoutesByFullPath {
   '/app/sales': typeof AuthenticatedAppSalesRouteWithChildren
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
-  '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
   '/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
   '/workspace/finance': typeof AuthenticatedWorkspaceFinanceRouteWithChildren
   '/workspace/gst': typeof AuthenticatedWorkspaceGstRouteWithChildren
@@ -1394,7 +1386,6 @@ export interface FileRoutesByTo {
   '/app/$module': typeof AuthenticatedAppModuleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/users': typeof AuthenticatedAppUsersRoute
-  '/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/workspace': typeof AuthenticatedWorkspaceIndexRoute
@@ -1562,7 +1553,6 @@ export interface FileRoutesById {
   '/_authenticated/app/sales': typeof AuthenticatedAppSalesRouteWithChildren
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRoute
   '/_authenticated/app/users': typeof AuthenticatedAppUsersRoute
-  '/_authenticated/workspace/administration': typeof AuthenticatedWorkspaceAdministrationRoute
   '/_authenticated/workspace/crm': typeof AuthenticatedWorkspaceCrmRouteWithChildren
   '/_authenticated/workspace/finance': typeof AuthenticatedWorkspaceFinanceRouteWithChildren
   '/_authenticated/workspace/gst': typeof AuthenticatedWorkspaceGstRouteWithChildren
@@ -1739,7 +1729,6 @@ export interface FileRouteTypes {
     | '/app/sales'
     | '/app/settings'
     | '/app/users'
-    | '/workspace/administration'
     | '/workspace/crm'
     | '/workspace/finance'
     | '/workspace/gst'
@@ -1902,7 +1891,6 @@ export interface FileRouteTypes {
     | '/app/$module'
     | '/app/settings'
     | '/app/users'
-    | '/workspace/administration'
     | '/admin'
     | '/app'
     | '/workspace'
@@ -2069,7 +2057,6 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales'
     | '/_authenticated/app/settings'
     | '/_authenticated/app/users'
-    | '/_authenticated/workspace/administration'
     | '/_authenticated/workspace/crm'
     | '/_authenticated/workspace/finance'
     | '/_authenticated/workspace/gst'
@@ -2438,13 +2425,6 @@ declare module '@tanstack/react-router' {
       path: '/crm'
       fullPath: '/workspace/crm'
       preLoaderRoute: typeof AuthenticatedWorkspaceCrmRouteImport
-      parentRoute: typeof AuthenticatedWorkspaceRoute
-    }
-    '/_authenticated/workspace/administration': {
-      id: '/_authenticated/workspace/administration'
-      path: '/administration'
-      fullPath: '/workspace/administration'
-      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationRouteImport
       parentRoute: typeof AuthenticatedWorkspaceRoute
     }
     '/_authenticated/app/users': {
@@ -4119,7 +4099,6 @@ const AuthenticatedWorkspaceWorkflowRouteWithChildren =
   )
 
 interface AuthenticatedWorkspaceRouteChildren {
-  AuthenticatedWorkspaceAdministrationRoute: typeof AuthenticatedWorkspaceAdministrationRoute
   AuthenticatedWorkspaceCrmRoute: typeof AuthenticatedWorkspaceCrmRouteWithChildren
   AuthenticatedWorkspaceFinanceRoute: typeof AuthenticatedWorkspaceFinanceRouteWithChildren
   AuthenticatedWorkspaceGstRoute: typeof AuthenticatedWorkspaceGstRouteWithChildren
@@ -4134,8 +4113,6 @@ interface AuthenticatedWorkspaceRouteChildren {
 
 const AuthenticatedWorkspaceRouteChildren: AuthenticatedWorkspaceRouteChildren =
   {
-    AuthenticatedWorkspaceAdministrationRoute:
-      AuthenticatedWorkspaceAdministrationRoute,
     AuthenticatedWorkspaceCrmRoute: AuthenticatedWorkspaceCrmRouteWithChildren,
     AuthenticatedWorkspaceFinanceRoute:
       AuthenticatedWorkspaceFinanceRouteWithChildren,
@@ -4226,13 +4203,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
