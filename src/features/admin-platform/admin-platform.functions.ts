@@ -21,10 +21,9 @@ async function loadAdminClient() {
   return supabaseAdmin;
 }
 
-function logAudit(context: { userId: string }, action: string, entity: string, entityId: string | null, metadata: Record<string, unknown> = {}) {
-  const supabase = context.supabase as any;
+function logAudit(supabase: any, actorId: string, action: string, entity: string, entityId: string | null, metadata: Record<string, unknown> = {}) {
   return supabase.rpc('log_platform_audit', {
-    _actor_id: context.userId,
+    _actor_id: actorId,
     _action: action,
     _entity: entity,
     _entity_id: entityId ?? null,
@@ -173,14 +172,14 @@ export const createTenant = createServerFn({ method: 'POST' })
     const { data: existingSlug } = await admin.from('companies').select('id').eq('slug', data.slug).maybeSingle();
     if (existingSlug) throw new Error('Company slug already taken');
 
-    const defaultModules = ['sales', 'procurement', 'inventory', 'finance', 'reports'];
+    const defaultModules: AppModule[] = ['sales', 'procurement', 'inventory', 'finance', 'reports'];
 
     const { data: company, error: companyError } = await admin
       .from('companies')
       .insert({
         name: data.name,
         slug: data.slug,
-        plan: data.plan,
+        plan: data.plan as any,
         legal_name: data.name,
         is_active: true,
         enabled_modules: defaultModules,
