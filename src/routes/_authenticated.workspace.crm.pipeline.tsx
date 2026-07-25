@@ -1,22 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { KanbanBoard } from "@/features/crm/components/KanbanBoard";
-import { PriorityDot, StatusBadge } from "@/features/crm/components/StatusBadge";
-import { LEADS, LEAD_STATUSES, formatINR, formatDate } from "@/features/crm/data";
+import { StatusBadge } from "@/features/crm/components/StatusBadge";
+import { useLeads, formatINR, formatDate } from "@/features/crm/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/crm/pipeline")({
   component: LeadPipelinePage,
 });
 
+const STATUSES = [
+  { key: "new", label: "New", tone: "bg-slate-100 text-slate-700 border-slate-200" },
+  { key: "contacted", label: "Contacted", tone: "bg-blue-50 text-blue-700 border-blue-200" },
+  { key: "qualified", label: "Qualified", tone: "bg-violet-50 text-violet-700 border-violet-200" },
+  { key: "proposal", label: "Proposal", tone: "bg-amber-50 text-amber-800 border-amber-200" },
+  { key: "won", label: "Won", tone: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { key: "lost", label: "Lost", tone: "bg-rose-50 text-rose-700 border-rose-200" },
+];
+
 function LeadPipelinePage() {
-  const columns = LEAD_STATUSES.map((s) => ({
+  const { data: leads = [] } = useLeads();
+  const columns = STATUSES.map((s) => ({
     key: s.key, label: s.label, tone: s.tone,
-    items: LEADS.filter((l) => l.status === s.key),
+    items: leads.filter((l) => l.status === s.key),
   }));
 
-  const totalValue = LEADS.reduce((sum, l) => sum + l.value, 0);
-  const wonValue = LEADS.filter((l) => l.status === "won").reduce((s, l) => s + l.value, 0);
-  const winRate = LEADS.length > 0 ? Math.round((LEADS.filter((l) => l.status === "won").length / LEADS.length) * 100) : 0;
+  const totalValue = leads.reduce((sum, l) => sum + Number(l.expected_value ?? 0), 0);
+  const wonValue = leads.filter((l) => l.status === "won").reduce((s, l) => s + Number(l.expected_value ?? 0), 0);
+  const winRate = leads.length > 0 ? Math.round((leads.filter((l) => l.status === "won").length / leads.length) * 100) : 0;
 
   return (
     <div className="space-y-4">
@@ -40,26 +50,21 @@ function LeadPipelinePage() {
           <KanbanBoard
             columns={columns}
             getKey={(l) => l.id}
-            summary={(items) => formatINR(items.reduce((s, l) => s + l.value, 0))}
+            summary={(items) => formatINR(items.reduce((s, l) => s + Number(l.expected_value ?? 0), 0))}
             renderCard={(l) => {
-              const tone = LEAD_STATUSES.find((s) => s.key === l.status)?.tone;
+              const tone = STATUSES.find((s) => s.key === l.status)?.tone;
               return (
                 <div>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-medium">{l.name}</div>
-                      <div className="truncate text-xs text-muted-foreground">{l.company}</div>
-                    </div>
-                    <PriorityDot priority={l.priority} />
-                  </div>
+                  <div className="truncate text-sm font-medium">{l.title}</div>
+                  <div className="truncate text-xs text-muted-foreground">{l.company_name ?? l.contact_name ?? "—"}</div>
                   <div className="mt-2 flex items-center justify-between text-xs">
-                    <span className="font-medium">{formatINR(l.value)}</span>
-                    <StatusBadge label={l.source} tone="bg-slate-100 text-slate-700 border-slate-200" />
+                    <span className="font-medium">{formatINR(Number(l.expected_value ?? 0))}</span>
+                    <span className="text-muted-foreground">{l.win_probability}%</span>
                   </div>
-                  {l.nextFollowUp && (
-                    <div className="mt-2 text-[11px] text-muted-foreground">Next: {formatDate(l.nextFollowUp)}</div>
+                  {l.expected_close_date && (
+                    <div className="mt-2 text-[11px] text-muted-foreground">Close: {formatDate(l.expected_close_date)}</div>
                   )}
-                  <StatusBadge label={LEAD_STATUSES.find((s) => s.key === l.status)!.label} tone={tone} className="mt-2" />
+                  <StatusBadge label={STATUSES.find((s) => s.key === l.status)?.label ?? l.status} tone={tone} className="mt-2" />
                 </div>
               );
             }}

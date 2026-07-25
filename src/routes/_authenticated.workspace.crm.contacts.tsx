@@ -2,35 +2,39 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Mail, Phone } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { FilterBar } from "@/features/crm/components/FilterBar";
-import { RecordDrawer, DetailGrid } from "@/features/crm/components/RecordDrawer";
-import { StatusBadge } from "@/features/crm/components/StatusBadge";
-import { CONTACTS, formatDate, type Contact } from "@/features/crm/data";
+import { FormDialog, Field } from "@/features/crm/components/FormDialog";
+import { RowActions } from "@/components/RowActions";
+import { useContacts, useSaveContact, useCustomers, formatDate, type ContactRow } from "@/features/crm/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/crm/contacts")({
   component: ContactsPage,
 });
 
-const ACCOUNT_OPTIONS = Array.from(new Set(CONTACTS.map((c) => c.account))).map((a) => ({ value: a, label: a }));
-const OWNER_OPTIONS = Array.from(new Set(CONTACTS.map((c) => c.owner))).map((o) => ({ value: o, label: o }));
+const empty: Partial<ContactRow> = { name: "", title: "", email: "", phone: "", tags: [] };
 
 function ContactsPage() {
+  const { data: contacts = [], isLoading } = useContacts();
+  const { data: customers = [] } = useCustomers();
+  const save = useSaveContact();
   const [search, setSearch] = useState("");
-  const [account, setAccount] = useState("");
-  const [owner, setOwner] = useState("");
-  const [selected, setSelected] = useState<Contact | null>(null);
+  const [customerId, setCustomerId] = useState("");
+  const [editing, setEditing] = useState<Partial<ContactRow> | null>(null);
+
+  const customerName = (id: string | null) => customers.find((c) => c.id === id)?.name ?? "—";
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return CONTACTS.filter((c) => {
-      if (account && c.account !== account) return false;
-      if (owner && c.owner !== owner) return false;
+    return contacts.filter((c) => {
+      if (customerId && c.customer_id !== customerId) return false;
       if (!term) return true;
-      return [c.name, c.email, c.title, c.account].some((v) => v.toLowerCase().includes(term));
+      return [c.name, c.email, c.title, c.phone].filter(Boolean).some((v) => (v as string).toLowerCase().includes(term));
     });
-  }, [search, account, owner]);
+  }, [contacts, search, customerId]);
 
   return (
     <div className="space-y-4">
@@ -41,10 +45,9 @@ function ContactsPage() {
             onSearchChange={setSearch}
             placeholder="Search contacts…"
             filters={[
-              { key: "account", label: "Account", value: account, onChange: setAccount, options: ACCOUNT_OPTIONS },
-              { key: "owner", label: "Owner", value: owner, onChange: setOwner, options: OWNER_OPTIONS },
+              { key: "customer", label: "Account", value: customerId, onChange: setCustomerId, options: customers.map((c) => ({ value: c.id, label: c.name })) },
             ]}
-            actions={<Button size="sm"><Plus className="h-4 w-4 mr-1.5" /> New contact</Button>}
+            actions={<Button size="sm" onClick={() => setEditing({ ...empty })}><Plus className="h-4 w-4 mr-1.5" /> New contact</Button>}
           />
 
           <div className="rounded-lg border border-border overflow-x-auto">
@@ -56,29 +59,31 @@ function ContactsPage() {
                   <TableHead>Account</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
-                  <TableHead>Owner</TableHead>
                   <TableHead>Last contacted</TableHead>
-                  <TableHead>Tags</TableHead>
+                  <TableHead className="w-24"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow><TableCell colSpan={8} className="py-10 text-center text-muted-foreground">No contacts found.</TableCell></TableRow>
+                {isLoading ? (
+                  <TableRow><TableCell colSpan={7} className="py-10 text-center"><Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" /></TableCell></TableRow>
+                ) : filtered.length === 0 ? (
+                  <TableRow><TableCell colSpan={7} className="py-10 text-center text-muted-foreground">No contacts yet.</TableCell></TableRow>
                 ) : filtered.map((c) => (
-                  <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelected(c)}>
+                  <TableRow key={c.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium">{c.name}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{c.title}</TableCell>
-                    <TableCell>{c.account}</TableCell>
-                    <TableCell className="text-sm">{c.email}</TableCell>
-                    <TableCell className="text-sm">{c.phone}</TableCell>
-                    <TableCell>{c.owner}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatDate(c.lastContacted)}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {c.tags.length === 0 ? <span className="text-xs text-muted-foreground">—</span> : c.tags.map((t) => (
-                          <StatusBadge key={t} label={t} tone={t === "vip" ? "bg-amber-50 text-amber-800 border-amber-200" : "bg-blue-50 text-blue-700 border-blue-200"} />
-                        ))}
-                      </div>
+                    <TableCell className="text-sm text-muted-foreground">{c.title ?? "—"}</TableCell>
+                    <TableCell>{customerName(c.customer_id)}</TableCell>
+                    <TableCell className="text-sm">{c.email ?? "—"}</TableCell>
+                    <TableCell className="text-sm">{c.phone ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{formatDate(c.last_contacted_at)}</TableCell>
+                    <TableCell className="text-right">
+                      <RowActions
+                        onEdit={() => setEditing(c)}
+                        table="crm_contacts"
+                        id={c.id}
+                        invalidateKeys={[["crm", "contacts"]]}
+                        label="contact"
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -88,24 +93,32 @@ function ContactsPage() {
         </CardContent>
       </Card>
 
-      <RecordDrawer
-        open={!!selected}
-        onOpenChange={(o) => !o && setSelected(null)}
-        title={selected?.name ?? ""}
-        subtitle={selected ? `${selected.title} · ${selected.account}` : ""}
-        details={
-          selected ? (
-            <DetailGrid items={[
-              { label: "Email",  value: <span className="inline-flex items-center gap-1.5"><Mail className="h-3.5 w-3.5 text-muted-foreground" />{selected.email}</span> },
-              { label: "Phone",  value: <span className="inline-flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-muted-foreground" />{selected.phone}</span> },
-              { label: "Account",value: selected.account },
-              { label: "Owner",  value: selected.owner },
-              { label: "Last contacted", value: formatDate(selected.lastContacted) },
-              { label: "Tags",   value: selected.tags.join(", ") || "—" },
-            ]} />
-          ) : null
-        }
-      />
+      {editing && (
+        <FormDialog
+          open={!!editing}
+          onOpenChange={(o) => !o && setEditing(null)}
+          title={editing.id ? "Edit contact" : "New contact"}
+          submitting={save.isPending}
+          onSubmit={async () => { await save.mutateAsync(editing); }}
+        >
+          <Field label="Name *"><Input value={editing.name ?? ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} required /></Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Title"><Input value={editing.title ?? ""} onChange={(e) => setEditing({ ...editing, title: e.target.value })} /></Field>
+            <Field label="Account">
+              <Select value={editing.customer_id ?? "none"} onValueChange={(v) => setEditing({ ...editing, customer_id: v === "none" ? null : v })}>
+                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— None —</SelectItem>
+                  {customers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Email"><Input type="email" value={editing.email ?? ""} onChange={(e) => setEditing({ ...editing, email: e.target.value })} /></Field>
+            <Field label="Phone"><Input value={editing.phone ?? ""} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} /></Field>
+            <Field label="Last contacted"><Input type="date" value={editing.last_contacted_at?.slice(0, 10) ?? ""} onChange={(e) => setEditing({ ...editing, last_contacted_at: e.target.value ? new Date(e.target.value).toISOString() : null })} /></Field>
+          </div>
+        </FormDialog>
+      )}
     </div>
   );
 }
