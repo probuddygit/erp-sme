@@ -48,8 +48,9 @@ export function useItemsMaster() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("items")
-        .select("id, name, sku, uom, selling_price")
+        .select("id, name, sku, unit, standard_cost")
         .eq("company_id", profile!.company_id!)
+        .eq("is_active", true)
         .order("name");
       if (error) throw error;
       return data ?? [];
