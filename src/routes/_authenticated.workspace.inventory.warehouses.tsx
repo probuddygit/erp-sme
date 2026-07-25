@@ -1,58 +1,75 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Warehouse as WarehouseIcon, MoreHorizontal, Pencil, Eye, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Warehouse as WarehouseIcon } from "lucide-react";
 import { InventoryTable, type Column } from "@/features/inventory/components/InventoryTable";
 import { StatusBadge } from "@/features/sales/components/StatusBadge";
-import { WAREHOUSES, STATUS_TONES, formatNum, type Warehouse } from "@/features/inventory/data";
+import { RowActions } from "@/components/RowActions";
+import { WarehouseFormDialog } from "@/features/inventory/components/WarehouseFormDialog";
+import { useWarehouses, useStockLevels, fmtINR } from "@/features/inventory/api";
+import { STATUS_TONES } from "@/features/inventory/data";
+import { useMemo, useState } from "react";
+import type { Database } from "@/integrations/supabase/types";
+
+type WhRow = Database["public"]["Tables"]["warehouses"]["Row"];
 
 export const Route = createFileRoute("/_authenticated/workspace/inventory/warehouses")({
   component: WarehousesPage,
 });
 
 function WarehousesPage() {
-  const columns: Column<Warehouse>[] = [
+  const { data: warehouses = [], isLoading } = useWarehouses();
+  const { data: levels = [] } = useStockLevels();
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<WhRow | null>(null);
+
+  const totalsByWh = useMemo(() => {
+    const m = new Map<string, { qty: number; value: number; skus: Set<string> }>();
+    levels.forEach((l) => {
+      const prev = m.get(l.warehouse_id) ?? { qty: 0, value: 0, skus: new Set() };
+      prev.qty += Number(l.on_hand); prev.value += Number(l.value); prev.skus.add(l.item_id);
+      m.set(l.warehouse_id, prev);
+    });
+    return m;
+  }, [levels]);
+
+  const columns: Column<WhRow>[] = [
     { header: "Code", cell: (r) => <span className="font-medium">{r.code}</span> },
-    { header: "Warehouse", cell: (r) => <div><div className="font-medium">{r.name}</div><div className="text-xs text-muted-foreground">{r.city}, {r.state}</div></div> },
-    { header: "Manager", cell: (r) => r.manager },
-    { header: "Bins", align: "right", cell: (r) => r.bins },
-    { header: "Capacity", align: "right", cell: (r) => formatNum(r.capacity) },
-    { header: "Utilization", cell: (r) => (
-      <div className="flex items-center gap-2">
-        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted">
-          <div className={r.utilization > 80 ? "h-full bg-rose-500" : r.utilization > 60 ? "h-full bg-amber-500" : "h-full bg-emerald-500"} style={{ width: `${r.utilization}%` }} />
-        </div>
-        <span className="text-xs">{r.utilization}%</span>
-      </div>
-    ) },
-    { header: "Status", cell: (r) => <StatusBadge label={r.status} tone={STATUS_TONES[r.status]} /> },
-    { header: "", align: "right", cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem><Eye className="mr-2 h-4 w-4" /> View</DropdownMenuItem>
-          <DropdownMenuItem><Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
-          <DropdownMenuItem className="text-rose-600"><Trash2 className="mr-2 h-4 w-4" /> Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    { header: "Warehouse", cell: (r) => <div><div className="font-medium">{r.name}</div>{r.address && <div className="text-xs text-muted-foreground">{r.address}</div>}</div> },
+    { header: "SKUs", align: "right", cell: (r) => totalsByWh.get(r.id)?.skus.size ?? 0 },
+    { header: "On Hand", align: "right", cell: (r) => totalsByWh.get(r.id)?.qty.toFixed(2) ?? "0" },
+    { header: "Value", align: "right", cell: (r) => fmtINR(totalsByWh.get(r.id)?.value ?? 0) },
+    { header: "Status", cell: (r) => <StatusBadge label={r.is_active ? "active" : "inactive"} tone={STATUS_TONES[r.is_active ? "active" : "inactive"]} /> },
+    { header: "", align: "right", cell: (r) => (
+      <RowActions
+        onEdit={() => { setEditing(r); setOpen(true); }}
+        table="warehouses" id={r.id}
+        invalidateKeys={[["inv", "warehouses"]]}
+        label={r.name}
+      />
     ) },
   ];
 
+  const totalValue = warehouses.reduce((s, w) => s + (totalsByWh.get(w.id)?.value ?? 0), 0);
+
   return (
-    <InventoryTable<Warehouse>
-      title="Warehouses"
-      description="Physical storage locations with capacity & manager."
-      icon={WarehouseIcon}
-      data={WAREHOUSES}
-      columns={columns}
-      searchable={(r) => `${r.code} ${r.name} ${r.city} ${r.manager}`}
-      kpis={[
-        { label: "Warehouses", value: String(WAREHOUSES.length) },
-        { label: "Active", value: String(WAREHOUSES.filter((w) => w.status === "active").length) },
-        { label: "Total Bins", value: String(WAREHOUSES.reduce((s, w) => s + w.bins, 0)) },
-        { label: "Total Capacity", value: formatNum(WAREHOUSES.reduce((s, w) => s + w.capacity, 0)) },
-      ]}
-      newLabel="New Warehouse"
-    />
+    <>
+      <InventoryTable<WhRow>
+        title="Warehouses"
+        description="Physical storage locations with live on-hand & value."
+        icon={WarehouseIcon}
+        data={warehouses}
+        columns={columns}
+        loading={isLoading}
+        searchable={(r) => `${r.code} ${r.name} ${r.address ?? ""}`}
+        kpis={[
+          { label: "Warehouses", value: String(warehouses.length) },
+          { label: "Active", value: String(warehouses.filter((w) => w.is_active).length) },
+          { label: "Total SKUs", value: String(new Set(levels.map((l) => l.item_id)).size) },
+          { label: "Total Value", value: fmtINR(totalValue) },
+        ]}
+        newLabel="New Warehouse"
+        onNew={() => { setEditing(null); setOpen(true); }}
+      />
+      <WarehouseFormDialog open={open} onOpenChange={setOpen} initial={editing} />
+    </>
   );
 }
