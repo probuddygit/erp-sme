@@ -145,6 +145,7 @@ import { Route as AuthenticatedWorkspaceAdministrationTeamsRouteImport } from '.
 import { Route as AuthenticatedWorkspaceAdministrationRolesRouteImport } from './routes/_authenticated.workspace.administration.roles'
 import { Route as AuthenticatedWorkspaceAdministrationPermissionsRouteImport } from './routes/_authenticated.workspace.administration.permissions'
 import { Route as AuthenticatedWorkspaceAdministrationOrganizationRouteImport } from './routes/_authenticated.workspace.administration.organization'
+import { Route as AuthenticatedWorkspaceAdministrationNotificationsRouteImport } from './routes/_authenticated.workspace.administration.notifications'
 import { Route as AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport } from './routes/_authenticated.workspace.administration.financial-years'
 import { Route as AuthenticatedWorkspaceAdministrationDocumentNumberingRouteImport } from './routes/_authenticated.workspace.administration.document-numbering'
 import { Route as AuthenticatedWorkspaceAdministrationDesignationsRouteImport } from './routes/_authenticated.workspace.administration.designations'
@@ -152,7 +153,9 @@ import { Route as AuthenticatedWorkspaceAdministrationDepartmentsRouteImport } f
 import { Route as AuthenticatedWorkspaceAdministrationCurrenciesRouteImport } from './routes/_authenticated.workspace.administration.currencies'
 import { Route as AuthenticatedWorkspaceAdministrationCompaniesRouteImport } from './routes/_authenticated.workspace.administration.companies'
 import { Route as AuthenticatedWorkspaceAdministrationBranchesRouteImport } from './routes/_authenticated.workspace.administration.branches'
+import { Route as AuthenticatedWorkspaceAdministrationAuditLogsRouteImport } from './routes/_authenticated.workspace.administration.audit-logs'
 import { Route as AuthenticatedWorkspaceAdministrationApprovalMatrixRouteImport } from './routes/_authenticated.workspace.administration.approval-matrix'
+import { Route as AuthenticatedWorkspaceAdministrationActivityLogsRouteImport } from './routes/_authenticated.workspace.administration.activity-logs'
 import { Route as AuthenticatedAppSalesReturnsRouteImport } from './routes/_authenticated.app.sales.returns'
 import { Route as AuthenticatedAppSalesRecurringRouteImport } from './routes/_authenticated.app.sales.recurring'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
@@ -985,6 +988,12 @@ const AuthenticatedWorkspaceAdministrationOrganizationRoute =
     path: '/organization',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
+const AuthenticatedWorkspaceAdministrationNotificationsRoute =
+  AuthenticatedWorkspaceAdministrationNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
 const AuthenticatedWorkspaceAdministrationFinancialYearsRoute =
   AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport.update({
     id: '/financial-years',
@@ -1027,10 +1036,22 @@ const AuthenticatedWorkspaceAdministrationBranchesRoute =
     path: '/branches',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
+const AuthenticatedWorkspaceAdministrationAuditLogsRoute =
+  AuthenticatedWorkspaceAdministrationAuditLogsRouteImport.update({
+    id: '/audit-logs',
+    path: '/audit-logs',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
 const AuthenticatedWorkspaceAdministrationApprovalMatrixRoute =
   AuthenticatedWorkspaceAdministrationApprovalMatrixRouteImport.update({
     id: '/approval-matrix',
     path: '/approval-matrix',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
+const AuthenticatedWorkspaceAdministrationActivityLogsRoute =
+  AuthenticatedWorkspaceAdministrationActivityLogsRouteImport.update({
+    id: '/activity-logs',
+    path: '/activity-logs',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
 const AuthenticatedAppSalesReturnsRoute =
@@ -1389,7 +1410,9 @@ export interface FileRoutesByFullPath {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/administration/activity-logs': typeof AuthenticatedWorkspaceAdministrationActivityLogsRoute
   '/workspace/administration/approval-matrix': typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRoute
+  '/workspace/administration/audit-logs': typeof AuthenticatedWorkspaceAdministrationAuditLogsRoute
   '/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
   '/workspace/administration/companies': typeof AuthenticatedWorkspaceAdministrationCompaniesRoute
   '/workspace/administration/currencies': typeof AuthenticatedWorkspaceAdministrationCurrenciesRoute
@@ -1397,6 +1420,7 @@ export interface FileRoutesByFullPath {
   '/workspace/administration/designations': typeof AuthenticatedWorkspaceAdministrationDesignationsRoute
   '/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
   '/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
   '/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/workspace/administration/permissions': typeof AuthenticatedWorkspaceAdministrationPermissionsRoute
   '/workspace/administration/roles': typeof AuthenticatedWorkspaceAdministrationRolesRoute
@@ -1557,7 +1581,9 @@ export interface FileRoutesByTo {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/administration/activity-logs': typeof AuthenticatedWorkspaceAdministrationActivityLogsRoute
   '/workspace/administration/approval-matrix': typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRoute
+  '/workspace/administration/audit-logs': typeof AuthenticatedWorkspaceAdministrationAuditLogsRoute
   '/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
   '/workspace/administration/companies': typeof AuthenticatedWorkspaceAdministrationCompaniesRoute
   '/workspace/administration/currencies': typeof AuthenticatedWorkspaceAdministrationCurrenciesRoute
@@ -1565,6 +1591,7 @@ export interface FileRoutesByTo {
   '/workspace/administration/designations': typeof AuthenticatedWorkspaceAdministrationDesignationsRoute
   '/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
   '/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
   '/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/workspace/administration/permissions': typeof AuthenticatedWorkspaceAdministrationPermissionsRoute
   '/workspace/administration/roles': typeof AuthenticatedWorkspaceAdministrationRolesRoute
@@ -1749,7 +1776,9 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/_authenticated/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/_authenticated/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/_authenticated/workspace/administration/activity-logs': typeof AuthenticatedWorkspaceAdministrationActivityLogsRoute
   '/_authenticated/workspace/administration/approval-matrix': typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRoute
+  '/_authenticated/workspace/administration/audit-logs': typeof AuthenticatedWorkspaceAdministrationAuditLogsRoute
   '/_authenticated/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
   '/_authenticated/workspace/administration/companies': typeof AuthenticatedWorkspaceAdministrationCompaniesRoute
   '/_authenticated/workspace/administration/currencies': typeof AuthenticatedWorkspaceAdministrationCurrenciesRoute
@@ -1757,6 +1786,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/administration/designations': typeof AuthenticatedWorkspaceAdministrationDesignationsRoute
   '/_authenticated/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
   '/_authenticated/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/_authenticated/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
   '/_authenticated/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/_authenticated/workspace/administration/permissions': typeof AuthenticatedWorkspaceAdministrationPermissionsRoute
   '/_authenticated/workspace/administration/roles': typeof AuthenticatedWorkspaceAdministrationRolesRoute
@@ -1941,7 +1971,9 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/administration/activity-logs'
     | '/workspace/administration/approval-matrix'
+    | '/workspace/administration/audit-logs'
     | '/workspace/administration/branches'
     | '/workspace/administration/companies'
     | '/workspace/administration/currencies'
@@ -1949,6 +1981,7 @@ export interface FileRouteTypes {
     | '/workspace/administration/designations'
     | '/workspace/administration/document-numbering'
     | '/workspace/administration/financial-years'
+    | '/workspace/administration/notifications'
     | '/workspace/administration/organization'
     | '/workspace/administration/permissions'
     | '/workspace/administration/roles'
@@ -2109,7 +2142,9 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/administration/activity-logs'
     | '/workspace/administration/approval-matrix'
+    | '/workspace/administration/audit-logs'
     | '/workspace/administration/branches'
     | '/workspace/administration/companies'
     | '/workspace/administration/currencies'
@@ -2117,6 +2152,7 @@ export interface FileRouteTypes {
     | '/workspace/administration/designations'
     | '/workspace/administration/document-numbering'
     | '/workspace/administration/financial-years'
+    | '/workspace/administration/notifications'
     | '/workspace/administration/organization'
     | '/workspace/administration/permissions'
     | '/workspace/administration/roles'
@@ -2300,7 +2336,9 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/quotations'
     | '/_authenticated/app/sales/recurring'
     | '/_authenticated/app/sales/returns'
+    | '/_authenticated/workspace/administration/activity-logs'
     | '/_authenticated/workspace/administration/approval-matrix'
+    | '/_authenticated/workspace/administration/audit-logs'
     | '/_authenticated/workspace/administration/branches'
     | '/_authenticated/workspace/administration/companies'
     | '/_authenticated/workspace/administration/currencies'
@@ -2308,6 +2346,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/administration/designations'
     | '/_authenticated/workspace/administration/document-numbering'
     | '/_authenticated/workspace/administration/financial-years'
+    | '/_authenticated/workspace/administration/notifications'
     | '/_authenticated/workspace/administration/organization'
     | '/_authenticated/workspace/administration/permissions'
     | '/_authenticated/workspace/administration/roles'
@@ -3368,6 +3407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationOrganizationRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
+    '/_authenticated/workspace/administration/notifications': {
+      id: '/_authenticated/workspace/administration/notifications'
+      path: '/notifications'
+      fullPath: '/workspace/administration/notifications'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationNotificationsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
     '/_authenticated/workspace/administration/financial-years': {
       id: '/_authenticated/workspace/administration/financial-years'
       path: '/financial-years'
@@ -3417,11 +3463,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationBranchesRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
+    '/_authenticated/workspace/administration/audit-logs': {
+      id: '/_authenticated/workspace/administration/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/workspace/administration/audit-logs'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationAuditLogsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
     '/_authenticated/workspace/administration/approval-matrix': {
       id: '/_authenticated/workspace/administration/approval-matrix'
       path: '/approval-matrix'
       fullPath: '/workspace/administration/approval-matrix'
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
+    '/_authenticated/workspace/administration/activity-logs': {
+      id: '/_authenticated/workspace/administration/activity-logs'
+      path: '/activity-logs'
+      fullPath: '/workspace/administration/activity-logs'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationActivityLogsRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
     '/_authenticated/app/sales/returns': {
@@ -4076,7 +4136,9 @@ const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 interface AuthenticatedWorkspaceAdministrationRouteChildren {
+  AuthenticatedWorkspaceAdministrationActivityLogsRoute: typeof AuthenticatedWorkspaceAdministrationActivityLogsRoute
   AuthenticatedWorkspaceAdministrationApprovalMatrixRoute: typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRoute
+  AuthenticatedWorkspaceAdministrationAuditLogsRoute: typeof AuthenticatedWorkspaceAdministrationAuditLogsRoute
   AuthenticatedWorkspaceAdministrationBranchesRoute: typeof AuthenticatedWorkspaceAdministrationBranchesRoute
   AuthenticatedWorkspaceAdministrationCompaniesRoute: typeof AuthenticatedWorkspaceAdministrationCompaniesRoute
   AuthenticatedWorkspaceAdministrationCurrenciesRoute: typeof AuthenticatedWorkspaceAdministrationCurrenciesRoute
@@ -4084,6 +4146,7 @@ interface AuthenticatedWorkspaceAdministrationRouteChildren {
   AuthenticatedWorkspaceAdministrationDesignationsRoute: typeof AuthenticatedWorkspaceAdministrationDesignationsRoute
   AuthenticatedWorkspaceAdministrationDocumentNumberingRoute: typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
   AuthenticatedWorkspaceAdministrationFinancialYearsRoute: typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  AuthenticatedWorkspaceAdministrationNotificationsRoute: typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
   AuthenticatedWorkspaceAdministrationOrganizationRoute: typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   AuthenticatedWorkspaceAdministrationPermissionsRoute: typeof AuthenticatedWorkspaceAdministrationPermissionsRoute
   AuthenticatedWorkspaceAdministrationRolesRoute: typeof AuthenticatedWorkspaceAdministrationRolesRoute
@@ -4095,8 +4158,12 @@ interface AuthenticatedWorkspaceAdministrationRouteChildren {
 
 const AuthenticatedWorkspaceAdministrationRouteChildren: AuthenticatedWorkspaceAdministrationRouteChildren =
   {
+    AuthenticatedWorkspaceAdministrationActivityLogsRoute:
+      AuthenticatedWorkspaceAdministrationActivityLogsRoute,
     AuthenticatedWorkspaceAdministrationApprovalMatrixRoute:
       AuthenticatedWorkspaceAdministrationApprovalMatrixRoute,
+    AuthenticatedWorkspaceAdministrationAuditLogsRoute:
+      AuthenticatedWorkspaceAdministrationAuditLogsRoute,
     AuthenticatedWorkspaceAdministrationBranchesRoute:
       AuthenticatedWorkspaceAdministrationBranchesRoute,
     AuthenticatedWorkspaceAdministrationCompaniesRoute:
@@ -4111,6 +4178,8 @@ const AuthenticatedWorkspaceAdministrationRouteChildren: AuthenticatedWorkspaceA
       AuthenticatedWorkspaceAdministrationDocumentNumberingRoute,
     AuthenticatedWorkspaceAdministrationFinancialYearsRoute:
       AuthenticatedWorkspaceAdministrationFinancialYearsRoute,
+    AuthenticatedWorkspaceAdministrationNotificationsRoute:
+      AuthenticatedWorkspaceAdministrationNotificationsRoute,
     AuthenticatedWorkspaceAdministrationOrganizationRoute:
       AuthenticatedWorkspaceAdministrationOrganizationRoute,
     AuthenticatedWorkspaceAdministrationPermissionsRoute:
