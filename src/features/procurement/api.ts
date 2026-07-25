@@ -367,7 +367,7 @@ export function useSaveGRN() {
         await supabase.from("grn_items").delete().eq("grn_id", id);
       } else {
         const grn_number = await nextNumber(companyId, "GRN");
-        const { data, error } = await supabase.from("grns" as any).insert({ ...header, grn_number, created_by: profile!.id } as any).select("id").single() as any;
+        const { data, error } = await supabase.from("grns").insert({ ...header, grn_number, created_by: profile!.id } as any).select("id").single() as any;
         if (error) throw error;
         id = data.id;
       }
