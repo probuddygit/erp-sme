@@ -119,7 +119,7 @@ export function useSaveIndent() {
       } else {
         const indent_number = await nextNumber(companyId, "INDENT");
         const { data, error } = await supabase.from("purchase_indents")
-          .insert({ ...header, indent_number, created_by: profile!.id })
+          .insert({ ...header, indent_number, created_by: profile!.id } as any)
           .select("id").single();
         if (error) throw error;
         id = data.id;
@@ -550,12 +550,12 @@ export function useSaveVendorReturn() {
       };
       let id = input.id;
       if (id) {
-        const { error } = await supabase.from("vendor_returns").update(header as any).eq("id", id);
+        const { error } = await supabase.from("vendor_returns" as any).update(header as any).eq("id", id);
         if (error) throw error;
-        await supabase.from("vendor_return_items").delete().eq("vret_id", id);
+        await supabase.from("vendor_return_items" as any).delete().eq("vret_id", id);
       } else {
         const vret_number = await nextNumber(companyId, "VRET");
-        const { data, error } = await supabase.from("vendor_returns").insert({ ...header, vret_number, created_by: profile!.id } as any).select("id").single();
+        const { data, error } = await supabase.from("vendor_returns" as any).insert({ ...header, vret_number, created_by: profile!.id } as any).select("id").single();
         if (error) throw error;
         id = data.id;
       }
@@ -568,7 +568,7 @@ export function useSaveVendorReturn() {
         };
       });
       if (rows.length) {
-        const { error } = await supabase.from("vendor_return_items").insert(rows as any);
+        const { error } = await supabase.from("vendor_return_items" as any).insert(rows as any);
         if (error) throw error;
       }
     },

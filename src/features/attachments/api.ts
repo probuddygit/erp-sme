@@ -101,7 +101,7 @@ export function useUploadAttachment() {
         contentType: args.file.type || undefined,
       });
       if (upErr) throw upErr;
-      const { error: insErr } = await supabase.from("attachments").insert({
+      const { error: insErr } = await supabase.from("attachments" as any).insert({
         company_id: profile.company_id,
         entity_type: args.entityType,
         entity_id: args.entityId,
@@ -131,7 +131,7 @@ export function useDeleteAttachment() {
   return useMutation({
     mutationFn: async (row: AttachmentRow) => {
       await supabase.storage.from(BUCKET).remove([row.bucket_path]).catch(() => {});
-      const { error } = await supabase.from("attachments").delete().eq("id", row.id);
+      const { error } = await supabase.from("attachments" as any).delete().eq("id", row.id);
       if (error) throw error;
     },
     onSuccess: (_d, row) => {
