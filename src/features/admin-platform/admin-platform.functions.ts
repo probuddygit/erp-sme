@@ -78,7 +78,7 @@ export const listTenants = createServerFn({ method: 'POST' })
 
     let query = admin
       .from('companies')
-      .select('id, name, slug, plan, is_active, enabled_modules, created_at, organization_id, organizations!inner(id, name, owner_id)', { count: 'exact' })
+      .select('id, name, slug, plan, is_active, enabled_modules, created_at, organization_id, organizations(id, name, owner_id)', { count: 'exact' })
       .order('created_at', { ascending: false });
 
     if (data.search) {
