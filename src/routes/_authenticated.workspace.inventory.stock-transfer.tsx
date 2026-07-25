@@ -11,17 +11,10 @@ export const Route = createFileRoute("/_authenticated/workspace/inventory/stock-
   component: TransferPage,
 });
 
-interface TxnRow {
-  id: string; occurred_at: string; txn_type: string; quantity: number;
-  total_value: number; notes: string | null; reference_type: string | null; reference_id: string | null;
-  item: { name: string; sku: string } | null;
-  warehouse: { name: string; code: string } | null;
-}
-
 interface Pair { id: string; date: string; item: string; from: string; to: string; qty: number; value: number; }
 
 function TransferPage() {
-  const { data: rows = [], isLoading } = useStockTransactions() as { data: TxnRow[]; isLoading: boolean };
+  const { data: rows = [], isLoading } = useStockTransactions();
   const [open, setOpen] = useState(false);
 
   // Pair transfer_out + transfer_in by (item, close occurred_at, ~equal qty)

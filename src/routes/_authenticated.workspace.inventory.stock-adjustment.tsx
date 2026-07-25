@@ -3,7 +3,7 @@ import { Sliders } from "lucide-react";
 import { InventoryTable, type Column } from "@/features/inventory/components/InventoryTable";
 import { StatusBadge } from "@/features/sales/components/StatusBadge";
 import { AdjustmentDialog } from "@/features/inventory/components/AdjustmentDialog";
-import { useStockTransactions, fmtINR, fmtDateTime } from "@/features/inventory/api";
+import { useStockTransactions, fmtINR, fmtDateTime, type StockTxnRow } from "@/features/inventory/api";
 import { STATUS_TONES } from "@/features/inventory/data";
 import { useState } from "react";
 
@@ -11,19 +11,12 @@ export const Route = createFileRoute("/_authenticated/workspace/inventory/stock-
   component: AdjustmentPage,
 });
 
-interface Row {
-  id: string; occurred_at: string; txn_type: string; quantity: number;
-  unit_cost: number; total_value: number; notes: string | null;
-  item: { name: string; sku: string } | null;
-  warehouse: { name: string; code: string } | null;
-}
-
 function AdjustmentPage() {
-  const { data: rows = [], isLoading } = useStockTransactions() as { data: Row[]; isLoading: boolean };
+  const { data: rows = [], isLoading } = useStockTransactions();
   const adjustments = rows.filter((r) => r.txn_type === "adjustment");
   const [open, setOpen] = useState(false);
 
-  const columns: Column<Row>[] = [
+  const columns: Column<StockTxnRow>[] = [
     { header: "Date", cell: (r) => fmtDateTime(r.occurred_at) },
     { header: "Item", cell: (r) => <div><div className="font-medium">{r.item?.name ?? "—"}</div><div className="text-xs text-muted-foreground">{r.item?.sku}</div></div> },
     { header: "Warehouse", cell: (r) => r.warehouse?.name ?? "—" },
@@ -37,7 +30,7 @@ function AdjustmentPage() {
 
   return (
     <>
-      <InventoryTable<Row>
+      <InventoryTable<StockTxnRow>
         title="Stock Adjustments" description="Post variances between system and physical stock." icon={Sliders}
         data={adjustments} columns={columns} loading={isLoading}
         searchable={(r) => `${r.item?.name ?? ""} ${r.item?.sku ?? ""} ${r.notes ?? ""}`}

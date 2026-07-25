@@ -3,26 +3,12 @@ import { BookOpen } from "lucide-react";
 import { InventoryTable, type Column } from "@/features/inventory/components/InventoryTable";
 import { StatusBadge } from "@/features/sales/components/StatusBadge";
 import { STATUS_TONES } from "@/features/inventory/data";
-import { useStockTransactions, useWarehouses, fmtINR, fmtDateTime } from "@/features/inventory/api";
+import { useStockTransactions, useWarehouses, fmtINR, fmtDateTime, type StockTxnRow } from "@/features/inventory/api";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/workspace/inventory/stock-ledger")({
   component: StockLedgerPage,
 });
-
-interface TxnRow {
-  id: string;
-  occurred_at: string;
-  txn_type: string;
-  quantity: number;
-  unit_cost: number;
-  total_value: number;
-  reference_type: string | null;
-  notes: string | null;
-  warehouse_id: string;
-  item: { name: string; sku: string } | null;
-  warehouse: { name: string; code: string } | null;
-}
 
 const TXN_TONE: Record<string, string> = {
   receipt: STATUS_TONES.IN,
@@ -36,13 +22,13 @@ const TXN_TONE: Record<string, string> = {
 };
 
 function StockLedgerPage() {
-  const { data: rows = [], isLoading } = useStockTransactions() as { data: TxnRow[]; isLoading: boolean };
+  const { data: rows = [], isLoading } = useStockTransactions();
   const { data: warehouses = [] } = useWarehouses();
   const [type, setType] = useState("");
   const [wh, setWh] = useState("");
   const data = rows.filter((l) => (!type || l.txn_type === type) && (!wh || l.warehouse_id === wh));
 
-  const columns: Column<TxnRow>[] = [
+  const columns: Column<StockTxnRow>[] = [
     { header: "Date", cell: (r) => fmtDateTime(r.occurred_at) },
     { header: "Type", cell: (r) => <StatusBadge label={r.txn_type.replace(/_/g, " ")} tone={TXN_TONE[r.txn_type] ?? STATUS_TONES.ADJUST} /> },
     { header: "Item", cell: (r) => <div><div className="font-medium">{r.item?.name ?? "—"}</div><div className="text-xs text-muted-foreground">{r.item?.sku ?? ""}</div></div> },
@@ -54,7 +40,7 @@ function StockLedgerPage() {
   ];
 
   return (
-    <InventoryTable<TxnRow>
+    <InventoryTable<StockTxnRow>
       title="Stock Ledger"
       description="Chronological stock movements across all items & warehouses (last 500 events)."
       icon={BookOpen}
