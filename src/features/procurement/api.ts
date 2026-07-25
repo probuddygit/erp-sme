@@ -129,7 +129,7 @@ export function useSaveIndent() {
         unit: l.unit ?? null, quantity: l.quantity, notes: l.notes ?? null, position: i,
       }));
       if (rows.length) {
-        const { error } = await supabase.from("purchase_indent_items").insert(rows);
+        const { error } = await supabase.from("purchase_indent_items").insert(rows as any);
         if (error) throw error;
       }
     },
@@ -184,7 +184,7 @@ export function useSaveRFQ() {
         company_id: companyId, rfq_id: id!, item_name: l.item_name, item_code: l.item_code ?? null, unit: l.unit ?? null, quantity: l.quantity, position: i,
       }));
       if (rows.length) {
-        const { error } = await supabase.from("rfq_items").insert(rows);
+        const { error } = await supabase.from("rfq_items").insert(rows as any);
         if (error) throw error;
       }
     },
@@ -239,10 +239,10 @@ export function useSaveVendorQuote() {
         is_selected: input.is_selected ?? false,
       };
       if (input.id) {
-        const { error } = await supabase.from("rfq_supplier_quotes").update(row).eq("id", input.id);
+        const { error } = await supabase.from("rfq_supplier_quotes").update(row as any).eq("id", input.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("rfq_supplier_quotes").insert(row);
+        const { error } = await supabase.from("rfq_supplier_quotes").insert(row as any);
         if (error) throw error;
       }
     },
@@ -314,7 +314,7 @@ export function useSavePurchaseOrder() {
         };
       });
       if (rows.length) {
-        const { error } = await supabase.from("purchase_order_items").insert(rows);
+        const { error } = await supabase.from("purchase_order_items").insert(rows as any);
         if (error) throw error;
       }
     },
@@ -367,7 +367,7 @@ export function useSaveGRN() {
         await supabase.from("grn_items").delete().eq("grn_id", id);
       } else {
         const grn_number = await nextNumber(companyId, "GRN");
-        const { data, error } = await supabase.from("grns").insert({ ...header, grn_number, created_by: profile!.id }).select("id").single();
+        const { data, error } = await supabase.from("grns" as any).insert({ ...header, grn_number, created_by: profile!.id }).select("id").single();
         if (error) throw error;
         id = data.id;
       }
@@ -377,7 +377,7 @@ export function useSaveGRN() {
         warehouse_id: input.warehouse_id ?? null, batch_no: l.batch_no ?? null, position: i,
       }));
       if (rows.length) {
-        const { error } = await supabase.from("grn_items").insert(rows);
+        const { error } = await supabase.from("grn_items").insert(rows as any);
         if (error) throw error;
       }
     },
@@ -449,7 +449,7 @@ export function useSaveVendorInvoice() {
         };
       });
       if (rows.length) {
-        const { error } = await supabase.from("vendor_invoice_items").insert(rows);
+        const { error } = await supabase.from("vendor_invoice_items").insert(rows as any);
         if (error) throw error;
       }
     },
@@ -568,7 +568,7 @@ export function useSaveVendorReturn() {
         };
       });
       if (rows.length) {
-        const { error } = await supabase.from("vendor_return_items").insert(rows);
+        const { error } = await supabase.from("vendor_return_items").insert(rows as any);
         if (error) throw error;
       }
     },
