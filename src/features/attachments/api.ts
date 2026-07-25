@@ -54,7 +54,7 @@ export function useAttachments(entityType: EntityType, entityId: string | null |
     enabled: !!profile?.company_id && !!entityId,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("attachments")
+        .from("attachments" as any)
         .select("*")
         .eq("company_id", profile!.company_id!)
         .eq("entity_type", entityType)
@@ -74,7 +74,7 @@ export function useAttachmentCounts(entityType: EntityType, entityIds: string[])
     enabled: !!profile?.company_id && ids.length > 0,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("attachments")
+        .from("attachments" as any)
         .select("entity_id")
         .eq("company_id", profile!.company_id!)
         .eq("entity_type", entityType)

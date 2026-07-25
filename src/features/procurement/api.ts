@@ -521,7 +521,7 @@ export function useVendorReturns() {
     enabled: !!profile?.company_id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("vendor_returns")
+        .from("vendor_returns" as any)
         .select("*, supplier:suppliers(id,name,code), grn:grns(id,grn_number), items:vendor_return_items(*)")
         .eq("company_id", profile!.company_id!)
         .order("return_date", { ascending: false });
