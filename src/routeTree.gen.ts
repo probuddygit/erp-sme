@@ -85,6 +85,7 @@ import { Route as AuthenticatedWorkspaceSalesQuotationsRouteImport } from './rou
 import { Route as AuthenticatedWorkspaceSalesPaymentsRouteImport } from './routes/_authenticated.workspace.sales.payments'
 import { Route as AuthenticatedWorkspaceSalesInvoicesRouteImport } from './routes/_authenticated.workspace.sales.invoices'
 import { Route as AuthenticatedWorkspaceSalesDeliveryNotesRouteImport } from './routes/_authenticated.workspace.sales.delivery-notes'
+import { Route as AuthenticatedWorkspaceReportsCategoryRouteImport } from './routes/_authenticated.workspace.reports.$category'
 import { Route as AuthenticatedWorkspaceProcurementVendorReturnsRouteImport } from './routes/_authenticated.workspace.procurement.vendor-returns'
 import { Route as AuthenticatedWorkspaceProcurementVendorQuotationsRouteImport } from './routes/_authenticated.workspace.procurement.vendor-quotations'
 import { Route as AuthenticatedWorkspaceProcurementVendorPaymentsRouteImport } from './routes/_authenticated.workspace.procurement.vendor-payments'
@@ -607,6 +608,12 @@ const AuthenticatedWorkspaceSalesDeliveryNotesRoute =
     id: '/delivery-notes',
     path: '/delivery-notes',
     getParentRoute: () => AuthenticatedWorkspaceSalesRoute,
+  } as any)
+const AuthenticatedWorkspaceReportsCategoryRoute =
+  AuthenticatedWorkspaceReportsCategoryRouteImport.update({
+    id: '/$category',
+    path: '/$category',
+    getParentRoute: () => AuthenticatedWorkspaceReportsRoute,
   } as any)
 const AuthenticatedWorkspaceProcurementVendorReturnsRoute =
   AuthenticatedWorkspaceProcurementVendorReturnsRouteImport.update({
@@ -1322,6 +1329,7 @@ export interface FileRoutesByFullPath {
   '/workspace/procurement/vendor-payments': typeof AuthenticatedWorkspaceProcurementVendorPaymentsRoute
   '/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
+  '/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRoute
   '/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -1474,6 +1482,7 @@ export interface FileRoutesByTo {
   '/workspace/procurement/vendor-payments': typeof AuthenticatedWorkspaceProcurementVendorPaymentsRoute
   '/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
+  '/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRoute
   '/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -1649,6 +1658,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/procurement/vendor-payments': typeof AuthenticatedWorkspaceProcurementVendorPaymentsRoute
   '/_authenticated/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/_authenticated/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
+  '/_authenticated/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRoute
   '/_authenticated/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/_authenticated/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/_authenticated/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -1824,6 +1834,7 @@ export interface FileRouteTypes {
     | '/workspace/procurement/vendor-payments'
     | '/workspace/procurement/vendor-quotations'
     | '/workspace/procurement/vendor-returns'
+    | '/workspace/reports/$category'
     | '/workspace/sales/delivery-notes'
     | '/workspace/sales/invoices'
     | '/workspace/sales/payments'
@@ -1976,6 +1987,7 @@ export interface FileRouteTypes {
     | '/workspace/procurement/vendor-payments'
     | '/workspace/procurement/vendor-quotations'
     | '/workspace/procurement/vendor-returns'
+    | '/workspace/reports/$category'
     | '/workspace/sales/delivery-notes'
     | '/workspace/sales/invoices'
     | '/workspace/sales/payments'
@@ -2150,6 +2162,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/procurement/vendor-payments'
     | '/_authenticated/workspace/procurement/vendor-quotations'
     | '/_authenticated/workspace/procurement/vendor-returns'
+    | '/_authenticated/workspace/reports/$category'
     | '/_authenticated/workspace/sales/delivery-notes'
     | '/_authenticated/workspace/sales/invoices'
     | '/_authenticated/workspace/sales/payments'
@@ -2728,6 +2741,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/sales/delivery-notes'
       preLoaderRoute: typeof AuthenticatedWorkspaceSalesDeliveryNotesRouteImport
       parentRoute: typeof AuthenticatedWorkspaceSalesRoute
+    }
+    '/_authenticated/workspace/reports/$category': {
+      id: '/_authenticated/workspace/reports/$category'
+      path: '/$category'
+      fullPath: '/workspace/reports/$category'
+      preLoaderRoute: typeof AuthenticatedWorkspaceReportsCategoryRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceReportsRoute
     }
     '/_authenticated/workspace/procurement/vendor-returns': {
       id: '/_authenticated/workspace/procurement/vendor-returns'
@@ -3977,11 +3997,14 @@ const AuthenticatedWorkspaceProcurementRouteWithChildren =
   )
 
 interface AuthenticatedWorkspaceReportsRouteChildren {
+  AuthenticatedWorkspaceReportsCategoryRoute: typeof AuthenticatedWorkspaceReportsCategoryRoute
   AuthenticatedWorkspaceReportsIndexRoute: typeof AuthenticatedWorkspaceReportsIndexRoute
 }
 
 const AuthenticatedWorkspaceReportsRouteChildren: AuthenticatedWorkspaceReportsRouteChildren =
   {
+    AuthenticatedWorkspaceReportsCategoryRoute:
+      AuthenticatedWorkspaceReportsCategoryRoute,
     AuthenticatedWorkspaceReportsIndexRoute:
       AuthenticatedWorkspaceReportsIndexRoute,
   }
