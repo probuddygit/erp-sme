@@ -880,6 +880,33 @@ export type Database = {
           },
         ]
       }
+      email_templates: {
+        Row: {
+          body_html: string | null
+          body_text: string | null
+          description: string | null
+          key: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          body_html?: string | null
+          body_text?: string | null
+          description?: string | null
+          key: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          body_html?: string | null
+          body_text?: string | null
+          description?: string | null
+          key?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       employees: {
         Row: {
           address: string | null
@@ -955,6 +982,33 @@ export type Database = {
           status?: Database["public"]["Enums"]["employee_status"]
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          description: string | null
+          enabled: boolean
+          key: string
+          target: string
+          target_value: string | null
+          updated_at: string
+        }
+        Insert: {
+          description?: string | null
+          enabled?: boolean
+          key: string
+          target?: string
+          target_value?: string | null
+          updated_at?: string
+        }
+        Update: {
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          target?: string
+          target_value?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2574,6 +2628,179 @@ export type Database = {
           module?: string
         }
         Relationships: []
+      }
+      platform_audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: string
+          ip: string | null
+          metadata: Json
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      platform_invoices: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          due_date: string | null
+          id: string
+          invoice_number: string
+          metadata: Json
+          paid_at: string | null
+          status: Database["public"]["Enums"]["platform_invoice_status"]
+          subscription_id: string | null
+          tax: number
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          company_id: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          invoice_number: string
+          metadata?: Json
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["platform_invoice_status"]
+          subscription_id?: string | null
+          tax?: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          metadata?: Json
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["platform_invoice_status"]
+          subscription_id?: string | null
+          tax?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "platform_invoices_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "platform_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_settings: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      platform_subscriptions: {
+        Row: {
+          billing_email: string | null
+          company_id: string
+          created_at: string
+          ends_at: string | null
+          id: string
+          metadata: Json
+          monthly_price: number
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          seats: number
+          starts_at: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_email?: string | null
+          company_id: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          metadata?: Json
+          monthly_price?: number
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          seats?: number
+          starts_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_email?: string | null
+          company_id?: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          metadata?: Json
+          monthly_price?: number
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          seats?: number
+          starts_at?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_subscriptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_lists: {
         Row: {
@@ -4405,6 +4632,16 @@ export type Database = {
           warehouse_id: string
         }[]
       }
+      log_platform_audit: {
+        Args: {
+          _action: string
+          _actor_id: string
+          _entity: string
+          _entity_id: string
+          _metadata: Json
+        }
+        Returns: undefined
+      }
       next_doc_number: {
         Args: { _company_id: string; _prefix: string }
         Returns: string
@@ -4576,6 +4813,7 @@ export type Database = {
         | "card"
         | "other"
       payroll_run_status: "draft" | "processed" | "posted"
+      platform_invoice_status: "draft" | "open" | "paid" | "void"
       po_status:
         | "draft"
         | "pending_approval"
@@ -4618,6 +4856,12 @@ export type Database = {
         | "production_out"
         | "opening"
       subscription_plan: "trial" | "starter" | "pro" | "enterprise"
+      subscription_status:
+        | "active"
+        | "trial"
+        | "cancelled"
+        | "past_due"
+        | "suspended"
       tax_type: "intra_state" | "inter_state" | "exempt"
       valuation_method: "fifo" | "weighted_average"
       vinv_status:
@@ -4879,6 +5123,7 @@ export const Constants = {
         "other",
       ],
       payroll_run_status: ["draft", "processed", "posted"],
+      platform_invoice_status: ["draft", "open", "paid", "void"],
       po_status: [
         "draft",
         "pending_approval",
@@ -4925,6 +5170,13 @@ export const Constants = {
         "opening",
       ],
       subscription_plan: ["trial", "starter", "pro", "enterprise"],
+      subscription_status: [
+        "active",
+        "trial",
+        "cancelled",
+        "past_due",
+        "suspended",
+      ],
       tax_type: ["intra_state", "inter_state", "exempt"],
       valuation_method: ["fifo", "weighted_average"],
       vinv_status: [

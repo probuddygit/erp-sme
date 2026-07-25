@@ -1,113 +1,121 @@
-# Enterprise Authentication & RBAC
+# Platform Operator Admin Dashboard
 
-Leverages existing `profiles`, `companies`, `user_roles`, `app_role` schema. Adds organization, branches, financial years, invitations, permissions, audit log. New auth surfaces live under `/auth/*` and `/onboarding/*`. Legacy `/app` and `/workspace` shells remain.
+Keep the existing `/workspace/administration` as the tenant-level settings area. Build out `/_authenticated/admin/` as a dedicated platform operator console for the SaaS operator (super_admin only). This console provides tenant lifecycle, billing, user management, system health, and global configuration.
 
-## 1. Database (single migration)
+## Current state
+- `/workspace/administration` is tenant-level (Organization, Companies, Branches, Users, Roles, etc.).
+- `/_authenticated/admin/` exists as a minimal Super Admin shell with two pages:
+  - `admin/index.tsx` — company provisioning and plan/module toggles.
+  - `admin/users.tsx` — cross-tenant user list with role assignment.
+- The database has `companies`, `organizations`, `profiles`, `user_roles`, and business-module tables, but no platform-level tables for subscriptions, invoices, feature flags, or global settings.
+- The super admin guard checks `isSuperAdmin` from `AuthContext`.
+
+## 1. Database schema (single migration)
+
+Add platform-level tables. Because these are operator-facing, they will be read/written by `supabaseAdmin` (RLS bypass) after the caller is verified as super_admin.
 
 ### New tables
-- **organizations** — tenant root above companies. `name`, `slug`, `owner_id`, `plan`, `status`, timestamps.
-- **companies** (extend existing) — add `organization_id`, `legal_name`, `gstin`, `pan`, `state_code`, `country`, `currency`, `address`, `logo_url`.
-- **branches** — `company_id`, `name`, `code`, `gstin`, `state_code`, `address`, `is_head_office`, `is_active`.
-- **financial_years** — `company_id`, `name` (e.g. "FY 2025-26"), `start_date`, `end_date`, `is_active`, `is_closed`.
-- **permissions** — catalog of permission keys (`module.action`, e.g. `sales.view`, `sales.create`, `sales.approve`).
-- **role_permissions** — maps `app_role` → `permission_key` (defaults per role).
-- **user_permission_overrides** — grant/revoke specific perms per user in a company (optional overlay).
-- **invitations** — `organization_id`, `company_id`, `email`, `role`, `token_hash`, `invited_by`, `status` (pending/accepted/revoked/expired), `expires_at`, `accepted_at`.
-- **audit_logs** — `organization_id`, `company_id`, `user_id`, `action`, `entity`, `entity_id`, `metadata jsonb`, `ip`, `user_agent`, `created_at`.
+- **platform_subscriptions** — `company_id`, `plan`, `status` (active/trial/cancelled/past_due), `billing_email`, `seats`, `monthly_price`, `starts_at`, `ends_at`, `trial_ends_at`, `metadata`.
+- **platform_invoices** — `company_id`, `subscription_id`, `amount`, `tax`, `status` (draft/open/paid/void), `due_date`, `paid_at`, `invoice_number`.
+- **platform_settings** — `key` (PK), `value` (jsonb), `description`, `updated_at`. Used for global defaults (email gateway, signup mode, default modules, maintenance banner).
+- **feature_flags** — `key` (PK), `enabled`, `target` (global/company/plan), `target_value`, `description`.
+- **platform_audit_logs** — `actor_id`, `action`, `entity`, `entity_id`, `metadata`, `ip`, `created_at`. Operator-only audit trail.
+- **email_templates** — `key`, `subject`, `body_html`, `body_text`, `description` (global templates for operator-managed emails).
 
 ### Enum additions
-- `app_role`: add `owner`, `manager`, `viewer` (keep existing).
-- `invitation_status`, `fy_status` enums.
+- `subscription_status` enum: `active`, `trial`, `cancelled`, `past_due`, `suspended`.
+- `invoice_status` enum: `draft`, `open`, `paid`, `void`.
 
 ### Functions & policies
-- `has_permission(_user_id, _company_id, _perm_key)` — SECURITY DEFINER, checks role_permissions + overrides.
-- `current_user_orgs()`, `current_user_companies()` helpers.
-- Update `handle_new_user` to skip profile.company_id (company assigned via onboarding).
-- RLS: every new table scoped by org/company; org rows readable by members; audit_logs insert-only by service or via SECURITY DEFINER function.
-- GRANT SELECT/INSERT/UPDATE/DELETE per policy on each table.
+- `is_super_admin(_user_id uuid)` — already exists; ensure `authenticated` can execute.
+- `log_platform_audit(...)` — SECURITY DEFINER helper to append to `platform_audit_logs`.
+- RLS: platform tables restrict `SELECT/INSERT/UPDATE/DELETE` to service_role only; the operator console uses `supabaseAdmin` after verifying `isSuperAdmin`.
+- GRANT `ALL` on each new table to `service_role`.
 
 ### Seed
-- Insert baseline permission catalog for 10 modules × common actions (view/create/update/delete/approve/export).
-- Insert default `role_permissions` mapping.
+- Seed `platform_settings` keys: `default_modules`, `signup_mode`, `email_from`, `support_email`, `maintenance_banner`.
+- Seed `feature_flags`: `new_reports`, `ai_copilot`, `maintenance_module`, `multi_currency`.
+- Seed one `platform_invoices` and `platform_subscriptions` row per existing company so the dashboard has real data.
 
-## 2. Auth routes (`src/routes/auth/*`)
+## 2. Server functions (`src/features/admin-platform/*.functions.ts`)
 
-Public routes (top-level, no auth gate):
-- `/auth/login` — email+password + Google.
-- `/auth/register` — creates user + organization in same server fn.
-- `/auth/forgot-password` — `resetPasswordForEmail`.
-- `/auth/reset-password` — updates password (handles `type=recovery` hash).
-- `/auth/verify-email` — landing after email confirmation link.
-- `/auth/accept-invite` — token param → validates + creates membership.
+All functions require `requireSupabaseAuth` and explicitly verify `isSuperAdmin` before using `supabaseAdmin`.
 
-Replace legacy `/login` with redirect to `/auth/login`.
+- `getPlatformDashboardMetrics()` — tenant count, active users, MRR, trial count, open invoices, today's logins.
+- `listTenants({ search, plan, status, page, limit })` — companies + organization + subscription.
+- `getTenantDetails({ companyId })` — company, org, branches, users, subscription, invoices.
+- `createTenant({ name, slug, plan, ownerEmail, ownerFullName, ownerPassword })` — create company + owner profile + user_roles + subscription + audit log.
+- `updateTenant({ companyId, plan, isActive, enabledModules })` — update company + subscription + audit log.
+- `suspendTenant({ companyId, reason })` — set `is_active=false`, subscription status `suspended`, audit log.
+- `listAllUsers({ search, companyId, role, page, limit })` — profiles + companies + roles.
+- `updateUserRoles({ userId, roles })` — idempotent replace of `user_roles` for the user, restricted to admin/super_admin/manager/viewer.
+- `resetUserPassword({ userId })` — generate a password reset link/ticket via `supabaseAdmin.auth.admin.generateLink` and optionally send email.
+- `impersonateUser({ userId })` — generate a one-time sign-in link for support (logged).
+- `listSubscriptions({ status, plan })` and `updateSubscription({ subscriptionId, plan, status, endsAt })`.
+- `listInvoices({ companyId, status })`, `createInvoice({ companyId, amount, dueDate })`, `markInvoicePaid({ invoiceId })`.
+- `getPlatformSettings()`, `updatePlatformSetting({ key, value })`.
+- `listFeatureFlags()`, `updateFeatureFlag({ key, enabled, target, targetValue })`.
+- `listPlatformAuditLogs({ action, entity, limit })`, `logPlatformAudit({ action, entity, entityId, metadata })`.
+- `getSystemHealth()` — returns recent error counts, slow queries, storage usage (where available from Supabase). For now, synthetic metrics from `audit_logs` and `platform_audit_logs`.
 
-## 3. Onboarding wizard (`/onboarding/*`, authenticated)
+## 3. Routing (`src/routes/_authenticated.admin.*`)
 
-Multi-step for users whose organization has no company yet:
-- `/onboarding/company` — legal name, GSTIN, PAN, state, currency, logo.
-- `/onboarding/branch` — head office branch (auto-created; user may add more).
-- `/onboarding/financial-year` — FY start month/date, generates current FY.
-- `/onboarding/invite` — optional email invitations.
-- `/onboarding/complete` → `/workspace`.
+Convert the existing `admin.tsx` guard into a proper operator layout with a sidebar, then add child routes.
 
-Gate: if `profile.company_id` null AND user owns an org without companies, force `/onboarding/company`.
+- `_authenticated.admin.tsx` — Super Admin layout with `<Outlet />` and a vertical navigation rail.
+- `_authenticated.admin.index.tsx` — renamed/overhauled to `/admin` platform dashboard.
+  - KPI cards: Tenants, Active Users, MRR, Open Invoices, Trial Conversions.
+  - Charts: tenants by plan, MRR trend, sign-ups over time (last 30 days).
+  - Recent activity feed from `platform_audit_logs`.
+- `_authenticated.admin.tenants.tsx` — `/admin/tenants` — full tenant list with search, filters, status, plan, actions (view, edit, suspend, impersonate owner).
+- `_authenticated.admin.tenants.$id.tsx` — `/admin/tenants/$id` — tenant detail with tabs (Overview, Users, Subscriptions, Invoices, Audit).
+- `_authenticated.admin.users.tsx` — `/admin/users` — overhauled cross-tenant user list with search, company filter, role badges, reset-password, role editor.
+- `_authenticated.admin.billing.tsx` — `/admin/billing` — subscriptions and invoices, mark-paid, create invoice, plan changes.
+- `_authenticated.admin.settings.tsx` — `/admin/settings` — global settings editor (key/value jsonb), email defaults, maintenance banner.
+- `_authenticated.admin.feature-flags.tsx` — `/admin/feature-flags` — toggle flags globally or per company/plan.
+- `_authenticated.admin.audit.tsx` — `/admin/audit` — platform operator audit logs.
+- `_authenticated.admin.health.tsx` — `/admin/health` — system health dashboard (synthetic metrics, recent errors, API request volume).
 
-## 4. Server functions
+## 4. UI components (`src/features/admin-platform/`)
 
-Under `src/features/auth/*.functions.ts` and `src/features/org/*.functions.ts`:
-- `registerOrganization({ orgName, fullName })` — post-signup finalizer.
-- `createCompany(...)`, `createBranch(...)`, `createFinancialYear(...)`.
-- `inviteUser({ email, role, companyId })` — creates invitation row, sends email via existing auth email infra (magic link with token).
-- `acceptInvitation({ token })` — validates hash, creates `user_roles` row, updates profile.
-- `revokeInvitation`, `resendInvitation`.
-- `listBranches`, `listFinancialYears`, `switchActiveFY`.
-- All use `requireSupabaseAuth`, write audit_logs.
+- `PlatformLayout.tsx` — sidebar + top bar for operator console. Distinct visual identity (darker top bar, operator badge) so it is never confused with the tenant workspace.
+- `PlatformNav.tsx` — navigation items for the operator console.
+- `KpiCard.tsx` and `MetricChart.tsx` — reused from shared dashboard components.
+- `TenantList.tsx`, `TenantDetail.tsx`, `TenantForm.tsx`.
+- `UserList.tsx`, `UserRoleEditor.tsx`, `PasswordResetDialog.tsx`.
+- `SubscriptionList.tsx`, `InvoiceList.tsx`, `InvoiceForm.tsx`.
+- `SettingsEditor.tsx`, `FeatureFlagEditor.tsx`.
+- `AuditLogTable.tsx`, `SystemHealthPanel.tsx`.
 
-## 5. RBAC middleware & hooks
+## 5. Security & RBAC
 
-- **Server**: `requirePermission(permKey)` middleware factory — chains on `requireSupabaseAuth`, resolves company from request context, throws 403 if `has_permission` returns false.
-- **Client**: `usePermission(key)` hook + `<Can permission="...">` component reading from auth context (fetched via `getMyPermissions` server fn on login, cached in React Query).
-- **Route guards**: each `_authenticated/workspace/<module>` route calls `beforeLoad` → checks permission via context; unauthorized → `/unauthorized` page.
-- Add `<Unauthorized />` route.
+- All operator routes remain under `/_authenticated/admin` and reuse the existing `isSuperAdmin` guard.
+- Every server function verifies `isSuperAdmin` via `context.supabase` + `public.is_super_admin(context.userId)` before invoking `supabaseAdmin`.
+- Operator actions are written to `platform_audit_logs` with actor and IP where available.
+- No PII is returned in list endpoints beyond what is necessary for admin operations.
+- Use `supabaseAdmin` for writes to platform tables; use `context.supabase` for reads where the user is authenticated and the policy allows.
 
-## 6. Auth context updates
+## 6. Navigation & access
 
-Extend `AuthProvider` with:
-- `organization`, `branches[]`, `activeBranch`, `financialYears[]`, `activeFinancialYear`, `permissions: Set<string>`, `hasPermission(key)`.
-- Branch & FY switchers in TopBar (already scaffolded UI) wired to real data.
+- Add a discreet "Operator Console" link in the main workspace TopBar or user menu, visible only to `super_admin`.
+- Inside the operator console, keep a clear "Back to Workspace" link.
+- The console URL path remains `/admin/*` for the platform operator and `/workspace/administration/*` for tenant admins.
 
-## 7. Email
+## 7. Out of scope
 
-Use existing auth email infra (already scaffolded per `authentication-emails-guide`). Add:
-- Invitation email (transactional) — accept URL with token.
-- If auth email infra not yet configured, call `email_domain--check_email_domain_status` and scaffold if missing.
+- Real payment gateway integration (Stripe/Paddle); invoices are records only.
+- Real email sending; the UI prepares templates and records intent.
+- Advanced monitoring (Datadog/New Relic); health page uses synthetic/derived data.
 
-## 8. Files to add/edit (high level)
+## 8. Delivery order
 
-New:
-- `src/routes/auth/login.tsx`, `register.tsx`, `forgot-password.tsx`, `reset-password.tsx`, `verify-email.tsx`, `accept-invite.tsx`, `route.tsx` (public layout).
-- `src/routes/_authenticated/onboarding.*.tsx` (5 files).
-- `src/routes/_authenticated/unauthorized.tsx`.
-- `src/features/auth/*.functions.ts`, `src/features/org/*.functions.ts`.
-- `src/features/rbac/{permissions.ts, use-permission.ts, Can.tsx, require-permission.ts}`.
-- `src/shared/components/wizard/{Stepper.tsx, WizardShell.tsx}`.
-
-Edit:
-- `src/lib/auth-context.tsx` — load org/branches/FYs/perms.
-- `src/shared/layout/TopBar.tsx` — wire real switchers.
-- `src/routes/index.tsx`, `src/routes/login.tsx` — redirect to `/auth/login`.
-- `src/routes/_authenticated/route.tsx` if needed for onboarding gate.
-
-## Out of scope (per user)
-- No business module logic.
-- No reporting/dashboard data.
-
-## Delivery order
-1. Migration (schema + permission seed).
-2. Server fns for auth/org/invitation.
-3. Auth pages (`/auth/*`).
-4. Onboarding wizard.
-5. RBAC middleware + hooks + route guards.
-6. Auth context wiring + TopBar switchers.
-7. Invitation email template.
+1. Database migration (platform tables + seed data).
+2. Server functions for dashboard, tenants, users, billing, settings, audit, health.
+3. Operator layout and navigation.
+4. Platform dashboard (`/admin`).
+5. Tenant management (`/admin/tenants`, `/admin/tenants/$id`).
+6. User management overhaul (`/admin/users`).
+7. Billing (`/admin/billing`).
+8. Settings, feature flags, audit, health.
+9. TopBar operator link and navigation polish.
+10. Security review and audit logging.
