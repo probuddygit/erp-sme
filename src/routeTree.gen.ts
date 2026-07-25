@@ -207,6 +207,7 @@ import { Route as AuthenticatedAppFinanceReportsRouteImport } from './routes/_au
 import { Route as AuthenticatedAppFinanceLedgerRouteImport } from './routes/_authenticated.app.finance.ledger'
 import { Route as AuthenticatedAppFinanceGstRouteImport } from './routes/_authenticated.app.finance.gst'
 import { Route as AuthenticatedAppFinanceAccountsRouteImport } from './routes/_authenticated.app.finance.accounts'
+import { Route as AuthenticatedAdminTenantsIdRouteImport } from './routes/_authenticated.admin.tenants.$id'
 import { Route as AuthenticatedWorkspaceReportsCategoryReportIdRouteImport } from './routes/_authenticated.workspace.reports.$category.$reportId'
 import { Route as AuthenticatedAppProductionWorkOrdersIdRouteImport } from './routes/_authenticated.app.production.work-orders.$id'
 import { Route as AuthenticatedAppProductionBomsIdRouteImport } from './routes/_authenticated.app.production.boms.$id'
@@ -1371,6 +1372,12 @@ const AuthenticatedAppFinanceAccountsRoute =
     path: '/accounts',
     getParentRoute: () => AuthenticatedAppFinanceRoute,
   } as any)
+const AuthenticatedAdminTenantsIdRoute =
+  AuthenticatedAdminTenantsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminTenantsRoute,
+  } as any)
 const AuthenticatedWorkspaceReportsCategoryReportIdRoute =
   AuthenticatedWorkspaceReportsCategoryReportIdRouteImport.update({
     id: '/$reportId',
@@ -1421,7 +1428,7 @@ export interface FileRoutesByFullPath {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
-  '/admin/tenants': typeof AuthenticatedAdminTenantsRoute
+  '/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
   '/app/finance': typeof AuthenticatedAppFinanceRouteWithChildren
@@ -1448,6 +1455,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/workspace/': typeof AuthenticatedWorkspaceIndexRoute
+  '/admin/tenants/$id': typeof AuthenticatedAdminTenantsIdRoute
   '/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
   '/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
@@ -1622,7 +1630,7 @@ export interface FileRoutesByTo {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
-  '/admin/tenants': typeof AuthenticatedAdminTenantsRoute
+  '/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
@@ -1630,6 +1638,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/workspace': typeof AuthenticatedWorkspaceIndexRoute
+  '/admin/tenants/$id': typeof AuthenticatedAdminTenantsIdRoute
   '/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
   '/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
@@ -1809,7 +1818,7 @@ export interface FileRoutesById {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
-  '/_authenticated/admin/tenants': typeof AuthenticatedAdminTenantsRoute
+  '/_authenticated/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
   '/_authenticated/app/finance': typeof AuthenticatedAppFinanceRouteWithChildren
@@ -1836,6 +1845,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/workspace/': typeof AuthenticatedWorkspaceIndexRoute
+  '/_authenticated/admin/tenants/$id': typeof AuthenticatedAdminTenantsIdRoute
   '/_authenticated/app/finance/accounts': typeof AuthenticatedAppFinanceAccountsRoute
   '/_authenticated/app/finance/gst': typeof AuthenticatedAppFinanceGstRoute
   '/_authenticated/app/finance/ledger': typeof AuthenticatedAppFinanceLedgerRoute
@@ -2042,6 +2052,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/app/'
     | '/workspace/'
+    | '/admin/tenants/$id'
     | '/app/finance/accounts'
     | '/app/finance/gst'
     | '/app/finance/ledger'
@@ -2224,6 +2235,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/workspace'
+    | '/admin/tenants/$id'
     | '/app/finance/accounts'
     | '/app/finance/gst'
     | '/app/finance/ledger'
@@ -2429,6 +2441,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/workspace/'
+    | '/_authenticated/admin/tenants/$id'
     | '/_authenticated/app/finance/accounts'
     | '/_authenticated/app/finance/gst'
     | '/_authenticated/app/finance/ledger'
@@ -3984,6 +3997,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppFinanceAccountsRouteImport
       parentRoute: typeof AuthenticatedAppFinanceRoute
     }
+    '/_authenticated/admin/tenants/$id': {
+      id: '/_authenticated/admin/tenants/$id'
+      path: '/$id'
+      fullPath: '/admin/tenants/$id'
+      preLoaderRoute: typeof AuthenticatedAdminTenantsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminTenantsRoute
+    }
     '/_authenticated/workspace/reports/$category/$reportId': {
       id: '/_authenticated/workspace/reports/$category/$reportId'
       path: '/$reportId'
@@ -4022,14 +4042,28 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminTenantsRouteChildren {
+  AuthenticatedAdminTenantsIdRoute: typeof AuthenticatedAdminTenantsIdRoute
+}
+
+const AuthenticatedAdminTenantsRouteChildren: AuthenticatedAdminTenantsRouteChildren =
+  {
+    AuthenticatedAdminTenantsIdRoute: AuthenticatedAdminTenantsIdRoute,
+  }
+
+const AuthenticatedAdminTenantsRouteWithChildren =
+  AuthenticatedAdminTenantsRoute._addFileChildren(
+    AuthenticatedAdminTenantsRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminTenantsRoute: typeof AuthenticatedAdminTenantsRoute
+  AuthenticatedAdminTenantsRoute: typeof AuthenticatedAdminTenantsRouteWithChildren
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminTenantsRoute: AuthenticatedAdminTenantsRoute,
+  AuthenticatedAdminTenantsRoute: AuthenticatedAdminTenantsRouteWithChildren,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }

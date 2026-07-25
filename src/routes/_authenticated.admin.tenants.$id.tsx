@@ -130,7 +130,9 @@ function TenantDetailPage() {
 
   if (!detail) return <div>Tenant not found</div>;
 
-  const { company, organization, branches, users, subscription } = detail;
+  const { company, branches, users, subscription } = detail;
+  const organization = company?.organizations as any;
+
 
   return (
     <div className="space-y-6">
