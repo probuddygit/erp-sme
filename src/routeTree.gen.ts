@@ -55,7 +55,10 @@ import { Route as AuthenticatedAppFinanceRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppModuleRouteImport } from './routes/_authenticated.app.$module'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAdminTenantsRouteImport } from './routes/_authenticated.admin.tenants'
+import { Route as AuthenticatedAdminSystemRouteImport } from './routes/_authenticated.admin.system'
 import { Route as AuthenticatedAdminSubscriptionsRouteImport } from './routes/_authenticated.admin.subscriptions'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated.admin.settings'
+import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated.admin.billing'
 import { Route as AuthenticatedWorkspaceWorkflowIndexRouteImport } from './routes/_authenticated.workspace.workflow.index'
 import { Route as AuthenticatedWorkspaceSalesIndexRouteImport } from './routes/_authenticated.workspace.sales.index'
 import { Route as AuthenticatedWorkspaceReportsIndexRouteImport } from './routes/_authenticated.workspace.reports.index'
@@ -462,10 +465,28 @@ const AuthenticatedAdminTenantsRoute =
     path: '/tenants',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSystemRoute =
+  AuthenticatedAdminSystemRouteImport.update({
+    id: '/system',
+    path: '/system',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSubscriptionsRoute =
   AuthenticatedAdminSubscriptionsRouteImport.update({
     id: '/subscriptions',
     path: '/subscriptions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminBillingRoute =
+  AuthenticatedAdminBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedWorkspaceWorkflowIndexRoute =
@@ -1435,7 +1456,10 @@ export interface FileRoutesByFullPath {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
+  '/admin/system': typeof AuthenticatedAdminSystemRoute
   '/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
@@ -1638,7 +1662,10 @@ export interface FileRoutesByTo {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
+  '/admin/system': typeof AuthenticatedAdminSystemRoute
   '/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/$module': typeof AuthenticatedAppModuleRoute
@@ -1827,7 +1854,10 @@ export interface FileRoutesById {
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/financial-year': typeof OnboardingFinancialYearRoute
   '/onboarding/organization': typeof OnboardingOrganizationRoute
+  '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
+  '/_authenticated/admin/system': typeof AuthenticatedAdminSystemRoute
   '/_authenticated/admin/tenants': typeof AuthenticatedAdminTenantsRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/$module': typeof AuthenticatedAppModuleRoute
@@ -2035,7 +2065,10 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/admin/billing'
+    | '/admin/settings'
     | '/admin/subscriptions'
+    | '/admin/system'
     | '/admin/tenants'
     | '/admin/users'
     | '/app/$module'
@@ -2238,7 +2271,10 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/admin/billing'
+    | '/admin/settings'
     | '/admin/subscriptions'
+    | '/admin/system'
     | '/admin/tenants'
     | '/admin/users'
     | '/app/$module'
@@ -2426,7 +2462,10 @@ export interface FileRouteTypes {
     | '/onboarding/company'
     | '/onboarding/financial-year'
     | '/onboarding/organization'
+    | '/_authenticated/admin/billing'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/subscriptions'
+    | '/_authenticated/admin/system'
     | '/_authenticated/admin/tenants'
     | '/_authenticated/admin/users'
     | '/_authenticated/app/$module'
@@ -2946,11 +2985,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTenantsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/system': {
+      id: '/_authenticated/admin/system'
+      path: '/system'
+      fullPath: '/admin/system'
+      preLoaderRoute: typeof AuthenticatedAdminSystemRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/subscriptions': {
       id: '/_authenticated/admin/subscriptions'
       path: '/subscriptions'
       fullPath: '/admin/subscriptions'
       preLoaderRoute: typeof AuthenticatedAdminSubscriptionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/billing': {
+      id: '/_authenticated/admin/billing'
+      path: '/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AuthenticatedAdminBillingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/workspace/workflow/': {
@@ -4077,14 +4137,20 @@ const AuthenticatedAdminTenantsRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSubscriptionsRoute: typeof AuthenticatedAdminSubscriptionsRoute
+  AuthenticatedAdminSystemRoute: typeof AuthenticatedAdminSystemRoute
   AuthenticatedAdminTenantsRoute: typeof AuthenticatedAdminTenantsRouteWithChildren
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSubscriptionsRoute: AuthenticatedAdminSubscriptionsRoute,
+  AuthenticatedAdminSystemRoute: AuthenticatedAdminSystemRoute,
   AuthenticatedAdminTenantsRoute: AuthenticatedAdminTenantsRouteWithChildren,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
