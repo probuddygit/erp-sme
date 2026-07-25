@@ -61,7 +61,7 @@ export function useAttachments(entityType: EntityType, entityId: string | null |
         .eq("entity_id", entityId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as AttachmentRow[];
+      return ((data ?? []) as unknown) as AttachmentRow[];
     },
   });
 }
@@ -81,7 +81,9 @@ export function useAttachmentCounts(entityType: EntityType, entityIds: string[])
         .in("entity_id", ids);
       if (error) throw error;
       const map: Record<string, number> = {};
-      for (const r of data ?? []) map[r.entity_id] = (map[r.entity_id] ?? 0) + 1;
+      for (const r of (data ?? []) as unknown as { entity_id: string }[]) {
+        map[r.entity_id] = (map[r.entity_id] ?? 0) + 1;
+      }
       return map;
     },
   });
