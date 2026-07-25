@@ -367,7 +367,7 @@ export function useSaveGRN() {
         await supabase.from("grn_items").delete().eq("grn_id", id);
       } else {
         const grn_number = await nextNumber(companyId, "GRN");
-        const { data, error } = await supabase.from("grns" as any).insert({ ...header, grn_number, created_by: profile!.id } as any).select("id").single();
+        const { data, error } = await supabase.from("grns" as any).insert({ ...header, grn_number, created_by: profile!.id } as any).select("id").single() as any;
         if (error) throw error;
         id = data.id;
       }
@@ -555,7 +555,7 @@ export function useSaveVendorReturn() {
         await supabase.from("vendor_return_items" as any).delete().eq("vret_id", id);
       } else {
         const vret_number = await nextNumber(companyId, "VRET");
-        const { data, error } = await supabase.from("vendor_returns" as any).insert({ ...header, vret_number, created_by: profile!.id } as any).select("id").single();
+        const { data, error } = await supabase.from("vendor_returns" as any).insert({ ...header, vret_number, created_by: profile!.id } as any).select("id").single() as any;
         if (error) throw error;
         id = data.id;
       }
