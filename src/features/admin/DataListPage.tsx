@@ -15,7 +15,7 @@ export interface Column<T> {
 interface Props<T> {
   columns: Column<T>[];
   rows: T[];
-  searchKeys?: (keyof T)[];
+  searchKeys?: string[];
   actionLabel?: string;
   onAction?: () => void;
   extraActions?: ReactNode;
