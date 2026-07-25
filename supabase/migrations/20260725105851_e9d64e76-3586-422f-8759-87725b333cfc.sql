@@ -1,0 +1,1 @@
+ALTER TABLE public.grns ALTER COLUMN po_id DROP NOT NULL;
