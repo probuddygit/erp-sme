@@ -140,13 +140,17 @@ import { Route as AuthenticatedWorkspaceCrmContactsRouteImport } from './routes/
 import { Route as AuthenticatedWorkspaceCrmActivitiesRouteImport } from './routes/_authenticated.workspace.crm.activities'
 import { Route as AuthenticatedWorkspaceCrmAccountsRouteImport } from './routes/_authenticated.workspace.crm.accounts'
 import { Route as AuthenticatedWorkspaceAdministrationWorkflowSettingsRouteImport } from './routes/_authenticated.workspace.administration.workflow-settings'
+import { Route as AuthenticatedWorkspaceAdministrationWhatsappRouteImport } from './routes/_authenticated.workspace.administration.whatsapp'
 import { Route as AuthenticatedWorkspaceAdministrationUsersRouteImport } from './routes/_authenticated.workspace.administration.users'
 import { Route as AuthenticatedWorkspaceAdministrationTeamsRouteImport } from './routes/_authenticated.workspace.administration.teams'
+import { Route as AuthenticatedWorkspaceAdministrationSmsRouteImport } from './routes/_authenticated.workspace.administration.sms'
 import { Route as AuthenticatedWorkspaceAdministrationRolesRouteImport } from './routes/_authenticated.workspace.administration.roles'
 import { Route as AuthenticatedWorkspaceAdministrationPermissionsRouteImport } from './routes/_authenticated.workspace.administration.permissions'
 import { Route as AuthenticatedWorkspaceAdministrationOrganizationRouteImport } from './routes/_authenticated.workspace.administration.organization'
 import { Route as AuthenticatedWorkspaceAdministrationNotificationsRouteImport } from './routes/_authenticated.workspace.administration.notifications'
+import { Route as AuthenticatedWorkspaceAdministrationIntegrationsRouteImport } from './routes/_authenticated.workspace.administration.integrations'
 import { Route as AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport } from './routes/_authenticated.workspace.administration.financial-years'
+import { Route as AuthenticatedWorkspaceAdministrationEmailSettingsRouteImport } from './routes/_authenticated.workspace.administration.email-settings'
 import { Route as AuthenticatedWorkspaceAdministrationDocumentNumberingRouteImport } from './routes/_authenticated.workspace.administration.document-numbering'
 import { Route as AuthenticatedWorkspaceAdministrationDesignationsRouteImport } from './routes/_authenticated.workspace.administration.designations'
 import { Route as AuthenticatedWorkspaceAdministrationDepartmentsRouteImport } from './routes/_authenticated.workspace.administration.departments'
@@ -155,6 +159,7 @@ import { Route as AuthenticatedWorkspaceAdministrationCompaniesRouteImport } fro
 import { Route as AuthenticatedWorkspaceAdministrationBranchesRouteImport } from './routes/_authenticated.workspace.administration.branches'
 import { Route as AuthenticatedWorkspaceAdministrationAuditLogsRouteImport } from './routes/_authenticated.workspace.administration.audit-logs'
 import { Route as AuthenticatedWorkspaceAdministrationApprovalMatrixRouteImport } from './routes/_authenticated.workspace.administration.approval-matrix'
+import { Route as AuthenticatedWorkspaceAdministrationApiKeysRouteImport } from './routes/_authenticated.workspace.administration.api-keys'
 import { Route as AuthenticatedWorkspaceAdministrationActivityLogsRouteImport } from './routes/_authenticated.workspace.administration.activity-logs'
 import { Route as AuthenticatedAppSalesReturnsRouteImport } from './routes/_authenticated.app.sales.returns'
 import { Route as AuthenticatedAppSalesRecurringRouteImport } from './routes/_authenticated.app.sales.recurring'
@@ -958,6 +963,12 @@ const AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute =
     path: '/workflow-settings',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
+const AuthenticatedWorkspaceAdministrationWhatsappRoute =
+  AuthenticatedWorkspaceAdministrationWhatsappRouteImport.update({
+    id: '/whatsapp',
+    path: '/whatsapp',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
 const AuthenticatedWorkspaceAdministrationUsersRoute =
   AuthenticatedWorkspaceAdministrationUsersRouteImport.update({
     id: '/users',
@@ -968,6 +979,12 @@ const AuthenticatedWorkspaceAdministrationTeamsRoute =
   AuthenticatedWorkspaceAdministrationTeamsRouteImport.update({
     id: '/teams',
     path: '/teams',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
+const AuthenticatedWorkspaceAdministrationSmsRoute =
+  AuthenticatedWorkspaceAdministrationSmsRouteImport.update({
+    id: '/sms',
+    path: '/sms',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
 const AuthenticatedWorkspaceAdministrationRolesRoute =
@@ -994,10 +1011,22 @@ const AuthenticatedWorkspaceAdministrationNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
+const AuthenticatedWorkspaceAdministrationIntegrationsRoute =
+  AuthenticatedWorkspaceAdministrationIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
 const AuthenticatedWorkspaceAdministrationFinancialYearsRoute =
   AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport.update({
     id: '/financial-years',
     path: '/financial-years',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
+const AuthenticatedWorkspaceAdministrationEmailSettingsRoute =
+  AuthenticatedWorkspaceAdministrationEmailSettingsRouteImport.update({
+    id: '/email-settings',
+    path: '/email-settings',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
 const AuthenticatedWorkspaceAdministrationDocumentNumberingRoute =
@@ -1046,6 +1075,12 @@ const AuthenticatedWorkspaceAdministrationApprovalMatrixRoute =
   AuthenticatedWorkspaceAdministrationApprovalMatrixRouteImport.update({
     id: '/approval-matrix',
     path: '/approval-matrix',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
+const AuthenticatedWorkspaceAdministrationApiKeysRoute =
+  AuthenticatedWorkspaceAdministrationApiKeysRouteImport.update({
+    id: '/api-keys',
+    path: '/api-keys',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
 const AuthenticatedWorkspaceAdministrationActivityLogsRoute =
@@ -1411,6 +1446,7 @@ export interface FileRoutesByFullPath {
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/workspace/administration/activity-logs': typeof AuthenticatedWorkspaceAdministrationActivityLogsRoute
+  '/workspace/administration/api-keys': typeof AuthenticatedWorkspaceAdministrationApiKeysRoute
   '/workspace/administration/approval-matrix': typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRoute
   '/workspace/administration/audit-logs': typeof AuthenticatedWorkspaceAdministrationAuditLogsRoute
   '/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
@@ -1419,13 +1455,17 @@ export interface FileRoutesByFullPath {
   '/workspace/administration/departments': typeof AuthenticatedWorkspaceAdministrationDepartmentsRoute
   '/workspace/administration/designations': typeof AuthenticatedWorkspaceAdministrationDesignationsRoute
   '/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
+  '/workspace/administration/email-settings': typeof AuthenticatedWorkspaceAdministrationEmailSettingsRoute
   '/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/workspace/administration/integrations': typeof AuthenticatedWorkspaceAdministrationIntegrationsRoute
   '/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
   '/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/workspace/administration/permissions': typeof AuthenticatedWorkspaceAdministrationPermissionsRoute
   '/workspace/administration/roles': typeof AuthenticatedWorkspaceAdministrationRolesRoute
+  '/workspace/administration/sms': typeof AuthenticatedWorkspaceAdministrationSmsRoute
   '/workspace/administration/teams': typeof AuthenticatedWorkspaceAdministrationTeamsRoute
   '/workspace/administration/users': typeof AuthenticatedWorkspaceAdministrationUsersRoute
+  '/workspace/administration/whatsapp': typeof AuthenticatedWorkspaceAdministrationWhatsappRoute
   '/workspace/administration/workflow-settings': typeof AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute
   '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
@@ -1582,6 +1622,7 @@ export interface FileRoutesByTo {
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/workspace/administration/activity-logs': typeof AuthenticatedWorkspaceAdministrationActivityLogsRoute
+  '/workspace/administration/api-keys': typeof AuthenticatedWorkspaceAdministrationApiKeysRoute
   '/workspace/administration/approval-matrix': typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRoute
   '/workspace/administration/audit-logs': typeof AuthenticatedWorkspaceAdministrationAuditLogsRoute
   '/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
@@ -1590,13 +1631,17 @@ export interface FileRoutesByTo {
   '/workspace/administration/departments': typeof AuthenticatedWorkspaceAdministrationDepartmentsRoute
   '/workspace/administration/designations': typeof AuthenticatedWorkspaceAdministrationDesignationsRoute
   '/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
+  '/workspace/administration/email-settings': typeof AuthenticatedWorkspaceAdministrationEmailSettingsRoute
   '/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/workspace/administration/integrations': typeof AuthenticatedWorkspaceAdministrationIntegrationsRoute
   '/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
   '/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/workspace/administration/permissions': typeof AuthenticatedWorkspaceAdministrationPermissionsRoute
   '/workspace/administration/roles': typeof AuthenticatedWorkspaceAdministrationRolesRoute
+  '/workspace/administration/sms': typeof AuthenticatedWorkspaceAdministrationSmsRoute
   '/workspace/administration/teams': typeof AuthenticatedWorkspaceAdministrationTeamsRoute
   '/workspace/administration/users': typeof AuthenticatedWorkspaceAdministrationUsersRoute
+  '/workspace/administration/whatsapp': typeof AuthenticatedWorkspaceAdministrationWhatsappRoute
   '/workspace/administration/workflow-settings': typeof AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute
   '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
@@ -1777,6 +1822,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/_authenticated/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
   '/_authenticated/workspace/administration/activity-logs': typeof AuthenticatedWorkspaceAdministrationActivityLogsRoute
+  '/_authenticated/workspace/administration/api-keys': typeof AuthenticatedWorkspaceAdministrationApiKeysRoute
   '/_authenticated/workspace/administration/approval-matrix': typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRoute
   '/_authenticated/workspace/administration/audit-logs': typeof AuthenticatedWorkspaceAdministrationAuditLogsRoute
   '/_authenticated/workspace/administration/branches': typeof AuthenticatedWorkspaceAdministrationBranchesRoute
@@ -1785,13 +1831,17 @@ export interface FileRoutesById {
   '/_authenticated/workspace/administration/departments': typeof AuthenticatedWorkspaceAdministrationDepartmentsRoute
   '/_authenticated/workspace/administration/designations': typeof AuthenticatedWorkspaceAdministrationDesignationsRoute
   '/_authenticated/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
+  '/_authenticated/workspace/administration/email-settings': typeof AuthenticatedWorkspaceAdministrationEmailSettingsRoute
   '/_authenticated/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/_authenticated/workspace/administration/integrations': typeof AuthenticatedWorkspaceAdministrationIntegrationsRoute
   '/_authenticated/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
   '/_authenticated/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/_authenticated/workspace/administration/permissions': typeof AuthenticatedWorkspaceAdministrationPermissionsRoute
   '/_authenticated/workspace/administration/roles': typeof AuthenticatedWorkspaceAdministrationRolesRoute
+  '/_authenticated/workspace/administration/sms': typeof AuthenticatedWorkspaceAdministrationSmsRoute
   '/_authenticated/workspace/administration/teams': typeof AuthenticatedWorkspaceAdministrationTeamsRoute
   '/_authenticated/workspace/administration/users': typeof AuthenticatedWorkspaceAdministrationUsersRoute
+  '/_authenticated/workspace/administration/whatsapp': typeof AuthenticatedWorkspaceAdministrationWhatsappRoute
   '/_authenticated/workspace/administration/workflow-settings': typeof AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute
   '/_authenticated/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/_authenticated/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
@@ -1972,6 +2022,7 @@ export interface FileRouteTypes {
     | '/app/sales/recurring'
     | '/app/sales/returns'
     | '/workspace/administration/activity-logs'
+    | '/workspace/administration/api-keys'
     | '/workspace/administration/approval-matrix'
     | '/workspace/administration/audit-logs'
     | '/workspace/administration/branches'
@@ -1980,13 +2031,17 @@ export interface FileRouteTypes {
     | '/workspace/administration/departments'
     | '/workspace/administration/designations'
     | '/workspace/administration/document-numbering'
+    | '/workspace/administration/email-settings'
     | '/workspace/administration/financial-years'
+    | '/workspace/administration/integrations'
     | '/workspace/administration/notifications'
     | '/workspace/administration/organization'
     | '/workspace/administration/permissions'
     | '/workspace/administration/roles'
+    | '/workspace/administration/sms'
     | '/workspace/administration/teams'
     | '/workspace/administration/users'
+    | '/workspace/administration/whatsapp'
     | '/workspace/administration/workflow-settings'
     | '/workspace/crm/accounts'
     | '/workspace/crm/activities'
@@ -2143,6 +2198,7 @@ export interface FileRouteTypes {
     | '/app/sales/recurring'
     | '/app/sales/returns'
     | '/workspace/administration/activity-logs'
+    | '/workspace/administration/api-keys'
     | '/workspace/administration/approval-matrix'
     | '/workspace/administration/audit-logs'
     | '/workspace/administration/branches'
@@ -2151,13 +2207,17 @@ export interface FileRouteTypes {
     | '/workspace/administration/departments'
     | '/workspace/administration/designations'
     | '/workspace/administration/document-numbering'
+    | '/workspace/administration/email-settings'
     | '/workspace/administration/financial-years'
+    | '/workspace/administration/integrations'
     | '/workspace/administration/notifications'
     | '/workspace/administration/organization'
     | '/workspace/administration/permissions'
     | '/workspace/administration/roles'
+    | '/workspace/administration/sms'
     | '/workspace/administration/teams'
     | '/workspace/administration/users'
+    | '/workspace/administration/whatsapp'
     | '/workspace/administration/workflow-settings'
     | '/workspace/crm/accounts'
     | '/workspace/crm/activities'
@@ -2337,6 +2397,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/recurring'
     | '/_authenticated/app/sales/returns'
     | '/_authenticated/workspace/administration/activity-logs'
+    | '/_authenticated/workspace/administration/api-keys'
     | '/_authenticated/workspace/administration/approval-matrix'
     | '/_authenticated/workspace/administration/audit-logs'
     | '/_authenticated/workspace/administration/branches'
@@ -2345,13 +2406,17 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/administration/departments'
     | '/_authenticated/workspace/administration/designations'
     | '/_authenticated/workspace/administration/document-numbering'
+    | '/_authenticated/workspace/administration/email-settings'
     | '/_authenticated/workspace/administration/financial-years'
+    | '/_authenticated/workspace/administration/integrations'
     | '/_authenticated/workspace/administration/notifications'
     | '/_authenticated/workspace/administration/organization'
     | '/_authenticated/workspace/administration/permissions'
     | '/_authenticated/workspace/administration/roles'
+    | '/_authenticated/workspace/administration/sms'
     | '/_authenticated/workspace/administration/teams'
     | '/_authenticated/workspace/administration/users'
+    | '/_authenticated/workspace/administration/whatsapp'
     | '/_authenticated/workspace/administration/workflow-settings'
     | '/_authenticated/workspace/crm/accounts'
     | '/_authenticated/workspace/crm/activities'
@@ -3372,6 +3437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationWorkflowSettingsRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
+    '/_authenticated/workspace/administration/whatsapp': {
+      id: '/_authenticated/workspace/administration/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/workspace/administration/whatsapp'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationWhatsappRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
     '/_authenticated/workspace/administration/users': {
       id: '/_authenticated/workspace/administration/users'
       path: '/users'
@@ -3384,6 +3456,13 @@ declare module '@tanstack/react-router' {
       path: '/teams'
       fullPath: '/workspace/administration/teams'
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationTeamsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
+    '/_authenticated/workspace/administration/sms': {
+      id: '/_authenticated/workspace/administration/sms'
+      path: '/sms'
+      fullPath: '/workspace/administration/sms'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationSmsRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
     '/_authenticated/workspace/administration/roles': {
@@ -3414,11 +3493,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationNotificationsRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
+    '/_authenticated/workspace/administration/integrations': {
+      id: '/_authenticated/workspace/administration/integrations'
+      path: '/integrations'
+      fullPath: '/workspace/administration/integrations'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
     '/_authenticated/workspace/administration/financial-years': {
       id: '/_authenticated/workspace/administration/financial-years'
       path: '/financial-years'
       fullPath: '/workspace/administration/financial-years'
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
+    '/_authenticated/workspace/administration/email-settings': {
+      id: '/_authenticated/workspace/administration/email-settings'
+      path: '/email-settings'
+      fullPath: '/workspace/administration/email-settings'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationEmailSettingsRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
     '/_authenticated/workspace/administration/document-numbering': {
@@ -3475,6 +3568,13 @@ declare module '@tanstack/react-router' {
       path: '/approval-matrix'
       fullPath: '/workspace/administration/approval-matrix'
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
+    '/_authenticated/workspace/administration/api-keys': {
+      id: '/_authenticated/workspace/administration/api-keys'
+      path: '/api-keys'
+      fullPath: '/workspace/administration/api-keys'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationApiKeysRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
     '/_authenticated/workspace/administration/activity-logs': {
@@ -4137,6 +4237,7 @@ const AuthenticatedAppRouteWithChildren =
 
 interface AuthenticatedWorkspaceAdministrationRouteChildren {
   AuthenticatedWorkspaceAdministrationActivityLogsRoute: typeof AuthenticatedWorkspaceAdministrationActivityLogsRoute
+  AuthenticatedWorkspaceAdministrationApiKeysRoute: typeof AuthenticatedWorkspaceAdministrationApiKeysRoute
   AuthenticatedWorkspaceAdministrationApprovalMatrixRoute: typeof AuthenticatedWorkspaceAdministrationApprovalMatrixRoute
   AuthenticatedWorkspaceAdministrationAuditLogsRoute: typeof AuthenticatedWorkspaceAdministrationAuditLogsRoute
   AuthenticatedWorkspaceAdministrationBranchesRoute: typeof AuthenticatedWorkspaceAdministrationBranchesRoute
@@ -4145,13 +4246,17 @@ interface AuthenticatedWorkspaceAdministrationRouteChildren {
   AuthenticatedWorkspaceAdministrationDepartmentsRoute: typeof AuthenticatedWorkspaceAdministrationDepartmentsRoute
   AuthenticatedWorkspaceAdministrationDesignationsRoute: typeof AuthenticatedWorkspaceAdministrationDesignationsRoute
   AuthenticatedWorkspaceAdministrationDocumentNumberingRoute: typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
+  AuthenticatedWorkspaceAdministrationEmailSettingsRoute: typeof AuthenticatedWorkspaceAdministrationEmailSettingsRoute
   AuthenticatedWorkspaceAdministrationFinancialYearsRoute: typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  AuthenticatedWorkspaceAdministrationIntegrationsRoute: typeof AuthenticatedWorkspaceAdministrationIntegrationsRoute
   AuthenticatedWorkspaceAdministrationNotificationsRoute: typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
   AuthenticatedWorkspaceAdministrationOrganizationRoute: typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   AuthenticatedWorkspaceAdministrationPermissionsRoute: typeof AuthenticatedWorkspaceAdministrationPermissionsRoute
   AuthenticatedWorkspaceAdministrationRolesRoute: typeof AuthenticatedWorkspaceAdministrationRolesRoute
+  AuthenticatedWorkspaceAdministrationSmsRoute: typeof AuthenticatedWorkspaceAdministrationSmsRoute
   AuthenticatedWorkspaceAdministrationTeamsRoute: typeof AuthenticatedWorkspaceAdministrationTeamsRoute
   AuthenticatedWorkspaceAdministrationUsersRoute: typeof AuthenticatedWorkspaceAdministrationUsersRoute
+  AuthenticatedWorkspaceAdministrationWhatsappRoute: typeof AuthenticatedWorkspaceAdministrationWhatsappRoute
   AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute: typeof AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute
   AuthenticatedWorkspaceAdministrationIndexRoute: typeof AuthenticatedWorkspaceAdministrationIndexRoute
 }
@@ -4160,6 +4265,8 @@ const AuthenticatedWorkspaceAdministrationRouteChildren: AuthenticatedWorkspaceA
   {
     AuthenticatedWorkspaceAdministrationActivityLogsRoute:
       AuthenticatedWorkspaceAdministrationActivityLogsRoute,
+    AuthenticatedWorkspaceAdministrationApiKeysRoute:
+      AuthenticatedWorkspaceAdministrationApiKeysRoute,
     AuthenticatedWorkspaceAdministrationApprovalMatrixRoute:
       AuthenticatedWorkspaceAdministrationApprovalMatrixRoute,
     AuthenticatedWorkspaceAdministrationAuditLogsRoute:
@@ -4176,8 +4283,12 @@ const AuthenticatedWorkspaceAdministrationRouteChildren: AuthenticatedWorkspaceA
       AuthenticatedWorkspaceAdministrationDesignationsRoute,
     AuthenticatedWorkspaceAdministrationDocumentNumberingRoute:
       AuthenticatedWorkspaceAdministrationDocumentNumberingRoute,
+    AuthenticatedWorkspaceAdministrationEmailSettingsRoute:
+      AuthenticatedWorkspaceAdministrationEmailSettingsRoute,
     AuthenticatedWorkspaceAdministrationFinancialYearsRoute:
       AuthenticatedWorkspaceAdministrationFinancialYearsRoute,
+    AuthenticatedWorkspaceAdministrationIntegrationsRoute:
+      AuthenticatedWorkspaceAdministrationIntegrationsRoute,
     AuthenticatedWorkspaceAdministrationNotificationsRoute:
       AuthenticatedWorkspaceAdministrationNotificationsRoute,
     AuthenticatedWorkspaceAdministrationOrganizationRoute:
@@ -4186,10 +4297,14 @@ const AuthenticatedWorkspaceAdministrationRouteChildren: AuthenticatedWorkspaceA
       AuthenticatedWorkspaceAdministrationPermissionsRoute,
     AuthenticatedWorkspaceAdministrationRolesRoute:
       AuthenticatedWorkspaceAdministrationRolesRoute,
+    AuthenticatedWorkspaceAdministrationSmsRoute:
+      AuthenticatedWorkspaceAdministrationSmsRoute,
     AuthenticatedWorkspaceAdministrationTeamsRoute:
       AuthenticatedWorkspaceAdministrationTeamsRoute,
     AuthenticatedWorkspaceAdministrationUsersRoute:
       AuthenticatedWorkspaceAdministrationUsersRoute,
+    AuthenticatedWorkspaceAdministrationWhatsappRoute:
+      AuthenticatedWorkspaceAdministrationWhatsappRoute,
     AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute:
       AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute,
     AuthenticatedWorkspaceAdministrationIndexRoute:
