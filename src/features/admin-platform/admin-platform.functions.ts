@@ -421,7 +421,7 @@ export const updateUserRoles = createServerFn({ method: 'POST' })
 
     const inserts = data.roles.map((role) => ({
       user_id: data.userId,
-      role: role as AppRole,
+      role: role as any,
       company_id: targetCompanyId,
     }));
     const { error } = await admin.from('user_roles').insert(inserts as any);
