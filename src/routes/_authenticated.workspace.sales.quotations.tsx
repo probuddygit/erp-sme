@@ -1,22 +1,85 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
-import { TransactionsPage } from "@/features/sales/components/TransactionsPage";
-import { QUOTATIONS, formatDate } from "@/features/sales/data";
+import { useState } from "react";
+import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
+import { DocumentFormDialog, type DocFormValue } from "@/features/sales/components/DocumentFormDialog";
+import { useQuotations, useSaveQuotation, useDeleteQuotation, type QuotationInput } from "@/features/sales/api";
+import { inr } from "@/lib/sales-utils";
 
 export const Route = createFileRoute("/_authenticated/workspace/sales/quotations")({
-  component: () => (
-    <TransactionsPage
-      title="Quotations"
-      description="Quotations are proposals shared with prospective customers, with tax breakup, approvals and terms."
-      icon={FileText}
-      data={QUOTATIONS}
-      statuses={["draft", "sent", "accepted", "rejected", "expired"]}
-      extraColumns={[
-        {
-          header: "Valid Until",
-          render: (t) => (t.validUntil ? formatDate(t.validUntil) : "—"),
-        },
-      ]}
-    />
-  ),
+  component: QuotationsPage,
 });
+
+function QuotationsPage() {
+  const { data = [], isLoading } = useQuotations();
+  const save = useSaveQuotation();
+  const del = useDeleteQuotation();
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<DocFormValue | null>(null);
+
+  const openNew = () => { setEditing(null); setOpen(true); };
+  const openEdit = (row: any) => {
+    setEditing({
+      id: row.id,
+      customer_id: row.customer_id,
+      primary_date: row.issue_date,
+      secondary_date: row.valid_until,
+      status: row.status,
+      tax_type: row.tax_type,
+      notes: row.notes ?? "",
+      lines: (row.items ?? []).map((i: any) => ({
+        product_name: i.product_name, description: i.description ?? "",
+        quantity: Number(i.quantity), unit_price: Number(i.unit_price),
+        discount_percent: Number(i.discount_percent), tax_percent: Number(i.tax_percent),
+      })),
+    });
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <SalesDocList
+        title="Quotations"
+        description="Proposals shared with prospective customers, with tax breakup and validity."
+        icon={FileText}
+        rows={data as any[]}
+        isLoading={isLoading}
+        searchable={(r: any) => `${r.quotation_number} ${r.customer?.name ?? ""} ${r.status}`}
+        totalOf={(r: any) => Number(r.grand_total ?? 0)}
+        onCreate={openNew}
+        onEdit={openEdit}
+        onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
+        columns={[
+          { header: "Number", cell: (r: any) => <span className="font-medium">{r.quotation_number}</span> },
+          { header: "Customer", cell: (r: any) => r.customer?.name ?? "—" },
+          { header: "Issue Date", cell: (r: any) => fmtDate(r.issue_date) },
+          { header: "Valid Until", cell: (r: any) => fmtDate(r.valid_until) },
+          { header: "Status", cell: (r: any) => <StatusChip value={r.status} tone={toneForStatus(r.status)} /> },
+          { header: "Total", className: "text-right", cell: (r: any) => <span className="tabular-nums">{inr(r.grand_total)}</span> },
+        ]}
+      />
+      <DocumentFormDialog
+        open={open}
+        onOpenChange={setOpen}
+        title={editing?.id ? "Edit Quotation" : "New Quotation"}
+        primaryDateLabel="Issue Date"
+        secondaryDateLabel="Valid Until"
+        statuses={[
+          { value: "draft", label: "Draft" },
+          { value: "sent", label: "Sent" },
+          { value: "accepted", label: "Accepted" },
+          { value: "rejected", label: "Rejected" },
+          { value: "expired", label: "Expired" },
+        ]}
+        initial={editing}
+        onSubmit={async (v) => {
+          const input: QuotationInput = {
+            id: v.id, customer_id: v.customer_id, issue_date: v.primary_date, valid_until: v.secondary_date ?? null,
+            status: v.status as any, tax_type: v.tax_type, notes: v.notes, lines: v.lines,
+          };
+          await save.mutateAsync(input);
+        }}
+      />
+    </>
+  );
+}
