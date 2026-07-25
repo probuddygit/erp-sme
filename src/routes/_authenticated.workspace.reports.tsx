@@ -1,22 +1,27 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { BarChart3 } from "lucide-react";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { PageHeader } from "@/shared/components/PageHeader";
-import { EmptyModule } from "@/shared/components/EmptyModule";
+import { ReportsSidebar } from "@/features/reports/components/ReportsSidebar";
+import { AIInsightsFab } from "@/features/reports/components/AIInsightsPanel";
 
 export const Route = createFileRoute("/_authenticated/workspace/reports")({
-  component: () => (
+  component: ReportsLayout,
+});
+
+function ReportsLayout() {
+  return (
     <div>
       <PageHeader
-        title="Reports"
-        description="Analytics and business intelligence."
+        title="Reports & Business Intelligence"
+        description="Prebuilt reports, dashboards, custom BI and AI-driven insights across every module."
         breadcrumbs={[{ label: "Workspace" }, { label: "Reports" }]}
       />
-      <EmptyModule
-        icon={BarChart3}
-        title="Reports & Analytics"
-        description="Prebuilt operational reports plus custom BI dashboards across every module."
-        features={["Sales analytics", "Inventory ageing", "Financial statements", "Custom dashboards"]}
-      />
+      <div className="flex flex-col gap-6 md:flex-row">
+        <ReportsSidebar />
+        <div className="min-w-0 flex-1">
+          <Outlet />
+        </div>
+      </div>
+      <AIInsightsFab />
     </div>
-  ),
-});
+  );
+}
