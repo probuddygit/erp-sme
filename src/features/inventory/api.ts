@@ -137,6 +137,22 @@ export function useStockLevels() {
 }
 
 // ---------- Stock Transactions (Ledger) ----------
+export interface StockTxnRow {
+  id: string;
+  occurred_at: string;
+  txn_type: StockTxnType;
+  quantity: number;
+  unit_cost: number;
+  total_value: number;
+  reference_type: string | null;
+  reference_id: string | null;
+  notes: string | null;
+  warehouse_id: string;
+  item_id: string;
+  item: { name: string; sku: string } | null;
+  warehouse: { name: string; code: string } | null;
+}
+
 export function useStockTransactions() {
   const { profile } = useAuth();
   return useQuery({
@@ -145,12 +161,29 @@ export function useStockTransactions() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("stock_transactions")
-        .select("*, item:items(name, sku), warehouse:warehouses(name, code)")
+        .select("*")
         .eq("company_id", profile!.company_id!)
         .order("occurred_at", { ascending: false })
         .limit(500);
       if (error) throw error;
-      return data ?? [];
+      const rows = (data ?? []) as any[];
+      const itemIds = Array.from(new Set(rows.map((r) => r.item_id).filter(Boolean)));
+      const whIds = Array.from(new Set(rows.map((r) => r.warehouse_id).filter(Boolean)));
+      const [{ data: items }, { data: whs }] = await Promise.all([
+        itemIds.length
+          ? supabase.from("items").select("id, name, sku").in("id", itemIds)
+          : Promise.resolve({ data: [] as any[] }),
+        whIds.length
+          ? supabase.from("warehouses").select("id, name, code").in("id", whIds)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      const itemMap = new Map((items ?? []).map((i: any) => [i.id, { name: i.name, sku: i.sku }]));
+      const whMap = new Map((whs ?? []).map((w: any) => [w.id, { name: w.name, code: w.code }]));
+      return rows.map((r) => ({
+        ...r,
+        item: itemMap.get(r.item_id) ?? null,
+        warehouse: whMap.get(r.warehouse_id) ?? null,
+      })) as StockTxnRow[];
     },
   });
 }
