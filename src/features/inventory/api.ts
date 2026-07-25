@@ -56,7 +56,7 @@ export function useUpsertItem() {
   return useMutation({
     mutationFn: async (input: ItemInput) => {
       if (!profile?.company_id) throw new Error("No company");
-      const payload = {
+      const payload: any = {
         ...input,
         company_id: profile.company_id,
         created_by: user?.id ?? null,
@@ -67,7 +67,7 @@ export function useUpsertItem() {
         const { error } = await supabase.from("items").update(payload).eq("id", input.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("items").insert(payload);
+        const { error } = await supabase.from("items").insert([payload]);
         if (error) throw error;
       }
     },
@@ -103,12 +103,12 @@ export function useUpsertWarehouse() {
   return useMutation({
     mutationFn: async (input: WarehouseInput) => {
       if (!profile?.company_id) throw new Error("No company");
-      const payload = { ...input, company_id: profile.company_id, is_active: input.is_active ?? true };
+      const payload: any = { ...input, company_id: profile.company_id, is_active: input.is_active ?? true };
       if (input.id) {
         const { error } = await supabase.from("warehouses").update(payload).eq("id", input.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("warehouses").insert(payload);
+        const { error } = await supabase.from("warehouses").insert([payload]);
         if (error) throw error;
       }
     },
