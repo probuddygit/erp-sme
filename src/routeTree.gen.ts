@@ -139,6 +139,7 @@ import { Route as AuthenticatedWorkspaceCrmEmailHistoryRouteImport } from './rou
 import { Route as AuthenticatedWorkspaceCrmContactsRouteImport } from './routes/_authenticated.workspace.crm.contacts'
 import { Route as AuthenticatedWorkspaceCrmActivitiesRouteImport } from './routes/_authenticated.workspace.crm.activities'
 import { Route as AuthenticatedWorkspaceCrmAccountsRouteImport } from './routes/_authenticated.workspace.crm.accounts'
+import { Route as AuthenticatedWorkspaceAdministrationOrganizationRouteImport } from './routes/_authenticated.workspace.administration.organization'
 import { Route as AuthenticatedAppSalesReturnsRouteImport } from './routes/_authenticated.app.sales.returns'
 import { Route as AuthenticatedAppSalesRecurringRouteImport } from './routes/_authenticated.app.sales.recurring'
 import { Route as AuthenticatedAppSalesQuotationsRouteImport } from './routes/_authenticated.app.sales.quotations'
@@ -935,6 +936,12 @@ const AuthenticatedWorkspaceCrmAccountsRoute =
     path: '/accounts',
     getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
   } as any)
+const AuthenticatedWorkspaceAdministrationOrganizationRoute =
+  AuthenticatedWorkspaceAdministrationOrganizationRouteImport.update({
+    id: '/organization',
+    path: '/organization',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
 const AuthenticatedAppSalesReturnsRoute =
   AuthenticatedAppSalesReturnsRouteImport.update({
     id: '/returns',
@@ -1291,6 +1298,7 @@ export interface FileRoutesByFullPath {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
   '/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
@@ -1445,6 +1453,7 @@ export interface FileRoutesByTo {
   '/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
   '/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
@@ -1623,6 +1632,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales/quotations': typeof AuthenticatedAppSalesQuotationsRoute
   '/_authenticated/app/sales/recurring': typeof AuthenticatedAppSalesRecurringRoute
   '/_authenticated/app/sales/returns': typeof AuthenticatedAppSalesReturnsRoute
+  '/_authenticated/workspace/administration/organization': typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   '/_authenticated/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
   '/_authenticated/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
   '/_authenticated/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
@@ -1801,6 +1811,7 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/administration/organization'
     | '/workspace/crm/accounts'
     | '/workspace/crm/activities'
     | '/workspace/crm/contacts'
@@ -1955,6 +1966,7 @@ export interface FileRouteTypes {
     | '/app/sales/quotations'
     | '/app/sales/recurring'
     | '/app/sales/returns'
+    | '/workspace/administration/organization'
     | '/workspace/crm/accounts'
     | '/workspace/crm/activities'
     | '/workspace/crm/contacts'
@@ -2132,6 +2144,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales/quotations'
     | '/_authenticated/app/sales/recurring'
     | '/_authenticated/app/sales/returns'
+    | '/_authenticated/workspace/administration/organization'
     | '/_authenticated/workspace/crm/accounts'
     | '/_authenticated/workspace/crm/activities'
     | '/_authenticated/workspace/crm/contacts'
@@ -3144,6 +3157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceCrmAccountsRouteImport
       parentRoute: typeof AuthenticatedWorkspaceCrmRoute
     }
+    '/_authenticated/workspace/administration/organization': {
+      id: '/_authenticated/workspace/administration/organization'
+      path: '/organization'
+      fullPath: '/workspace/administration/organization'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationOrganizationRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
     '/_authenticated/app/sales/returns': {
       id: '/_authenticated/app/sales/returns'
       path: '/returns'
@@ -3796,11 +3816,14 @@ const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 interface AuthenticatedWorkspaceAdministrationRouteChildren {
+  AuthenticatedWorkspaceAdministrationOrganizationRoute: typeof AuthenticatedWorkspaceAdministrationOrganizationRoute
   AuthenticatedWorkspaceAdministrationIndexRoute: typeof AuthenticatedWorkspaceAdministrationIndexRoute
 }
 
 const AuthenticatedWorkspaceAdministrationRouteChildren: AuthenticatedWorkspaceAdministrationRouteChildren =
   {
+    AuthenticatedWorkspaceAdministrationOrganizationRoute:
+      AuthenticatedWorkspaceAdministrationOrganizationRoute,
     AuthenticatedWorkspaceAdministrationIndexRoute:
       AuthenticatedWorkspaceAdministrationIndexRoute,
   }
