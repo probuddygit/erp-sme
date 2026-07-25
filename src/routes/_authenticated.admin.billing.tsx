@@ -38,7 +38,7 @@ function BillingPage() {
   const [rows, setRows] = useState<any[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
 
   const load = async () => {
@@ -46,7 +46,7 @@ function BillingPage() {
     try {
       const res = await fetchInvoices({
         data: {
-          status: statusFilter as any || undefined,
+          status: statusFilter !== "all" ? (statusFilter as any) : undefined,
           page,
           limit: 20,
         },
@@ -79,10 +79,10 @@ function BillingPage() {
       <div className="flex flex-wrap items-end gap-3">
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v)}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All statuses" />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All statuses</SelectItem>
+            <SelectItem value="all">All statuses</SelectItem>
             {STATUSES.map((s) => (
               <SelectItem key={s} value={s} className="capitalize">
                 {s}
