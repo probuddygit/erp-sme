@@ -1,4 +1,5 @@
-import { Bell, Search, ChevronDown, Menu, LogOut, User } from "lucide-react";
+import { Search, ChevronDown, Menu, LogOut, User } from "lucide-react";
+import { NotificationBell } from "@/features/shared/NotificationBell";
 import { useAuth } from "@/lib/auth-context";
 import { useNavigate } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
@@ -55,9 +56,9 @@ export function TopBar({ onToggleSidebar }: Props) {
         />
       </div>
 
-      <Button variant="ghost" size="icon" className="ml-auto md:ml-0" aria-label="Notifications">
-        <Bell className="h-5 w-5" />
-      </Button>
+      <div className="ml-auto md:ml-0">
+        <NotificationBell />
+      </div>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
