@@ -1,4 +1,96 @@
-# Turn 3 — Procurement wiring + Global Files feature
+# SAP-style End-to-End ERP Integration — 4-turn roadmap
+
+User decisions:
+- Delivery: All three flows in parallel, staged across 4 turns.
+- Approvals: Off by default, per-company toggle in `company_settings`.
+- Notifications: In-app now + Email queue (real email sending activates once domain is verified).
+- e-Invoice / e-Way Bill: Generate + persist compliant JSON payload; no IRP API calls yet.
+
+## Turn 1 — Foundation layer (THIS TURN)
+
+Migration `foundation_integration`:
+1. New enums: `posting_status` (`pending|posted|failed|skipped`), `notif_channel` (`in_app|email|whatsapp|push`), `doc_kind` (all doc-type strings).
+2. Universal columns on every transactional doc table
+   (`quotations`, `sales_orders`, `delivery_notes`, `invoices`, `payments`, `sales_returns`,
+   `purchase_indents`, `rfqs`, `purchase_orders`, `grns`, `vendor_invoices`, `supplier_payments`, `vendor_returns`):
+   `workflow_status text`, `approval_status text default 'not_required'`,
+   `financial_posting_status posting_status default 'pending'`,
+   `inventory_posting_status posting_status default 'pending'`,
+   `gst_status posting_status default 'pending'`,
+   `notification_status posting_status default 'pending'`,
+   `source_doc_kind doc_kind`, `source_doc_id uuid`,
+   `version int default 1`, `modified_by uuid`.
+3. New tables:
+   - `document_comments` (doc_kind, doc_id, author, body, created_at)
+   - `document_events` (doc_kind, doc_id, event, payload, actor, created_at) — event bus for downstream automation
+   - `document_links` (source_kind, source_id, destination_kind, destination_id) — many-to-many traceability
+   - `notifications` (user_id, company_id, channel, subject, body, status, doc_kind, doc_id, sent_at)
+   - `company_settings` (company_id, key, value jsonb) — approval toggles, credit-limit enforcement, etc.
+   - `customer_credit` (customer_id, credit_limit, current_outstanding) — for O2C credit check
+4. Generic PL/pgSQL helpers:
+   - `record_document_event(kind, id, event, payload)` — writes to `document_events`
+   - `link_documents(src_kind, src_id, dst_kind, dst_id)`
+   - `apply_universal_touch()` trigger — bumps `version`, sets `modified_by`
+   - `audit_doc_change()` trigger — writes to existing `audit_logs`
+5. Attach `apply_universal_touch` + `audit_doc_change` triggers to all doc tables.
+
+Shared frontend services (`src/features/shared/`):
+- `useDocumentComments`, `useDocumentEvents`, `useDocumentLinks` — React Query hooks.
+- `DocMetaBadges.tsx` — renders posting-status pills (Financial / Inventory / GST / Notified).
+- `DocHistoryPanel.tsx` — comments + events + audit tail combined.
+- `useCompanySetting(key)` — read/write toggles.
+
+## Turn 2 — Order to Cash (Lead → Cash)
+
+DB triggers (all `SECURITY DEFINER`, idempotent, guarded by posting_status):
+- `tg_so_reserve_stock` — on `sales_orders.status → approved`: inserts negative-quantity rows in a new `stock_reservations` table (item, warehouse, qty, so_id).
+- `tg_dn_issue_stock` — on `delivery_notes.status → dispatched`: calls `post_stock_issue` per line, clears matching reservation, records `document_event('stock_issued')`.
+- `tg_inv_generate_gst_payload` — on `invoices.status → sent`: builds e-Invoice + e-Way Bill JSON, stores in `invoices.einvoice_payload / eway_payload`, flips `gst_status='posted'`.
+- Existing `tg_post_invoice` already writes journal + GST ledger; extend it to flip `financial_posting_status`.
+- `tg_post_payment` already writes journal; extend to update `customer_credit.current_outstanding` and flip statuses.
+- `tg_notify_document_event` — on new `document_events` row: inserts one `notifications` row per subscribed user (channel=in_app; channel=email queued if company_settings.email_enabled).
+
+Frontend:
+- Sales Order approve action → also runs credit-check RPC `check_customer_credit(customer_id, amount)` and shows warning.
+- Delivery Note dispatch button → shows Pick List printable view.
+- Invoice detail page → shows GST-payload preview tab + Financial/Inventory/GST status pills.
+- Payment allocation drawer: split payment across multiple invoices.
+
+## Turn 3 — Procure to Pay
+
+DB triggers:
+- `tg_reorder_to_indent` — low-stock alert (already present) → auto-creates draft `purchase_indent` if `company_settings.auto_reorder_indent=true`.
+- `tg_po_notify` — on `purchase_orders.status → sent`: creates document_event + notification to vendor's email if set.
+- Existing `tg_post_grn` already accrues; extend to flip inventory + financial posting statuses.
+- Existing `tg_post_vinv` handles tax; extend for full AP journal + `vendor_credit` update.
+- `tg_post_sup_payment` already writes journal; extend to update vendor ledger and posting statuses.
+
+Frontend:
+- PO detail page: expected-receipt tracker (GRN progress bar), vendor comparison from RFQ.
+- Vendor Invoice: 3-way match (PO ↔ GRN ↔ Bill) with variance highlighting.
+
+## Turn 4 — Finance / GST / Dashboard / Reports rollup + AI hooks
+
+DB:
+- `mv_dashboard_kpis` materialized view refreshed by triggers on invoice/payment/grn/vinv posting.
+- `gstr1_lines`, `gstr3b_summary` views over `gst_ledger`.
+- `customer_ledger`, `vendor_ledger` views combining invoices + payments.
+- `bank_reconciliation` table + matching RPC.
+
+Frontend:
+- Dashboard KPIs read from `mv_dashboard_kpis` with realtime invalidate on `document_events`.
+- Reports auto-refresh via `postgres_changes` subscription on `document_events` filtered by company.
+- AI Copilot context providers per module (already scaffolded via CopilotFab) — feed live doc summaries.
+- Bank rec screen under Finance.
+
+## Notes / deferred
+- Real email delivery activates when the user configures an email domain (currently: not set up). Until then `notifications.channel='email'` rows queue with status `pending`.
+- e-Invoice IRP integration deferred (payload only, per user choice).
+- WhatsApp / Push channels: schema supports them; wiring later.
+
+---
+
+## Historical — Turn 3 (Procurement + Files) — SHIPPED
 
 ## A. Procurement backend wiring (all 8 doc types)
 
