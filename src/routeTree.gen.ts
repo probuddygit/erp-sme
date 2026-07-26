@@ -158,6 +158,7 @@ import { Route as AuthenticatedWorkspaceAdministrationOrganizationRouteImport } 
 import { Route as AuthenticatedWorkspaceAdministrationNotificationsRouteImport } from './routes/_authenticated.workspace.administration.notifications'
 import { Route as AuthenticatedWorkspaceAdministrationLicenseRouteImport } from './routes/_authenticated.workspace.administration.license'
 import { Route as AuthenticatedWorkspaceAdministrationIntegrationsRouteImport } from './routes/_authenticated.workspace.administration.integrations'
+import { Route as AuthenticatedWorkspaceAdministrationIntegrationTogglesRouteImport } from './routes/_authenticated.workspace.administration.integration-toggles'
 import { Route as AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport } from './routes/_authenticated.workspace.administration.financial-years'
 import { Route as AuthenticatedWorkspaceAdministrationEmailSettingsRouteImport } from './routes/_authenticated.workspace.administration.email-settings'
 import { Route as AuthenticatedWorkspaceAdministrationDocumentNumberingRouteImport } from './routes/_authenticated.workspace.administration.document-numbering'
@@ -1082,6 +1083,12 @@ const AuthenticatedWorkspaceAdministrationIntegrationsRoute =
     path: '/integrations',
     getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
   } as any)
+const AuthenticatedWorkspaceAdministrationIntegrationTogglesRoute =
+  AuthenticatedWorkspaceAdministrationIntegrationTogglesRouteImport.update({
+    id: '/integration-toggles',
+    path: '/integration-toggles',
+    getParentRoute: () => AuthenticatedWorkspaceAdministrationRoute,
+  } as any)
 const AuthenticatedWorkspaceAdministrationFinancialYearsRoute =
   AuthenticatedWorkspaceAdministrationFinancialYearsRouteImport.update({
     id: '/financial-years',
@@ -1541,6 +1548,7 @@ export interface FileRoutesByFullPath {
   '/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
   '/workspace/administration/email-settings': typeof AuthenticatedWorkspaceAdministrationEmailSettingsRoute
   '/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/workspace/administration/integration-toggles': typeof AuthenticatedWorkspaceAdministrationIntegrationTogglesRoute
   '/workspace/administration/integrations': typeof AuthenticatedWorkspaceAdministrationIntegrationsRoute
   '/workspace/administration/license': typeof AuthenticatedWorkspaceAdministrationLicenseRoute
   '/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
@@ -1728,6 +1736,7 @@ export interface FileRoutesByTo {
   '/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
   '/workspace/administration/email-settings': typeof AuthenticatedWorkspaceAdministrationEmailSettingsRoute
   '/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/workspace/administration/integration-toggles': typeof AuthenticatedWorkspaceAdministrationIntegrationTogglesRoute
   '/workspace/administration/integrations': typeof AuthenticatedWorkspaceAdministrationIntegrationsRoute
   '/workspace/administration/license': typeof AuthenticatedWorkspaceAdministrationLicenseRoute
   '/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
@@ -1939,6 +1948,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/administration/document-numbering': typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
   '/_authenticated/workspace/administration/email-settings': typeof AuthenticatedWorkspaceAdministrationEmailSettingsRoute
   '/_authenticated/workspace/administration/financial-years': typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  '/_authenticated/workspace/administration/integration-toggles': typeof AuthenticatedWorkspaceAdministrationIntegrationTogglesRoute
   '/_authenticated/workspace/administration/integrations': typeof AuthenticatedWorkspaceAdministrationIntegrationsRoute
   '/_authenticated/workspace/administration/license': typeof AuthenticatedWorkspaceAdministrationLicenseRoute
   '/_authenticated/workspace/administration/notifications': typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
@@ -2150,6 +2160,7 @@ export interface FileRouteTypes {
     | '/workspace/administration/document-numbering'
     | '/workspace/administration/email-settings'
     | '/workspace/administration/financial-years'
+    | '/workspace/administration/integration-toggles'
     | '/workspace/administration/integrations'
     | '/workspace/administration/license'
     | '/workspace/administration/notifications'
@@ -2337,6 +2348,7 @@ export interface FileRouteTypes {
     | '/workspace/administration/document-numbering'
     | '/workspace/administration/email-settings'
     | '/workspace/administration/financial-years'
+    | '/workspace/administration/integration-toggles'
     | '/workspace/administration/integrations'
     | '/workspace/administration/license'
     | '/workspace/administration/notifications'
@@ -2547,6 +2559,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/administration/document-numbering'
     | '/_authenticated/workspace/administration/email-settings'
     | '/_authenticated/workspace/administration/financial-years'
+    | '/_authenticated/workspace/administration/integration-toggles'
     | '/_authenticated/workspace/administration/integrations'
     | '/_authenticated/workspace/administration/license'
     | '/_authenticated/workspace/administration/notifications'
@@ -3706,6 +3719,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationIntegrationsRouteImport
       parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
     }
+    '/_authenticated/workspace/administration/integration-toggles': {
+      id: '/_authenticated/workspace/administration/integration-toggles'
+      path: '/integration-toggles'
+      fullPath: '/workspace/administration/integration-toggles'
+      preLoaderRoute: typeof AuthenticatedWorkspaceAdministrationIntegrationTogglesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceAdministrationRoute
+    }
     '/_authenticated/workspace/administration/financial-years': {
       id: '/_authenticated/workspace/administration/financial-years'
       path: '/financial-years'
@@ -4493,6 +4513,7 @@ interface AuthenticatedWorkspaceAdministrationRouteChildren {
   AuthenticatedWorkspaceAdministrationDocumentNumberingRoute: typeof AuthenticatedWorkspaceAdministrationDocumentNumberingRoute
   AuthenticatedWorkspaceAdministrationEmailSettingsRoute: typeof AuthenticatedWorkspaceAdministrationEmailSettingsRoute
   AuthenticatedWorkspaceAdministrationFinancialYearsRoute: typeof AuthenticatedWorkspaceAdministrationFinancialYearsRoute
+  AuthenticatedWorkspaceAdministrationIntegrationTogglesRoute: typeof AuthenticatedWorkspaceAdministrationIntegrationTogglesRoute
   AuthenticatedWorkspaceAdministrationIntegrationsRoute: typeof AuthenticatedWorkspaceAdministrationIntegrationsRoute
   AuthenticatedWorkspaceAdministrationLicenseRoute: typeof AuthenticatedWorkspaceAdministrationLicenseRoute
   AuthenticatedWorkspaceAdministrationNotificationsRoute: typeof AuthenticatedWorkspaceAdministrationNotificationsRoute
@@ -4538,6 +4559,8 @@ const AuthenticatedWorkspaceAdministrationRouteChildren: AuthenticatedWorkspaceA
       AuthenticatedWorkspaceAdministrationEmailSettingsRoute,
     AuthenticatedWorkspaceAdministrationFinancialYearsRoute:
       AuthenticatedWorkspaceAdministrationFinancialYearsRoute,
+    AuthenticatedWorkspaceAdministrationIntegrationTogglesRoute:
+      AuthenticatedWorkspaceAdministrationIntegrationTogglesRoute,
     AuthenticatedWorkspaceAdministrationIntegrationsRoute:
       AuthenticatedWorkspaceAdministrationIntegrationsRoute,
     AuthenticatedWorkspaceAdministrationLicenseRoute:
@@ -5024,13 +5047,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

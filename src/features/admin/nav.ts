@@ -35,6 +35,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { key: "workflow-settings", label: "Workflow Settings", to: "/workspace/administration/workflow-settings", icon: Workflow, group: "Automation", description: "Escalation & SLA defaults" },
   { key: "document-numbering", label: "Document Numbering", to: "/workspace/administration/document-numbering", icon: Hash, group: "Automation", description: "Prefixes & running series" },
   { key: "notifications", label: "Notifications", to: "/workspace/administration/notifications", icon: Bell, group: "Automation", description: "Email, SMS, WhatsApp, Push" },
+  { key: "integration-toggles", label: "ERP Integration", to: "/workspace/administration/integration-toggles", icon: Workflow, group: "Automation", description: "Auto-post journals, inventory, GST, e-Invoice" },
 
   { key: "audit-logs", label: "Audit Logs", to: "/workspace/administration/audit-logs", icon: ScrollText, group: "Observability", description: "Changes & deleted records" },
   { key: "activity-logs", label: "Activity Logs", to: "/workspace/administration/activity-logs", icon: Activity, group: "Observability", description: "User activity & API logs" },

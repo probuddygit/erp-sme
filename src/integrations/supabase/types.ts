@@ -667,6 +667,41 @@ export type Database = {
           },
         ]
       }
+      company_settings: {
+        Row: {
+          company_id: string
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          company_id: string
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          company_id?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crm_activities: {
         Row: {
           activity_type: string
@@ -958,6 +993,48 @@ export type Database = {
           },
         ]
       }
+      customer_credit: {
+        Row: {
+          company_id: string
+          credit_limit: number
+          current_outstanding: number
+          customer_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          credit_limit?: number
+          current_outstanding?: number
+          customer_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          credit_limit?: number
+          current_outstanding?: number
+          customer_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_credit_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_credit_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: true
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_pricing_rules: {
         Row: {
           company_id: string
@@ -1100,6 +1177,7 @@ export type Database = {
       }
       delivery_notes: {
         Row: {
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
@@ -1108,14 +1186,30 @@ export type Database = {
           dn_no: string
           driver_name: string | null
           driver_phone: string | null
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           sales_order_id: string | null
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["delivery_note_status"]
           updated_at: string
           vehicle_no: string | null
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
@@ -1124,14 +1218,30 @@ export type Database = {
           dn_no: string
           driver_name?: string | null
           driver_phone?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           sales_order_id?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["delivery_note_status"]
           updated_at?: string
           vehicle_no?: string | null
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
@@ -1140,12 +1250,27 @@ export type Database = {
           dn_no?: string
           driver_name?: string | null
           driver_phone?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           sales_order_id?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["delivery_note_status"]
           updated_at?: string
           vehicle_no?: string | null
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -1167,6 +1292,123 @@ export type Database = {
             columns: ["sales_order_id"]
             isOneToOne: false
             referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_comments: {
+        Row: {
+          author_id: string
+          body: string
+          company_id: string
+          created_at: string
+          doc_id: string
+          doc_kind: Database["public"]["Enums"]["doc_kind"]
+          id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          company_id: string
+          created_at?: string
+          doc_id: string
+          doc_kind: Database["public"]["Enums"]["doc_kind"]
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          company_id?: string
+          created_at?: string
+          doc_id?: string
+          doc_kind?: Database["public"]["Enums"]["doc_kind"]
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_comments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_events: {
+        Row: {
+          actor_id: string | null
+          company_id: string
+          created_at: string
+          doc_id: string
+          doc_kind: Database["public"]["Enums"]["doc_kind"]
+          event: string
+          id: string
+          payload: Json | null
+        }
+        Insert: {
+          actor_id?: string | null
+          company_id: string
+          created_at?: string
+          doc_id: string
+          doc_kind: Database["public"]["Enums"]["doc_kind"]
+          event: string
+          id?: string
+          payload?: Json | null
+        }
+        Update: {
+          actor_id?: string | null
+          company_id?: string
+          created_at?: string
+          doc_id?: string
+          doc_kind?: Database["public"]["Enums"]["doc_kind"]
+          event?: string
+          id?: string
+          payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_links: {
+        Row: {
+          company_id: string
+          created_at: string
+          destination_id: string
+          destination_kind: Database["public"]["Enums"]["doc_kind"]
+          id: string
+          source_id: string
+          source_kind: Database["public"]["Enums"]["doc_kind"]
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          destination_id: string
+          destination_kind: Database["public"]["Enums"]["doc_kind"]
+          id?: string
+          source_id: string
+          source_kind: Database["public"]["Enums"]["doc_kind"]
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          destination_id?: string
+          destination_kind?: Database["public"]["Enums"]["doc_kind"]
+          id?: string
+          source_id?: string
+          source_kind?: Database["public"]["Enums"]["doc_kind"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_links_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -1429,55 +1671,103 @@ export type Database = {
       }
       grns: {
         Row: {
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
           duty: number
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           freight: number
           grn_number: string
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           other_landed: number
           po_id: string | null
           received_date: string
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["grn_status"]
           supplier_id: string
           updated_at: string
+          version: number | null
           warehouse_id: string | null
+          workflow_status: string | null
         }
         Insert: {
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
           duty?: number
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           freight?: number
           grn_number: string
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           other_landed?: number
           po_id?: string | null
           received_date?: string
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["grn_status"]
           supplier_id: string
           updated_at?: string
+          version?: number | null
           warehouse_id?: string | null
+          workflow_status?: string | null
         }
         Update: {
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
           duty?: number
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           freight?: number
           grn_number?: string
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           other_landed?: number
           po_id?: string | null
           received_date?: string
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["grn_status"]
           supplier_id?: string
           updated_at?: string
+          version?: number | null
           warehouse_id?: string | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -1732,6 +2022,7 @@ export type Database = {
         Row: {
           amount_due: number
           amount_paid: number
+          approval_status: string | null
           cgst_total: number
           company_id: string
           created_at: string
@@ -1739,24 +2030,44 @@ export type Database = {
           customer_id: string
           discount_total: number
           due_date: string | null
+          einvoice_irn: string | null
+          einvoice_payload: Json | null
+          eway_bill_no: string | null
+          eway_payload: Json | null
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total: number
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
           igst_total: number
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_date: string
           invoice_number: string
           last_reminder_at: string | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           sales_order_id: string | null
           sgst_total: number
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["invoice_status"]
           subtotal: number
           tax_total: number
           tax_type: Database["public"]["Enums"]["tax_type"]
           updated_at: string
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
           amount_due?: number
           amount_paid?: number
+          approval_status?: string | null
           cgst_total?: number
           company_id: string
           created_at?: string
@@ -1764,24 +2075,44 @@ export type Database = {
           customer_id: string
           discount_total?: number
           due_date?: string | null
+          einvoice_irn?: string | null
+          einvoice_payload?: Json | null
+          eway_bill_no?: string | null
+          eway_payload?: Json | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           igst_total?: number
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_date?: string
           invoice_number: string
           last_reminder_at?: string | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           sales_order_id?: string | null
           sgst_total?: number
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_total?: number
           tax_type?: Database["public"]["Enums"]["tax_type"]
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
           amount_due?: number
           amount_paid?: number
+          approval_status?: string | null
           cgst_total?: number
           company_id?: string
           created_at?: string
@@ -1789,20 +2120,39 @@ export type Database = {
           customer_id?: string
           discount_total?: number
           due_date?: string | null
+          einvoice_irn?: string | null
+          einvoice_payload?: Json | null
+          eway_bill_no?: string | null
+          eway_payload?: Json | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           igst_total?: number
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_date?: string
           invoice_number?: string
           last_reminder_at?: string | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           sales_order_id?: string | null
           sgst_total?: number
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_total?: number
           tax_type?: Database["public"]["Enums"]["tax_type"]
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -2683,6 +3033,62 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          channel: Database["public"]["Enums"]["notif_channel"]
+          company_id: string
+          created_at: string
+          doc_id: string | null
+          doc_kind: Database["public"]["Enums"]["doc_kind"] | null
+          id: string
+          metadata: Json | null
+          read_at: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["notif_status"]
+          subject: string
+          user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          channel?: Database["public"]["Enums"]["notif_channel"]
+          company_id: string
+          created_at?: string
+          doc_id?: string | null
+          doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
+          id?: string
+          metadata?: Json | null
+          read_at?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["notif_status"]
+          subject: string
+          user_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          channel?: Database["public"]["Enums"]["notif_channel"]
+          company_id?: string
+          created_at?: string
+          doc_id?: string | null
+          doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
+          id?: string
+          metadata?: Json | null
+          read_at?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["notif_status"]
+          subject?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string
@@ -2769,39 +3175,87 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_id: string
           method: Database["public"]["Enums"]["payment_method"]
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           payment_date: string
           reference: string | null
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
           amount: number
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_id: string
           method?: Database["public"]["Enums"]["payment_method"]
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           payment_date?: string
           reference?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
           amount?: number
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_id?: string
           method?: Database["public"]["Enums"]["payment_method"]
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           payment_date?: string
           reference?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -3391,40 +3845,88 @@ export type Database = {
       }
       purchase_indents: {
         Row: {
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
           indent_number: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           required_by: string | null
           source: string | null
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["indent_status"]
           updated_at: string
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           indent_number: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           required_by?: string | null
           source?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["indent_status"]
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           indent_number?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           required_by?: string | null
           source?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["indent_status"]
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: []
       }
@@ -3495,71 +3997,119 @@ export type Database = {
         Row: {
           approval_level: number
           approval_notes: string | null
+          approval_status: string | null
           approved_at: string | null
           approved_by: string | null
           company_id: string
           created_at: string
           created_by: string | null
           expected_date: string | null
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           freight: number
           grand_total: number
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
           indent_id: string | null
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           order_date: string
           po_number: string
           rfq_id: string | null
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["po_status"]
           subtotal: number
           supplier_id: string
           tax_total: number
           updated_at: string
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
           approval_level?: number
           approval_notes?: string | null
+          approval_status?: string | null
           approved_at?: string | null
           approved_by?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
           expected_date?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           freight?: number
           grand_total?: number
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           indent_id?: string | null
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           order_date?: string
           po_number: string
           rfq_id?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["po_status"]
           subtotal?: number
           supplier_id: string
           tax_total?: number
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
           approval_level?: number
           approval_notes?: string | null
+          approval_status?: string | null
           approved_at?: string | null
           approved_by?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
           expected_date?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           freight?: number
           grand_total?: number
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           indent_id?: string | null
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           order_date?: string
           po_number?: string
           rfq_id?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["po_status"]
           subtotal?: number
           supplier_id?: string
           tax_total?: number
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -3756,61 +4306,109 @@ export type Database = {
       }
       quotations: {
         Row: {
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
           customer_id: string
           discount_total: number
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total: number
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           issue_date: string
           lead_id: string | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           quotation_number: string
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["quotation_status"]
           subtotal: number
           tax_total: number
           tax_type: Database["public"]["Enums"]["tax_type"]
           updated_at: string
           valid_until: string | null
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
           customer_id: string
           discount_total?: number
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           issue_date?: string
           lead_id?: string | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           quotation_number: string
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["quotation_status"]
           subtotal?: number
           tax_total?: number
           tax_type?: Database["public"]["Enums"]["tax_type"]
           updated_at?: string
           valid_until?: string | null
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
           customer_id?: string
           discount_total?: number
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           issue_date?: string
           lead_id?: string | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           quotation_number?: string
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["quotation_status"]
           subtotal?: number
           tax_total?: number
           tax_type?: Database["public"]["Enums"]["tax_type"]
           updated_at?: string
           valid_until?: string | null
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -4003,43 +4601,91 @@ export type Database = {
       }
       rfqs: {
         Row: {
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
           due_date: string | null
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
           indent_id: string | null
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           issue_date: string
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           rfq_number: string
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["rfq_status"]
           updated_at: string
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
           due_date?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           indent_id?: string | null
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           issue_date?: string
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           rfq_number: string
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["rfq_status"]
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
           due_date?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           indent_id?: string | null
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           issue_date?: string
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           rfq_number?: string
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["rfq_status"]
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -4187,6 +4833,7 @@ export type Database = {
       sales_orders: {
         Row: {
           approval_notes: string | null
+          approval_status: string | null
           approved_at: string | null
           approved_by: string | null
           company_id: string
@@ -4195,20 +4842,36 @@ export type Database = {
           customer_id: string
           delivery_date: string | null
           discount_total: number
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total: number
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           order_date: string
           order_number: string
           quotation_id: string | null
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["sales_order_status"]
           subtotal: number
           tax_total: number
           tax_type: Database["public"]["Enums"]["tax_type"]
           updated_at: string
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
           approval_notes?: string | null
+          approval_status?: string | null
           approved_at?: string | null
           approved_by?: string | null
           company_id: string
@@ -4217,20 +4880,36 @@ export type Database = {
           customer_id: string
           delivery_date?: string | null
           discount_total?: number
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           order_date?: string
           order_number: string
           quotation_id?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["sales_order_status"]
           subtotal?: number
           tax_total?: number
           tax_type?: Database["public"]["Enums"]["tax_type"]
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
           approval_notes?: string | null
+          approval_status?: string | null
           approved_at?: string | null
           approved_by?: string | null
           company_id?: string
@@ -4239,17 +4918,32 @@ export type Database = {
           customer_id?: string
           delivery_date?: string | null
           discount_total?: number
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           order_date?: string
           order_number?: string
           quotation_id?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["sales_order_status"]
           subtotal?: number
           tax_total?: number
           tax_type?: Database["public"]["Enums"]["tax_type"]
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -4321,55 +5015,103 @@ export type Database = {
       }
       sales_returns: {
         Row: {
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
           customer_id: string
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_id: string | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           reason: string | null
           return_date: string
           return_no: string
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["sales_return_status"]
           subtotal: number
           tax_amount: number
           total: number
           updated_at: string
+          version: number | null
+          workflow_status: string | null
         }
         Insert: {
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
           customer_id: string
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_id?: string | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           reason?: string | null
           return_date?: string
           return_no: string
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["sales_return_status"]
           subtotal?: number
           tax_amount?: number
           total?: number
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Update: {
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
           customer_id?: string
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_id?: string | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           reason?: string | null
           return_date?: string
           return_no?: string
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["sales_return_status"]
           subtotal?: number
           tax_amount?: number
           total?: number
           updated_at?: string
+          version?: number | null
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -4506,45 +5248,93 @@ export type Database = {
       supplier_payments: {
         Row: {
           amount: number
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           method: Database["public"]["Enums"]["payment_method"]
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           payment_date: string
           payment_number: string
           reference: string | null
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           supplier_id: string
+          version: number | null
           vinv_id: string
+          workflow_status: string | null
         }
         Insert: {
           amount: number
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           method?: Database["public"]["Enums"]["payment_method"]
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           payment_date?: string
           payment_number: string
           reference?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           supplier_id: string
+          version?: number | null
           vinv_id: string
+          workflow_status?: string | null
         }
         Update: {
           amount?: number
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           method?: Database["public"]["Enums"]["payment_method"]
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           payment_date?: string
           payment_number?: string
           reference?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           supplier_id?: string
+          version?: number | null
           vinv_id?: string
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -4846,71 +5636,119 @@ export type Database = {
         Row: {
           amount_due: number
           amount_paid: number
+          approval_status: string | null
           company_id: string
           created_at: string
           created_by: string | null
           due_date: string | null
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total: number
           grn_id: string | null
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_date: string
           match_notes: string | null
           match_status: string
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           po_id: string | null
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: Database["public"]["Enums"]["vinv_status"]
           subtotal: number
           supplier_id: string
           supplier_invoice_no: string | null
           tax_total: number
           updated_at: string
+          version: number | null
           vinv_number: string
+          workflow_status: string | null
         }
         Insert: {
           amount_due?: number
           amount_paid?: number
+          approval_status?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
           due_date?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
           grn_id?: string | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_date?: string
           match_notes?: string | null
           match_status?: string
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           po_id?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["vinv_status"]
           subtotal?: number
           supplier_id: string
           supplier_invoice_no?: string | null
           tax_total?: number
           updated_at?: string
+          version?: number | null
           vinv_number: string
+          workflow_status?: string | null
         }
         Update: {
           amount_due?: number
           amount_paid?: number
+          approval_status?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
           due_date?: string | null
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
           grn_id?: string | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           invoice_date?: string
           match_notes?: string | null
           match_status?: string
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           po_id?: string | null
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: Database["public"]["Enums"]["vinv_status"]
           subtotal?: number
           supplier_id?: string
           supplier_invoice_no?: string | null
           tax_total?: number
           updated_at?: string
+          version?: number | null
           vinv_number?: string
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -5011,67 +5849,115 @@ export type Database = {
       }
       vendor_returns: {
         Row: {
+          approval_status: string | null
           cgst_total: number
           company_id: string
           created_at: string
           created_by: string | null
           discount_total: number
+          financial_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total: number
           grn_id: string | null
+          gst_status: Database["public"]["Enums"]["posting_status"] | null
           id: string
           igst_total: number
+          inventory_posting_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by: string | null
           notes: string | null
+          notification_status:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           reason: string | null
           return_date: string
           sgst_total: number
+          source_doc_id: string | null
+          source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
           status: string
           subtotal: number
           supplier_id: string | null
           tax_total: number
           updated_at: string
+          version: number | null
           vret_number: string
+          workflow_status: string | null
         }
         Insert: {
+          approval_status?: string | null
           cgst_total?: number
           company_id: string
           created_at?: string
           created_by?: string | null
           discount_total?: number
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
           grn_id?: string | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           igst_total?: number
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           reason?: string | null
           return_date?: string
           sgst_total?: number
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: string
           subtotal?: number
           supplier_id?: string | null
           tax_total?: number
           updated_at?: string
+          version?: number | null
           vret_number: string
+          workflow_status?: string | null
         }
         Update: {
+          approval_status?: string | null
           cgst_total?: number
           company_id?: string
           created_at?: string
           created_by?: string | null
           discount_total?: number
+          financial_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           grand_total?: number
           grn_id?: string | null
+          gst_status?: Database["public"]["Enums"]["posting_status"] | null
           id?: string
           igst_total?: number
+          inventory_posting_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
+          modified_by?: string | null
           notes?: string | null
+          notification_status?:
+            | Database["public"]["Enums"]["posting_status"]
+            | null
           reason?: string | null
           return_date?: string
           sgst_total?: number
+          source_doc_id?: string | null
+          source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
           status?: string
           subtotal?: number
           supplier_id?: string | null
           tax_total?: number
           updated_at?: string
+          version?: number | null
           vret_number?: string
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -5242,6 +6128,10 @@ export type Database = {
           unit: string
         }[]
       }
+      get_company_setting: {
+        Args: { _company_id: string; _key: string }
+        Returns: Json
+      }
       get_user_company: { Args: { _user_id: string }; Returns: string }
       has_company_role: {
         Args: {
@@ -5283,6 +6173,16 @@ export type Database = {
           value: number
           warehouse_id: string
         }[]
+      }
+      link_documents: {
+        Args: {
+          _company_id: string
+          _dst_id: string
+          _dst_kind: Database["public"]["Enums"]["doc_kind"]
+          _src_id: string
+          _src_kind: Database["public"]["Enums"]["doc_kind"]
+        }
+        Returns: undefined
       }
       log_platform_audit: {
         Args: {
@@ -5352,6 +6252,16 @@ export type Database = {
         }
         Returns: string
       }
+      record_document_event: {
+        Args: {
+          _company_id: string
+          _event: string
+          _id: string
+          _kind: Database["public"]["Enums"]["doc_kind"]
+          _payload?: Json
+        }
+        Returns: string
+      }
       seed_chart_of_accounts: {
         Args: { _company_id: string }
         Returns: undefined
@@ -5402,6 +6312,24 @@ export type Database = {
         | "week_off"
       bom_status: "draft" | "active" | "archived"
       delivery_note_status: "draft" | "dispatched" | "delivered" | "cancelled"
+      doc_kind:
+        | "quotation"
+        | "sales_order"
+        | "delivery_note"
+        | "invoice"
+        | "payment"
+        | "sales_return"
+        | "purchase_indent"
+        | "rfq"
+        | "purchase_order"
+        | "grn"
+        | "vendor_invoice"
+        | "supplier_payment"
+        | "vendor_return"
+        | "journal_entry"
+        | "stock_transaction"
+        | "work_order"
+        | "maintenance_ticket"
       downtime_reason:
         | "mechanical_failure"
         | "electrical_failure"
@@ -5457,6 +6385,8 @@ export type Database = {
       maintenance_type: "preventive" | "breakdown" | "corrective" | "inspection"
       ncr_severity: "minor" | "major" | "critical"
       ncr_status: "open" | "investigating" | "resolved" | "closed"
+      notif_channel: "in_app" | "email" | "whatsapp" | "push"
+      notif_status: "pending" | "sent" | "failed" | "read"
       payment_method:
         | "cash"
         | "bank_transfer"
@@ -5476,6 +6406,12 @@ export type Database = {
         | "received"
         | "closed"
         | "cancelled"
+      posting_status:
+        | "pending"
+        | "posted"
+        | "failed"
+        | "skipped"
+        | "not_applicable"
       production_log_event:
         | "created"
         | "released"
@@ -5705,6 +6641,25 @@ export const Constants = {
       ],
       bom_status: ["draft", "active", "archived"],
       delivery_note_status: ["draft", "dispatched", "delivered", "cancelled"],
+      doc_kind: [
+        "quotation",
+        "sales_order",
+        "delivery_note",
+        "invoice",
+        "payment",
+        "sales_return",
+        "purchase_indent",
+        "rfq",
+        "purchase_order",
+        "grn",
+        "vendor_invoice",
+        "supplier_payment",
+        "vendor_return",
+        "journal_entry",
+        "stock_transaction",
+        "work_order",
+        "maintenance_ticket",
+      ],
       downtime_reason: [
         "mechanical_failure",
         "electrical_failure",
@@ -5766,6 +6721,8 @@ export const Constants = {
       maintenance_type: ["preventive", "breakdown", "corrective", "inspection"],
       ncr_severity: ["minor", "major", "critical"],
       ncr_status: ["open", "investigating", "resolved", "closed"],
+      notif_channel: ["in_app", "email", "whatsapp", "push"],
+      notif_status: ["pending", "sent", "failed", "read"],
       payment_method: [
         "cash",
         "bank_transfer",
@@ -5786,6 +6743,13 @@ export const Constants = {
         "received",
         "closed",
         "cancelled",
+      ],
+      posting_status: [
+        "pending",
+        "posted",
+        "failed",
+        "skipped",
+        "not_applicable",
       ],
       production_log_event: [
         "created",
