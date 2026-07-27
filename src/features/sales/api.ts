@@ -710,8 +710,9 @@ export function useConvertSoToDeliveryNote() {
         .select("*, items:sales_order_items(*)")
         .eq("id", soId).single();
       if (soErr || !so) throw soErr ?? new Error("SO not found");
-      const { data: items = [] } = await supabase
+      const { data: itemsRes } = await supabase
         .from("items").select("id,name,sku,unit").eq("company_id", companyId);
+      const items = itemsRes ?? [];
       const findItem = (name: string) => items.find((it: any) =>
         it.name?.toLowerCase() === name.toLowerCase() || it.sku?.toLowerCase() === name.toLowerCase());
       const dnLines = (so.items ?? [])
