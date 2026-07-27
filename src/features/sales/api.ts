@@ -633,3 +633,161 @@ export const useDeleteInvoice = () => useDelete("invoices", "invoices", "Invoice
 export const useDeleteDeliveryNote = () => useDelete("delivery_notes", "delivery_notes", "Delivery note");
 export const useDeleteSalesReturn = () => useDelete("sales_returns", "returns", "Return");
 export const useDeletePayment = () => useDelete("payments", "payments", "Payment");
+
+// ---------- Cross-doc conversions (O2C flow) ----------
+async function eventAndLink(companyId: string, src: { kind: any; id: string }, dst: { kind: any; id: string }, event: string, payload: Record<string, unknown> = {}) {
+  try {
+    await supabase.rpc("link_documents", { _company_id: companyId, _src_kind: src.kind, _src_id: src.id, _dst_kind: dst.kind, _dst_id: dst.id });
+    await supabase.rpc("record_document_event", { _company_id: companyId, _kind: src.kind, _id: src.id, _event: event, _payload: payload as never });
+    await supabase.rpc("record_document_event", { _company_id: companyId, _kind: dst.kind, _id: dst.id, _event: "created_from_" + src.kind, _payload: { source_id: src.id } as never });
+  } catch (e) { /* soft-fail: linking is auxiliary */ }
+}
+
+export function useConvertSoToInvoice() {
+  const { profile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (soId: string) => {
+      const companyId = profile!.company_id!;
+      const { data: so, error: soErr } = await supabase
+        .from("sales_orders")
+        .select("*, items:sales_order_items(*)")
+        .eq("id", soId).single();
+      if (soErr || !so) throw soErr ?? new Error("SO not found");
+      const lines = (so.items ?? []).map((i: any) => ({
+        product_name: i.product_name, description: i.description ?? null,
+        quantity: Number(i.quantity), unit_price: Number(i.unit_price),
+        discount_percent: Number(i.discount_percent ?? 0), tax_percent: Number(i.tax_percent ?? 0),
+      }));
+      const totals = computeTotals(lines, so.tax_type as TaxType);
+      const invoice_number = await nextDocNumber(companyId, "INV", "INV");
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: inv, error } = await supabase.from("invoices").insert({
+        company_id: companyId, customer_id: so.customer_id,
+        invoice_number, invoice_date: today,
+        status: "sent" as InvoiceStatus, tax_type: so.tax_type,
+        subtotal: totals.subtotal, discount_total: totals.discount_total,
+        cgst_total: totals.cgst_total, sgst_total: totals.sgst_total, igst_total: totals.igst_total,
+        tax_total: totals.tax_total, grand_total: totals.grand_total, amount_due: totals.grand_total,
+        sales_order_id: soId,
+        source_doc_kind: "sales_order", source_doc_id: soId,
+        created_by: profile!.id,
+      }).select("id").single();
+      if (error) throw error;
+      const rows = lines.map((l, i) => {
+        const c = computeLine(l, so.tax_type as TaxType);
+        return {
+          invoice_id: inv.id, company_id: companyId,
+          product_name: l.product_name, description: l.description,
+          quantity: l.quantity, unit_price: l.unit_price,
+          discount_percent: l.discount_percent, tax_percent: l.tax_percent,
+          cgst_amount: c.cgst_amount, sgst_amount: c.sgst_amount, igst_amount: c.igst_amount,
+          line_total: c.line_total, position: i,
+        };
+      });
+      if (rows.length) await supabase.from("invoice_items").insert(rows);
+      await supabase.from("sales_orders").update({ status: "fulfilled" as SalesOrderStatus }).eq("id", soId);
+      await eventAndLink(companyId, { kind: "sales_order", id: soId }, { kind: "invoice", id: inv.id }, "invoiced");
+      return inv.id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["sales", "invoices"] });
+      qc.invalidateQueries({ queryKey: ["sales", "sales_orders"] });
+      toast.success("Invoice created from sales order");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Convert failed"),
+  });
+}
+
+export function useConvertSoToDeliveryNote() {
+  const { profile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (soId: string) => {
+      const companyId = profile!.company_id!;
+      const { data: so, error: soErr } = await supabase
+        .from("sales_orders")
+        .select("*, items:sales_order_items(*)")
+        .eq("id", soId).single();
+      if (soErr || !so) throw soErr ?? new Error("SO not found");
+      const { data: items = [] } = await supabase
+        .from("items").select("id,name,sku,unit").eq("company_id", companyId);
+      const findItem = (name: string) => items.find((it: any) =>
+        it.name?.toLowerCase() === name.toLowerCase() || it.sku?.toLowerCase() === name.toLowerCase());
+      const dnLines = (so.items ?? [])
+        .map((i: any) => { const m = findItem(i.product_name); return m ? { item_id: m.id, qty: Number(i.quantity), uom: m.unit ?? null } : null; })
+        .filter(Boolean) as any[];
+      if (!dnLines.length) throw new Error("No SO lines matched an item in master. Create items first.");
+      const dn_no = await nextDocNumber(companyId, "DN", "DN");
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: dn, error } = await supabase.from("delivery_notes").insert({
+        company_id: companyId, customer_id: so.customer_id,
+        dn_no, delivery_date: today, status: "dispatched" as DeliveryStatus,
+        sales_order_id: soId,
+        source_doc_kind: "sales_order", source_doc_id: soId,
+        created_by: profile!.id,
+      }).select("id").single();
+      if (error) throw error;
+      await supabase.from("delivery_note_items").insert(dnLines.map((l) => ({ ...l, dn_id: dn.id })));
+      await eventAndLink(companyId, { kind: "sales_order", id: soId }, { kind: "delivery_note", id: dn.id }, "delivered");
+      return dn.id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["sales", "delivery_notes"] });
+      qc.invalidateQueries({ queryKey: ["sales", "sales_orders"] });
+      toast.success("Delivery note created from sales order");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Convert failed"),
+  });
+}
+
+export function useConvertQuotationToSalesOrder() {
+  const { profile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (qId: string) => {
+      const companyId = profile!.company_id!;
+      const { data: q, error: qErr } = await supabase
+        .from("quotations")
+        .select("*, items:quotation_items(*)")
+        .eq("id", qId).single();
+      if (qErr || !q) throw qErr ?? new Error("Quotation not found");
+      const lines = (q.items ?? []).map((i: any) => ({
+        product_name: i.product_name, description: i.description ?? null,
+        quantity: Number(i.quantity), unit_price: Number(i.unit_price),
+        discount_percent: Number(i.discount_percent ?? 0), tax_percent: Number(i.tax_percent ?? 0),
+      }));
+      const totals = computeTotals(lines, q.tax_type as TaxType);
+      const order_number = await nextDocNumber(companyId, "SO", "SO");
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: so, error } = await supabase.from("sales_orders").insert({
+        company_id: companyId, customer_id: q.customer_id,
+        order_number, order_date: today,
+        status: "approved" as SalesOrderStatus, tax_type: q.tax_type,
+        subtotal: totals.subtotal, discount_total: totals.discount_total,
+        tax_total: totals.tax_total, grand_total: totals.grand_total,
+        source_doc_kind: "quotation", source_doc_id: qId,
+        created_by: profile!.id,
+      }).select("id").single();
+      if (error) throw error;
+      const rows = lines.map((l, i) => {
+        const c = computeLine(l, q.tax_type as TaxType);
+        return { sales_order_id: so.id, company_id: companyId,
+          product_name: l.product_name, description: l.description,
+          quantity: l.quantity, unit_price: l.unit_price,
+          discount_percent: l.discount_percent, tax_percent: l.tax_percent,
+          line_total: c.line_total, position: i };
+      });
+      if (rows.length) await supabase.from("sales_order_items").insert(rows);
+      await supabase.from("quotations").update({ status: "accepted" as QuotationStatus }).eq("id", qId);
+      await eventAndLink(companyId, { kind: "quotation", id: qId }, { kind: "sales_order", id: so.id }, "accepted");
+      return so.id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["sales", "sales_orders"] });
+      qc.invalidateQueries({ queryKey: ["sales", "quotations"] });
+      toast.success("Sales order created from quotation");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Convert failed"),
+  });
+}
