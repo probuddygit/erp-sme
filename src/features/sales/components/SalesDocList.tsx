@@ -83,7 +83,7 @@ export function SalesDocList<T extends { id: string }>({
                     <TableHead key={c.header} className={c.className}>{c.header}</TableHead>
                   ))}
                   {entityType && <TableHead className="text-center w-20">Files</TableHead>}
-                  <TableHead className="text-right w-28">Actions</TableHead>
+                  <TableHead className="text-right w-40">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
