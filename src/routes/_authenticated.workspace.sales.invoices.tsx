@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ReceiptText } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { DocumentFormDialog, type DocFormValue } from "@/features/sales/components/DocumentFormDialog";
 import { useInvoices, useSaveInvoice, useDeleteInvoice, type InvoiceInput } from "@/features/sales/api";
+import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
+import { DocMetaBadges } from "@/features/shared/DocMetaBadges";
 import { inr } from "@/lib/sales-utils";
 
 export const Route = createFileRoute("/_authenticated/workspace/sales/invoices")({
@@ -44,12 +47,15 @@ function InvoicesPage() {
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
         canDelete={(r: any) => Number(r.amount_paid ?? 0) === 0}
+        rowExtraActions={(r: any) => <DocHistoryButton kind="invoice" id={r.id} label={r.invoice_number} />}
         columns={[
           { header: "Number", cell: (r: any) => <span className="font-medium">{r.invoice_number}</span> },
           { header: "Customer", cell: (r: any) => r.customer?.name ?? "—" },
+          { header: "Source", cell: (r: any) => r.sales_order_id ? <Badge variant="outline" className="text-[10px]">SO linked</Badge> : "—" },
           { header: "Date", cell: (r: any) => fmtDate(r.invoice_date) },
           { header: "Due", cell: (r: any) => fmtDate(r.due_date) },
           { header: "Status", cell: (r: any) => <StatusChip value={r.status} tone={toneForStatus(r.status)} /> },
+          { header: "Posting", cell: (r: any) => <DocMetaBadges financial={r.financial_posting_status} gst={r.gst_status} /> },
           { header: "Paid", className: "text-right", cell: (r: any) => <span className="tabular-nums text-muted-foreground">{inr(r.amount_paid)}</span> },
           { header: "Total", className: "text-right", cell: (r: any) => <span className="tabular-nums font-medium">{inr(r.grand_total)}</span> },
         ]}

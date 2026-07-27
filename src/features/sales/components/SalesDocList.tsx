@@ -34,11 +34,12 @@ interface Props<T extends { id: string }> {
   canDelete?: (row: T) => boolean;
   headerActions?: React.ReactNode;
   entityType?: EntityType;
+  rowExtraActions?: (row: T) => React.ReactNode;
 }
 
 export function SalesDocList<T extends { id: string }>({
   title, description, icon: Icon, rows, isLoading, searchable, columns,
-  totalOf, onCreate, onEdit, onDelete, canEdit, canDelete, headerActions, entityType,
+  totalOf, onCreate, onEdit, onDelete, canEdit, canDelete, headerActions, entityType, rowExtraActions,
 }: Props<T>) {
   const [q, setQ] = useState("");
 
@@ -82,7 +83,7 @@ export function SalesDocList<T extends { id: string }>({
                     <TableHead key={c.header} className={c.className}>{c.header}</TableHead>
                   ))}
                   {entityType && <TableHead className="text-center w-20">Files</TableHead>}
-                  <TableHead className="text-right w-28">Actions</TableHead>
+                  <TableHead className="text-right w-40">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -102,6 +103,8 @@ export function SalesDocList<T extends { id: string }>({
                         </TableCell>
                       )}
                       <TableCell className="text-right">
+                        <span className="inline-flex items-center gap-0.5">
+                        {rowExtraActions?.(row)}
                         <RowActions
                           onEdit={() => onEdit(row)}
                           onDelete={() => onDelete(row)}
@@ -109,6 +112,7 @@ export function SalesDocList<T extends { id: string }>({
                           canDelete={canDelete ? canDelete(row) : true}
                           label={title.replace(/s$/, "").toLowerCase()}
                         />
+                        </span>
                       </TableCell>
                     </TableRow>
                   ))
