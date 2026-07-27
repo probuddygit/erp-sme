@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, FileQuestion } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { ProcurementFormDialog, type ProcurementFormValue } from "@/features/procurement/components/ProcurementFormDialog";
-import { useIndents, useSaveIndent, useDeleteIndent, type IndentInput } from "@/features/procurement/api";
+import { useIndents, useSaveIndent, useDeleteIndent, useConvertIndentToRFQ, type IndentInput } from "@/features/procurement/api";
+import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
 
 export const Route = createFileRoute("/_authenticated/workspace/procurement/purchase-requests")({
   component: PurchaseRequestsPage,
@@ -13,6 +15,7 @@ function PurchaseRequestsPage() {
   const { data = [], isLoading } = useIndents();
   const save = useSaveIndent();
   const del = useDeleteIndent();
+  const toRfq = useConvertIndentToRFQ();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProcurementFormValue | null>(null);
 
@@ -40,6 +43,14 @@ function PurchaseRequestsPage() {
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
+        rowExtraActions={(r: any) => (
+          <>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Create RFQ" disabled={r.status === "converted" || toRfq.isPending} onClick={() => toRfq.mutate(r.id)}>
+              <FileQuestion className="h-3.5 w-3.5" />
+            </Button>
+            <DocHistoryButton kind="purchase_indent" id={r.id} label={r.indent_number} />
+          </>
+        )}
         columns={[
           { header: "Number", cell: (r: any) => <span className="font-medium">{r.indent_number}</span> },
           { header: "Required by", cell: (r: any) => fmtDate(r.required_by) },
