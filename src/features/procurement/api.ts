@@ -597,3 +597,210 @@ export const useDeleteGRN             = () => useDelete("grns",                "
 export const useDeleteVendorInvoice   = () => useDelete("vendor_invoices",     "vendor_invoices",  "Vendor invoice");
 export const useDeleteVendorPayment   = () => useDelete("supplier_payments",   "vendor_payments",  "Payment");
 export const useDeleteVendorReturn    = () => useDelete("vendor_returns",      "vendor_returns",   "Vendor return");
+
+// ---------- Cross-doc conversions (P2P flow) ----------
+async function eventAndLink(companyId: string, src: { kind: any; id: string }, dst: { kind: any; id: string }, event: string, payload: Record<string, unknown> = {}) {
+  try {
+    await supabase.rpc("link_documents", { _company_id: companyId, _src_kind: src.kind, _src_id: src.id, _dst_kind: dst.kind, _dst_id: dst.id });
+    await supabase.rpc("record_document_event", { _company_id: companyId, _kind: src.kind, _id: src.id, _event: event, _payload: payload as never });
+    await supabase.rpc("record_document_event", { _company_id: companyId, _kind: dst.kind, _id: dst.id, _event: "created_from_" + src.kind, _payload: { source_id: src.id } as never });
+  } catch { /* soft-fail */ }
+}
+
+export function useConvertIndentToRFQ() {
+  const { profile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (indentId: string) => {
+      const companyId = profile!.company_id!;
+      const { data: ind, error } = await supabase.from("purchase_indents").select("*, items:purchase_indent_items(*)").eq("id", indentId).single();
+      if (error || !ind) throw error ?? new Error("Indent not found");
+      const rfq_number = await nextNumber(companyId, "RFQ");
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: rfq, error: rErr } = await supabase.from("rfqs").insert({
+        company_id: companyId, rfq_number, issue_date: today, status: "draft" as any,
+        indent_id: indentId, source_doc_kind: "purchase_indent", source_doc_id: indentId,
+        created_by: profile!.id,
+      } as any).select("id").single();
+      if (rErr) throw rErr;
+      const rows = (ind.items ?? []).map((it: any, i: number) => ({
+        company_id: companyId, rfq_id: rfq.id, item_name: it.item_name, item_code: it.item_code ?? null,
+        unit: it.unit ?? "Nos", quantity: Number(it.quantity), position: i,
+      }));
+      if (rows.length) await supabase.from("rfq_items").insert(rows as any);
+      await supabase.from("purchase_indents").update({ status: "converted" as any }).eq("id", indentId);
+      await eventAndLink(companyId, { kind: "purchase_indent", id: indentId }, { kind: "rfq", id: rfq.id }, "converted_to_rfq");
+      return rfq.id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["procurement", "indents"] });
+      qc.invalidateQueries({ queryKey: ["procurement", "rfqs"] });
+      toast.success("RFQ created from purchase request");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Convert failed"),
+  });
+}
+
+export function useConvertRfqToPO() {
+  const { profile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (rfqId: string) => {
+      const companyId = profile!.company_id!;
+      const { data: rfq, error } = await supabase.from("rfqs").select("*, items:rfq_items(*)").eq("id", rfqId).single();
+      if (error || !rfq) throw error ?? new Error("RFQ not found");
+      const { data: quotes } = await supabase.from("rfq_supplier_quotes").select("*").eq("rfq_id", rfqId);
+      const selected = (quotes ?? []).find((q: any) => q.is_selected) ?? (quotes ?? [])[0];
+      if (!selected) throw new Error("Add at least one vendor quote (mark one as selected) before creating a PO.");
+      const priceByItem = new Map<string, number>();
+      (quotes ?? []).filter((q: any) => q.supplier_id === selected.supplier_id).forEach((q: any) => priceByItem.set(q.rfq_item_id, Number(q.unit_price)));
+      const lines = (rfq.items ?? []).map((it: any) => ({
+        item_name: it.item_name, item_code: it.item_code ?? undefined, unit: it.unit ?? "Nos",
+        quantity: Number(it.quantity), unit_price: priceByItem.get(it.id) ?? 0, tax_percent: 18,
+      }));
+      const totals = computeTotals(lines.map(l => ({ quantity: l.quantity, unit_price: l.unit_price, discount_percent: 0, tax_percent: l.tax_percent })), "intra_state");
+      const po_number = await nextNumber(companyId, "PO");
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: po, error: pErr } = await supabase.from("purchase_orders").insert({
+        company_id: companyId, supplier_id: selected.supplier_id, po_number,
+        order_date: today, status: "draft" as any, rfq_id: rfqId,
+        subtotal: totals.subtotal, tax_total: totals.tax_total, grand_total: totals.grand_total,
+        source_doc_kind: "rfq", source_doc_id: rfqId, created_by: profile!.id,
+      } as any).select("id").single();
+      if (pErr) throw pErr;
+      const rows = lines.map((l, i) => {
+        const c = computeLine({ quantity: l.quantity, unit_price: l.unit_price, discount_percent: 0, tax_percent: l.tax_percent }, "intra_state");
+        return {
+          company_id: companyId, po_id: po.id, item_name: l.item_name, item_code: l.item_code ?? null,
+          unit: l.unit, quantity: l.quantity, unit_price: l.unit_price, tax_percent: l.tax_percent,
+          line_total: c.line_total, position: i,
+        };
+      });
+      if (rows.length) await supabase.from("purchase_order_items").insert(rows as any);
+      await supabase.from("rfqs").update({ status: "closed" as any }).eq("id", rfqId);
+      await eventAndLink(companyId, { kind: "rfq", id: rfqId }, { kind: "purchase_order", id: po.id }, "awarded", { supplier_id: selected.supplier_id });
+      return po.id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["procurement", "purchase_orders"] });
+      qc.invalidateQueries({ queryKey: ["procurement", "rfqs"] });
+      toast.success("Purchase order created from RFQ");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Convert failed"),
+  });
+}
+
+export function useConvertPoToGRN() {
+  const { profile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (poId: string) => {
+      const companyId = profile!.company_id!;
+      const { data: po, error } = await supabase.from("purchase_orders").select("*, items:purchase_order_items(*)").eq("id", poId).single();
+      if (error || !po) throw error ?? new Error("PO not found");
+      const { data: whs } = await supabase.from("warehouses").select("id").eq("company_id", companyId).limit(1);
+      const warehouse_id = whs?.[0]?.id ?? null;
+      const grn_number = await nextNumber(companyId, "GRN");
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: grn, error: gErr } = await supabase.from("grns").insert({
+        company_id: companyId, po_id: poId, supplier_id: po.supplier_id,
+        warehouse_id, received_date: today, status: "draft" as any,
+        grn_number, source_doc_kind: "purchase_order", source_doc_id: poId,
+        created_by: profile!.id,
+      } as any).select("id").single();
+      if (gErr) throw gErr;
+      const rows = (po.items ?? []).map((it: any, i: number) => ({
+        company_id: companyId, grn_id: grn.id, po_item_id: it.id,
+        item_name: it.item_name, unit: it.unit ?? "Nos",
+        quantity: Number(it.quantity) - Number(it.received_quantity ?? 0),
+        unit_cost: Number(it.unit_price), warehouse_id, position: i,
+      })).filter((r: any) => r.quantity > 0);
+      if (rows.length) await supabase.from("grn_items").insert(rows as any);
+      await eventAndLink(companyId, { kind: "purchase_order", id: poId }, { kind: "grn", id: grn.id }, "received");
+      return grn.id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["procurement", "grns"] });
+      qc.invalidateQueries({ queryKey: ["procurement", "purchase_orders"] });
+      toast.success("Draft GRN created from PO — post it to update inventory");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Convert failed"),
+  });
+}
+
+export function useConvertGrnToVInvoice() {
+  const { profile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (grnId: string) => {
+      const companyId = profile!.company_id!;
+      const { data: grn, error } = await supabase.from("grns").select("*, items:grn_items(*)").eq("id", grnId).single();
+      if (error || !grn) throw error ?? new Error("GRN not found");
+      const lines = (grn.items ?? []).map((it: any) => ({
+        item_name: it.item_name, unit: it.unit ?? "Nos",
+        quantity: Number(it.quantity), unit_price: Number(it.unit_cost), tax_percent: 18,
+      }));
+      const totals = computeTotals(lines.map(l => ({ quantity: l.quantity, unit_price: l.unit_price, discount_percent: 0, tax_percent: l.tax_percent })), "intra_state");
+      const vinv_number = await nextNumber(companyId, "VINV");
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: v, error: vErr } = await supabase.from("vendor_invoices").insert({
+        company_id: companyId, supplier_id: grn.supplier_id, po_id: grn.po_id, grn_id: grnId,
+        vinv_number, invoice_date: today, status: "draft" as any,
+        subtotal: totals.subtotal, tax_total: totals.tax_total, grand_total: totals.grand_total,
+        amount_due: totals.grand_total,
+        source_doc_kind: "grn", source_doc_id: grnId, created_by: profile!.id,
+      } as any).select("id").single();
+      if (vErr) throw vErr;
+      const rows = lines.map((l, i) => {
+        const c = computeLine({ quantity: l.quantity, unit_price: l.unit_price, discount_percent: 0, tax_percent: l.tax_percent }, "intra_state");
+        return {
+          company_id: companyId, vinv_id: v.id, item_name: l.item_name, unit: l.unit,
+          quantity: l.quantity, unit_price: l.unit_price, tax_percent: l.tax_percent,
+          line_total: c.line_total, position: i,
+        };
+      });
+      if (rows.length) await supabase.from("vendor_invoice_items").insert(rows as any);
+      await eventAndLink(companyId, { kind: "grn", id: grnId }, { kind: "vendor_invoice", id: v.id }, "invoiced");
+      return v.id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["procurement", "vendor_invoices"] });
+      qc.invalidateQueries({ queryKey: ["procurement", "grns"] });
+      toast.success("Vendor invoice created from GRN");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Convert failed"),
+  });
+}
+
+export function usePayVendorInvoice() {
+  const { profile } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (vinvId: string) => {
+      const companyId = profile!.company_id!;
+      const { data: v, error } = await supabase.from("vendor_invoices").select("*").eq("id", vinvId).single();
+      if (error || !v) throw error ?? new Error("Vendor invoice not found");
+      const due = Number(v.amount_due ?? v.grand_total ?? 0);
+      if (due <= 0) throw new Error("Nothing due on this invoice");
+      const payment_number = await nextNumber(companyId, "PAY");
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: pay, error: pErr } = await supabase.from("supplier_payments").insert({
+        company_id: companyId, supplier_id: v.supplier_id, vinv_id: vinvId,
+        payment_number, payment_date: today, amount: due, method: "bank_transfer" as any,
+        source_doc_kind: "vendor_invoice", source_doc_id: vinvId, created_by: profile!.id,
+      } as any).select("id").single();
+      if (pErr) throw pErr;
+      await supabase.from("vendor_invoices").update({
+        amount_paid: Number(v.amount_paid ?? 0) + due, amount_due: 0, status: "paid" as any,
+      }).eq("id", vinvId);
+      await eventAndLink(companyId, { kind: "vendor_invoice", id: vinvId }, { kind: "supplier_payment", id: pay.id }, "paid", { amount: due });
+      return pay.id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["procurement", "vendor_payments"] });
+      qc.invalidateQueries({ queryKey: ["procurement", "vendor_invoices"] });
+      toast.success("Payment recorded against vendor invoice");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Payment failed"),
+  });
+}
