@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, ReceiptText, Truck } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { DocumentFormDialog, type DocFormValue } from "@/features/sales/components/DocumentFormDialog";
-import { useSalesOrders, useSaveSalesOrder, useDeleteSalesOrder, type SalesOrderInput } from "@/features/sales/api";
+import { useSalesOrders, useSaveSalesOrder, useDeleteSalesOrder, useConvertSoToInvoice, useConvertSoToDeliveryNote, type SalesOrderInput } from "@/features/sales/api";
+import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
 import { inr } from "@/lib/sales-utils";
 
 export const Route = createFileRoute("/_authenticated/workspace/sales/sales-orders")({
@@ -14,6 +16,8 @@ function SalesOrdersPage() {
   const { data = [], isLoading } = useSalesOrders();
   const save = useSaveSalesOrder();
   const del = useDeleteSalesOrder();
+  const toInv = useConvertSoToInvoice();
+  const toDn = useConvertSoToDeliveryNote();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<DocFormValue | null>(null);
 
@@ -43,6 +47,17 @@ function SalesOrdersPage() {
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
+        rowExtraActions={(r: any) => (
+          <>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Create Invoice" disabled={r.status === "fulfilled" || toInv.isPending} onClick={() => toInv.mutate(r.id)}>
+              <ReceiptText className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Create Delivery Note" disabled={toDn.isPending} onClick={() => toDn.mutate(r.id)}>
+              <Truck className="h-3.5 w-3.5" />
+            </Button>
+            <DocHistoryButton kind="sales_order" id={r.id} label={r.order_number} />
+          </>
+        )}
         columns={[
           { header: "Number", cell: (r: any) => <span className="font-medium">{r.order_number}</span> },
           { header: "Customer", cell: (r: any) => r.customer?.name ?? "—" },
