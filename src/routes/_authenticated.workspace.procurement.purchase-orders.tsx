@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, PackageCheck } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { ProcurementFormDialog, type ProcurementFormValue } from "@/features/procurement/components/ProcurementFormDialog";
-import { usePurchaseOrders, useSavePurchaseOrder, useDeletePurchaseOrder, type POInput } from "@/features/procurement/api";
+import { usePurchaseOrders, useSavePurchaseOrder, useDeletePurchaseOrder, useConvertPoToGRN, type POInput } from "@/features/procurement/api";
+import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
+import { DocMetaBadges } from "@/features/shared/DocMetaBadges";
 import { inr } from "@/lib/sales-utils";
 
 export const Route = createFileRoute("/_authenticated/workspace/procurement/purchase-orders")({ component: POPage });
@@ -12,6 +15,7 @@ function POPage() {
   const { data = [], isLoading } = usePurchaseOrders();
   const save = useSavePurchaseOrder();
   const del = useDeletePurchaseOrder();
+  const toGrn = useConvertPoToGRN();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProcurementFormValue | null>(null);
 
@@ -38,12 +42,21 @@ function POPage() {
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
+        rowExtraActions={(r: any) => (
+          <>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Create GRN" disabled={r.status === "closed" || r.status === "cancelled" || toGrn.isPending} onClick={() => toGrn.mutate(r.id)}>
+              <PackageCheck className="h-3.5 w-3.5" />
+            </Button>
+            <DocHistoryButton kind="purchase_order" id={r.id} label={r.po_number} />
+          </>
+        )}
         columns={[
           { header: "Number", cell: (r: any) => <span className="font-medium">{r.po_number}</span> },
           { header: "Supplier", cell: (r: any) => r.supplier?.name ?? "—" },
           { header: "Order date", cell: (r: any) => fmtDate(r.order_date) },
           { header: "Expected", cell: (r: any) => fmtDate(r.expected_date) },
           { header: "Status", cell: (r: any) => <StatusChip value={r.status} tone={toneForStatus(r.status)} /> },
+          { header: "Posting", cell: (r: any) => <DocMetaBadges financial={r.financial_posting_status} inventory={r.inventory_posting_status} /> },
           { header: "Total", className: "text-right", cell: (r: any) => <span className="tabular-nums font-medium">{inr(r.grand_total)}</span> },
         ]}
       />
