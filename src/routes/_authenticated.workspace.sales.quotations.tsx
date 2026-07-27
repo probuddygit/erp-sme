@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FileText } from "lucide-react";
+import { FileText, ClipboardList } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { DocumentFormDialog, type DocFormValue } from "@/features/sales/components/DocumentFormDialog";
-import { useQuotations, useSaveQuotation, useDeleteQuotation, type QuotationInput } from "@/features/sales/api";
+import { useQuotations, useSaveQuotation, useDeleteQuotation, useConvertQuotationToSalesOrder, type QuotationInput } from "@/features/sales/api";
+import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
 import { inr } from "@/lib/sales-utils";
 
 export const Route = createFileRoute("/_authenticated/workspace/sales/quotations")({
@@ -14,6 +16,7 @@ function QuotationsPage() {
   const { data = [], isLoading } = useQuotations();
   const save = useSaveQuotation();
   const del = useDeleteQuotation();
+  const toSo = useConvertQuotationToSalesOrder();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<DocFormValue | null>(null);
 
@@ -49,6 +52,14 @@ function QuotationsPage() {
         onCreate={openNew}
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
+        rowExtraActions={(r: any) => (
+          <>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Convert to Sales Order" disabled={r.status === "accepted" || toSo.isPending} onClick={() => toSo.mutate(r.id)}>
+              <ClipboardList className="h-3.5 w-3.5" />
+            </Button>
+            <DocHistoryButton kind="quotation" id={r.id} label={r.quotation_number} />
+          </>
+        )}
         columns={[
           { header: "Number", cell: (r: any) => <span className="font-medium">{r.quotation_number}</span> },
           { header: "Customer", cell: (r: any) => r.customer?.name ?? "—" },
