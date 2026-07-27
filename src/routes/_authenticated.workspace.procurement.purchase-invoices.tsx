@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ReceiptText } from "lucide-react";
+import { ReceiptText, Wallet } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { ProcurementFormDialog, type ProcurementFormValue } from "@/features/procurement/components/ProcurementFormDialog";
-import { useVendorInvoices, useSaveVendorInvoice, useDeleteVendorInvoice, type VInvInput } from "@/features/procurement/api";
+import { useVendorInvoices, useSaveVendorInvoice, useDeleteVendorInvoice, usePayVendorInvoice, type VInvInput } from "@/features/procurement/api";
+import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
+import { DocMetaBadges } from "@/features/shared/DocMetaBadges";
 import { inr } from "@/lib/sales-utils";
 
 export const Route = createFileRoute("/_authenticated/workspace/procurement/purchase-invoices")({ component: VInvPage });
@@ -12,6 +15,7 @@ function VInvPage() {
   const { data = [], isLoading } = useVendorInvoices();
   const save = useSaveVendorInvoice();
   const del = useDeleteVendorInvoice();
+  const pay = usePayVendorInvoice();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProcurementFormValue | null>(null);
 
@@ -39,12 +43,21 @@ function VInvPage() {
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
         canDelete={(r: any) => Number(r.amount_paid ?? 0) === 0}
+        rowExtraActions={(r: any) => (
+          <>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Record full payment" disabled={Number(r.amount_due ?? 0) <= 0 || pay.isPending} onClick={() => pay.mutate(r.id)}>
+              <Wallet className="h-3.5 w-3.5" />
+            </Button>
+            <DocHistoryButton kind="vendor_invoice" id={r.id} label={r.vinv_number} />
+          </>
+        )}
         columns={[
           { header: "Number", cell: (r: any) => <span className="font-medium">{r.vinv_number}</span> },
           { header: "Supplier", cell: (r: any) => r.supplier?.name ?? "—" },
           { header: "Invoice date", cell: (r: any) => fmtDate(r.invoice_date) },
           { header: "Due", cell: (r: any) => fmtDate(r.due_date) },
           { header: "Status", cell: (r: any) => <StatusChip value={r.status} tone={toneForStatus(r.status)} /> },
+          { header: "Posting", cell: (r: any) => <DocMetaBadges financial={r.financial_posting_status} gst={r.gst_status} /> },
           { header: "Total", className: "text-right", cell: (r: any) => <span className="tabular-nums font-medium">{inr(r.grand_total)}</span> },
         ]}
       />

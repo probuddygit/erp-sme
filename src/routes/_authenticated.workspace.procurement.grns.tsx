@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PackageCheck } from "lucide-react";
+import { PackageCheck, ReceiptText } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { ProcurementFormDialog, type ProcurementFormValue } from "@/features/procurement/components/ProcurementFormDialog";
-import { useGRNs, useSaveGRN, useDeleteGRN, type GRNInput } from "@/features/procurement/api";
+import { useGRNs, useSaveGRN, useDeleteGRN, useConvertGrnToVInvoice, type GRNInput } from "@/features/procurement/api";
+import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
+import { DocMetaBadges } from "@/features/shared/DocMetaBadges";
 
 export const Route = createFileRoute("/_authenticated/workspace/procurement/grns")({ component: GRNsPage });
 
@@ -11,6 +14,7 @@ function GRNsPage() {
   const { data = [], isLoading } = useGRNs();
   const save = useSaveGRN();
   const del = useDeleteGRN();
+  const toVinv = useConvertGrnToVInvoice();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProcurementFormValue | null>(null);
 
@@ -38,12 +42,21 @@ function GRNsPage() {
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
         canDelete={(r: any) => r.status !== "posted"}
+        rowExtraActions={(r: any) => (
+          <>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Create Vendor Invoice" disabled={r.status !== "posted" || toVinv.isPending} onClick={() => toVinv.mutate(r.id)}>
+              <ReceiptText className="h-3.5 w-3.5" />
+            </Button>
+            <DocHistoryButton kind="grn" id={r.id} label={r.grn_number} />
+          </>
+        )}
         columns={[
           { header: "Number", cell: (r: any) => <span className="font-medium">{r.grn_number}</span> },
           { header: "Supplier", cell: (r: any) => r.supplier?.name ?? "—" },
           { header: "PO", cell: (r: any) => r.po?.po_number ?? "—" },
           { header: "Received", cell: (r: any) => fmtDate(r.received_date) },
           { header: "Status", cell: (r: any) => <StatusChip value={r.status} tone={toneForStatus(r.status)} /> },
+          { header: "Posting", cell: (r: any) => <DocMetaBadges inventory={r.inventory_posting_status} /> },
           { header: "Lines", className: "text-right", cell: (r: any) => <span className="tabular-nums text-muted-foreground">{(r.items ?? []).length}</span> },
         ]}
       />
