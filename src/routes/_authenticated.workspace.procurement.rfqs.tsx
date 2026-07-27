@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FileQuestion } from "lucide-react";
+import { FileQuestion, ShoppingCart } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { ProcurementFormDialog, type ProcurementFormValue } from "@/features/procurement/components/ProcurementFormDialog";
-import { useRFQs, useSaveRFQ, useDeleteRFQ, type RFQInput } from "@/features/procurement/api";
+import { useRFQs, useSaveRFQ, useDeleteRFQ, useConvertRfqToPO, type RFQInput } from "@/features/procurement/api";
+import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
 
 export const Route = createFileRoute("/_authenticated/workspace/procurement/rfqs")({ component: RFQsPage });
 
@@ -11,6 +13,7 @@ function RFQsPage() {
   const { data = [], isLoading } = useRFQs();
   const save = useSaveRFQ();
   const del = useDeleteRFQ();
+  const toPo = useConvertRfqToPO();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProcurementFormValue | null>(null);
 
@@ -31,6 +34,14 @@ function RFQsPage() {
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
+        rowExtraActions={(r: any) => (
+          <>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Create Purchase Order" disabled={r.status === "closed" || toPo.isPending} onClick={() => toPo.mutate(r.id)}>
+              <ShoppingCart className="h-3.5 w-3.5" />
+            </Button>
+            <DocHistoryButton kind="rfq" id={r.id} label={r.rfq_number} />
+          </>
+        )}
         columns={[
           { header: "Number", cell: (r: any) => <span className="font-medium">{r.rfq_number}</span> },
           { header: "Issued", cell: (r: any) => fmtDate(r.issue_date) },
