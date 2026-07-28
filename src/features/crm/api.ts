@@ -152,6 +152,23 @@ export function useSaveLead() {
   });
 }
 
+export function useConvertLeadToQuotation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (leadId: string) => {
+      const { data, error } = await supabase.rpc("convert_lead_to_quotation" as never, { _lead_id: leadId } as never);
+      if (error) throw error;
+      return data as unknown as string;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["crm", "leads"] });
+      qc.invalidateQueries({ queryKey: ["sales", "quotations"] });
+      toast.success("Converted to quotation");
+    },
+    onError: (e) => handleError(e, "Conversion failed"),
+  });
+}
+
 // -------- Contacts --------
 export function useContacts() {
   const cid = useCompanyId();

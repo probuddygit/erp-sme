@@ -6118,6 +6118,7 @@ export type Database = {
         }[]
       }
       acct: { Args: { _code: string; _company_id: string }; Returns: string }
+      convert_lead_to_quotation: { Args: { _lead_id: string }; Returns: string }
       explode_bom: {
         Args: { _bom_id: string; _qty: number }
         Returns: {
@@ -6126,6 +6127,14 @@ export type Database = {
           total_cost: number
           total_quantity: number
           unit: string
+        }[]
+      }
+      generate_due_recurring_invoices: {
+        Args: { _company_id?: string }
+        Returns: {
+          invoice_id: string
+          invoice_number: string
+          template_id: string
         }[]
       }
       get_company_setting: {
@@ -6266,6 +6275,7 @@ export type Database = {
         Args: { _company_id: string }
         Returns: undefined
       }
+      sweep_overdue_invoices: { Args: never; Returns: number }
     }
     Enums: {
       account_type: "asset" | "liability" | "equity" | "revenue" | "expense"

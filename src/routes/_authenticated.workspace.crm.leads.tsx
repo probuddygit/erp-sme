@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, FileText } from "lucide-react";
 import { FilterBar } from "@/features/crm/components/FilterBar";
 import { StatusBadge } from "@/features/crm/components/StatusBadge";
 import { FormDialog, Field } from "@/features/crm/components/FormDialog";
 import { RowActions } from "@/components/RowActions";
-import { useLeads, useSaveLead, formatINR, formatDate, type LeadRow } from "@/features/crm/api";
+import { useLeads, useSaveLead, useConvertLeadToQuotation, formatINR, formatDate, type LeadRow } from "@/features/crm/api";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/workspace/crm/leads")({
   component: LeadsPage,
@@ -31,6 +32,8 @@ const emptyLead: Partial<LeadRow> = { title: "", contact_name: "", email: "", ph
 function LeadsPage() {
   const { data: leads = [], isLoading } = useLeads();
   const save = useSaveLead();
+  const convert = useConvertLeadToQuotation();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [source, setSource] = useState("");
@@ -93,13 +96,27 @@ function LeadsPage() {
                       <TableCell><StatusBadge label={LEAD_STATUSES.find((s) => s.key === l.status)?.label ?? l.status} tone={tone} /></TableCell>
                       <TableCell className="text-xs text-muted-foreground">{formatDate(l.expected_close_date)}</TableCell>
                       <TableCell className="text-right">
-                        <RowActions
-                          onEdit={() => setEditing(l)}
-                          table="leads"
-                          id={l.id}
-                          invalidateKeys={[["crm", "leads"]]}
-                          label="lead"
-                        />
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            title="Convert to quotation"
+                            disabled={convert.isPending || l.status === "won" || l.status === "lost"}
+                            onClick={async () => {
+                              await convert.mutateAsync(l.id);
+                              navigate({ to: "/workspace/sales/quotations" });
+                            }}
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                          <RowActions
+                            onEdit={() => setEditing(l)}
+                            table="leads"
+                            id={l.id}
+                            invalidateKeys={[["crm", "leads"]]}
+                            label="lead"
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
