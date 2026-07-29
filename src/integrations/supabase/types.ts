@@ -702,14 +702,112 @@ export type Database = {
           },
         ]
       }
-      crm_activities: {
+      crm_accounts: {
         Row: {
-          activity_type: string
+          billing_address: string | null
           company_id: string
           created_at: string
           created_by: string | null
+          credit_days: number
+          credit_limit: number
+          customer_id: string | null
+          gstin: string | null
+          gstin_legal_name: string | null
+          gstin_verified_at: string | null
+          id: string
+          name: string
+          notes: string | null
+          owner_id: string | null
+          pan: string | null
+          price_list_id: string | null
+          shipping_address: string | null
+          status: string
+          territory: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_address?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          credit_days?: number
+          credit_limit?: number
+          customer_id?: string | null
+          gstin?: string | null
+          gstin_legal_name?: string | null
+          gstin_verified_at?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          owner_id?: string | null
+          pan?: string | null
+          price_list_id?: string | null
+          shipping_address?: string | null
+          status?: string
+          territory?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_address?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          credit_days?: number
+          credit_limit?: number
+          customer_id?: string | null
+          gstin?: string | null
+          gstin_legal_name?: string | null
+          gstin_verified_at?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          owner_id?: string | null
+          pan?: string | null
+          price_list_id?: string | null
+          shipping_address?: string | null
+          status?: string
+          territory?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_accounts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_accounts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_accounts_price_list_id_fkey"
+            columns: ["price_list_id"]
+            isOneToOne: false
+            referencedRelation: "price_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_activities: {
+        Row: {
+          account_id: string | null
+          activity_type: string
+          channel: string | null
+          checked_in: boolean
+          company_id: string
+          created_at: string
+          created_by: string | null
+          due_date: string | null
+          gps_lat: number | null
+          gps_lng: number | null
           id: string
           notes: string | null
+          opportunity_id: string | null
           owner_id: string | null
           related_id: string | null
           related_type: string | null
@@ -719,12 +817,19 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           activity_type?: string
+          channel?: string | null
+          checked_in?: boolean
           company_id: string
           created_at?: string
           created_by?: string | null
+          due_date?: string | null
+          gps_lat?: number | null
+          gps_lng?: number | null
           id?: string
           notes?: string | null
+          opportunity_id?: string | null
           owner_id?: string | null
           related_id?: string | null
           related_type?: string | null
@@ -734,12 +839,19 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           activity_type?: string
+          channel?: string | null
+          checked_in?: boolean
           company_id?: string
           created_at?: string
           created_by?: string | null
+          due_date?: string | null
+          gps_lat?: number | null
+          gps_lng?: number | null
           id?: string
           notes?: string | null
+          opportunity_id?: string | null
           owner_id?: string | null
           related_id?: string | null
           related_type?: string | null
@@ -750,23 +862,42 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "crm_activities_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "crm_accounts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "crm_activities_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "crm_activities_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "crm_opportunities"
+            referencedColumns: ["id"]
+          },
         ]
       }
       crm_contacts: {
         Row: {
+          account_id: string | null
           company_id: string
           created_at: string
           created_by: string | null
           customer_id: string | null
+          designation: string | null
           email: string | null
+          first_name: string | null
           id: string
+          is_primary: boolean
           last_contacted_at: string | null
+          last_name: string | null
           name: string
           notes: string | null
           owner_id: string | null
@@ -774,15 +905,21 @@ export type Database = {
           tags: string[]
           title: string | null
           updated_at: string
+          whatsapp_opt_in: boolean
         }
         Insert: {
+          account_id?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          designation?: string | null
           email?: string | null
+          first_name?: string | null
           id?: string
+          is_primary?: boolean
           last_contacted_at?: string | null
+          last_name?: string | null
           name: string
           notes?: string | null
           owner_id?: string | null
@@ -790,15 +927,21 @@ export type Database = {
           tags?: string[]
           title?: string | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
         }
         Update: {
+          account_id?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          designation?: string | null
           email?: string | null
+          first_name?: string | null
           id?: string
+          is_primary?: boolean
           last_contacted_at?: string | null
+          last_name?: string | null
           name?: string
           notes?: string | null
           owner_id?: string | null
@@ -806,8 +949,16 @@ export type Database = {
           tags?: string[]
           title?: string | null
           updated_at?: string
+          whatsapp_opt_in?: boolean
         }
         Relationships: [
+          {
+            foreignKeyName: "crm_contacts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "crm_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "crm_contacts_company_id_fkey"
             columns: ["company_id"]
@@ -942,6 +1093,145 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_opportunities: {
+        Row: {
+          account_id: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          expected_close: string | null
+          id: string
+          lead_id: string | null
+          lost_reason: string | null
+          name: string
+          notes: string | null
+          owner_id: string | null
+          probability: number
+          quotation_id: string | null
+          stage: string
+          stage_entered_at: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          account_id?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          expected_close?: string | null
+          id?: string
+          lead_id?: string | null
+          lost_reason?: string | null
+          name: string
+          notes?: string | null
+          owner_id?: string | null
+          probability?: number
+          quotation_id?: string | null
+          stage?: string
+          stage_entered_at?: string
+          updated_at?: string
+          value?: number
+        }
+        Update: {
+          account_id?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          expected_close?: string | null
+          id?: string
+          lead_id?: string | null
+          lost_reason?: string | null
+          name?: string
+          notes?: string | null
+          owner_id?: string | null
+          probability?: number
+          quotation_id?: string | null
+          stage?: string
+          stage_entered_at?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_opportunities_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "crm_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_stage_configs: {
+        Row: {
+          aging_threshold_days: number
+          company_id: string
+          created_at: string
+          id: string
+          is_terminal: boolean
+          kind: string
+          label: string
+          sort_order: number
+          stage_key: string
+          tone: string | null
+          updated_at: string
+        }
+        Insert: {
+          aging_threshold_days?: number
+          company_id: string
+          created_at?: string
+          id?: string
+          is_terminal?: boolean
+          kind: string
+          label: string
+          sort_order?: number
+          stage_key: string
+          tone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aging_threshold_days?: number
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_terminal?: boolean
+          kind?: string
+          label?: string
+          sort_order?: number
+          stage_key?: string
+          tone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_stage_configs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -2328,66 +2618,100 @@ export type Database = {
       }
       leads: {
         Row: {
+          assigned_to: string | null
+          channel: string | null
           company_id: string
           company_name: string | null
           contact_name: string | null
+          converted_account_id: string | null
           created_at: string
           created_by: string | null
           customer_id: string | null
+          disqualified_reason: string | null
           email: string | null
           expected_close_date: string | null
           expected_value: number
           id: string
+          last_activity_at: string | null
           notes: string | null
           owner_id: string | null
           phone: string | null
+          product_interest: string | null
+          score: number | null
+          score_factors: Json | null
           source: Database["public"]["Enums"]["lead_source"]
           status: Database["public"]["Enums"]["lead_status"]
+          territory: string | null
           title: string
           updated_at: string
           win_probability: number
         }
         Insert: {
+          assigned_to?: string | null
+          channel?: string | null
           company_id: string
           company_name?: string | null
           contact_name?: string | null
+          converted_account_id?: string | null
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          disqualified_reason?: string | null
           email?: string | null
           expected_close_date?: string | null
           expected_value?: number
           id?: string
+          last_activity_at?: string | null
           notes?: string | null
           owner_id?: string | null
           phone?: string | null
+          product_interest?: string | null
+          score?: number | null
+          score_factors?: Json | null
           source?: Database["public"]["Enums"]["lead_source"]
           status?: Database["public"]["Enums"]["lead_status"]
+          territory?: string | null
           title: string
           updated_at?: string
           win_probability?: number
         }
         Update: {
+          assigned_to?: string | null
+          channel?: string | null
           company_id?: string
           company_name?: string | null
           contact_name?: string | null
+          converted_account_id?: string | null
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          disqualified_reason?: string | null
           email?: string | null
           expected_close_date?: string | null
           expected_value?: number
           id?: string
+          last_activity_at?: string | null
           notes?: string | null
           owner_id?: string | null
           phone?: string | null
+          product_interest?: string | null
+          score?: number | null
+          score_factors?: Json | null
           source?: Database["public"]["Enums"]["lead_source"]
           status?: Database["public"]["Enums"]["lead_status"]
+          territory?: string | null
           title?: string
           updated_at?: string
           win_probability?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "leads_converted_account_id_fkey"
+            columns: ["converted_account_id"]
+            isOneToOne: false
+            referencedRelation: "crm_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "leads_customer_id_fkey"
             columns: ["customer_id"]
@@ -6118,6 +6442,7 @@ export type Database = {
         }[]
       }
       acct: { Args: { _code: string; _company_id: string }; Returns: string }
+      convert_lead_to_account: { Args: { _lead_id: string }; Returns: Json }
       convert_lead_to_quotation: { Args: { _lead_id: string }; Returns: string }
       explode_bom: {
         Args: { _bom_id: string; _qty: number }
