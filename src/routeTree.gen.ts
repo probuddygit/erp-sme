@@ -214,6 +214,8 @@ import { Route as AuthenticatedAppFinanceGstRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppFinanceAccountsRouteImport } from './routes/_authenticated.app.finance.accounts'
 import { Route as AuthenticatedAdminTenantsIdRouteImport } from './routes/_authenticated.admin.tenants.$id'
 import { Route as AuthenticatedWorkspaceReportsCategoryReportIdRouteImport } from './routes/_authenticated.workspace.reports.$category.$reportId'
+import { Route as AuthenticatedWorkspaceCrmSettingsStagesRouteImport } from './routes/_authenticated.workspace.crm.settings.stages'
+import { Route as AuthenticatedWorkspaceCrmAccountsAccountIdRouteImport } from './routes/_authenticated.workspace.crm.accounts.$accountId'
 import { Route as AuthenticatedAppProductionWorkOrdersIdRouteImport } from './routes/_authenticated.app.production.work-orders.$id'
 import { Route as AuthenticatedAppProductionBomsIdRouteImport } from './routes/_authenticated.app.production.boms.$id'
 import { Route as AuthenticatedAppProcurementPurchaseOrdersIdRouteImport } from './routes/_authenticated.app.procurement.purchase-orders.$id'
@@ -1419,6 +1421,18 @@ const AuthenticatedWorkspaceReportsCategoryReportIdRoute =
     path: '/$reportId',
     getParentRoute: () => AuthenticatedWorkspaceReportsCategoryRoute,
   } as any)
+const AuthenticatedWorkspaceCrmSettingsStagesRoute =
+  AuthenticatedWorkspaceCrmSettingsStagesRouteImport.update({
+    id: '/settings/stages',
+    path: '/settings/stages',
+    getParentRoute: () => AuthenticatedWorkspaceCrmRoute,
+  } as any)
+const AuthenticatedWorkspaceCrmAccountsAccountIdRoute =
+  AuthenticatedWorkspaceCrmAccountsAccountIdRouteImport.update({
+    id: '/$accountId',
+    path: '/$accountId',
+    getParentRoute: () => AuthenticatedWorkspaceCrmAccountsRoute,
+  } as any)
 const AuthenticatedAppProductionWorkOrdersIdRoute =
   AuthenticatedAppProductionWorkOrdersIdRouteImport.update({
     id: '/$id',
@@ -1563,7 +1577,7 @@ export interface FileRoutesByFullPath {
   '/workspace/administration/users': typeof AuthenticatedWorkspaceAdministrationUsersRoute
   '/workspace/administration/whatsapp': typeof AuthenticatedWorkspaceAdministrationWhatsappRoute
   '/workspace/administration/workflow-settings': typeof AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute
-  '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
+  '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRouteWithChildren
   '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
   '/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
   '/workspace/crm/email-history': typeof AuthenticatedWorkspaceCrmEmailHistoryRoute
@@ -1652,6 +1666,8 @@ export interface FileRoutesByFullPath {
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
   '/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
+  '/workspace/crm/accounts/$accountId': typeof AuthenticatedWorkspaceCrmAccountsAccountIdRoute
+  '/workspace/crm/settings/stages': typeof AuthenticatedWorkspaceCrmSettingsStagesRoute
   '/workspace/reports/$category/$reportId': typeof AuthenticatedWorkspaceReportsCategoryReportIdRoute
 }
 export interface FileRoutesByTo {
@@ -1751,7 +1767,7 @@ export interface FileRoutesByTo {
   '/workspace/administration/users': typeof AuthenticatedWorkspaceAdministrationUsersRoute
   '/workspace/administration/whatsapp': typeof AuthenticatedWorkspaceAdministrationWhatsappRoute
   '/workspace/administration/workflow-settings': typeof AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute
-  '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
+  '/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRouteWithChildren
   '/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
   '/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
   '/workspace/crm/email-history': typeof AuthenticatedWorkspaceCrmEmailHistoryRoute
@@ -1840,6 +1856,8 @@ export interface FileRoutesByTo {
   '/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
   '/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
+  '/workspace/crm/accounts/$accountId': typeof AuthenticatedWorkspaceCrmAccountsAccountIdRoute
+  '/workspace/crm/settings/stages': typeof AuthenticatedWorkspaceCrmSettingsStagesRoute
   '/workspace/reports/$category/$reportId': typeof AuthenticatedWorkspaceReportsCategoryReportIdRoute
 }
 export interface FileRoutesById {
@@ -1963,7 +1981,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/administration/users': typeof AuthenticatedWorkspaceAdministrationUsersRoute
   '/_authenticated/workspace/administration/whatsapp': typeof AuthenticatedWorkspaceAdministrationWhatsappRoute
   '/_authenticated/workspace/administration/workflow-settings': typeof AuthenticatedWorkspaceAdministrationWorkflowSettingsRoute
-  '/_authenticated/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRoute
+  '/_authenticated/workspace/crm/accounts': typeof AuthenticatedWorkspaceCrmAccountsRouteWithChildren
   '/_authenticated/workspace/crm/activities': typeof AuthenticatedWorkspaceCrmActivitiesRoute
   '/_authenticated/workspace/crm/contacts': typeof AuthenticatedWorkspaceCrmContactsRoute
   '/_authenticated/workspace/crm/email-history': typeof AuthenticatedWorkspaceCrmEmailHistoryRoute
@@ -2052,6 +2070,8 @@ export interface FileRoutesById {
   '/_authenticated/app/procurement/purchase-orders/$id': typeof AuthenticatedAppProcurementPurchaseOrdersIdRoute
   '/_authenticated/app/production/boms/$id': typeof AuthenticatedAppProductionBomsIdRoute
   '/_authenticated/app/production/work-orders/$id': typeof AuthenticatedAppProductionWorkOrdersIdRoute
+  '/_authenticated/workspace/crm/accounts/$accountId': typeof AuthenticatedWorkspaceCrmAccountsAccountIdRoute
+  '/_authenticated/workspace/crm/settings/stages': typeof AuthenticatedWorkspaceCrmSettingsStagesRoute
   '/_authenticated/workspace/reports/$category/$reportId': typeof AuthenticatedWorkspaceReportsCategoryReportIdRoute
 }
 export interface FileRouteTypes {
@@ -2264,6 +2284,8 @@ export interface FileRouteTypes {
     | '/app/procurement/purchase-orders/$id'
     | '/app/production/boms/$id'
     | '/app/production/work-orders/$id'
+    | '/workspace/crm/accounts/$accountId'
+    | '/workspace/crm/settings/stages'
     | '/workspace/reports/$category/$reportId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -2452,6 +2474,8 @@ export interface FileRouteTypes {
     | '/app/procurement/purchase-orders/$id'
     | '/app/production/boms/$id'
     | '/app/production/work-orders/$id'
+    | '/workspace/crm/accounts/$accountId'
+    | '/workspace/crm/settings/stages'
     | '/workspace/reports/$category/$reportId'
   id:
     | '__root__'
@@ -2663,6 +2687,8 @@ export interface FileRouteTypes {
     | '/_authenticated/app/procurement/purchase-orders/$id'
     | '/_authenticated/app/production/boms/$id'
     | '/_authenticated/app/production/work-orders/$id'
+    | '/_authenticated/workspace/crm/accounts/$accountId'
+    | '/_authenticated/workspace/crm/settings/stages'
     | '/_authenticated/workspace/reports/$category/$reportId'
   fileRoutesById: FileRoutesById
 }
@@ -4111,6 +4137,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceReportsCategoryReportIdRouteImport
       parentRoute: typeof AuthenticatedWorkspaceReportsCategoryRoute
     }
+    '/_authenticated/workspace/crm/settings/stages': {
+      id: '/_authenticated/workspace/crm/settings/stages'
+      path: '/settings/stages'
+      fullPath: '/workspace/crm/settings/stages'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmSettingsStagesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmRoute
+    }
+    '/_authenticated/workspace/crm/accounts/$accountId': {
+      id: '/_authenticated/workspace/crm/accounts/$accountId'
+      path: '/$accountId'
+      fullPath: '/workspace/crm/accounts/$accountId'
+      preLoaderRoute: typeof AuthenticatedWorkspaceCrmAccountsAccountIdRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceCrmAccountsRoute
+    }
     '/_authenticated/app/production/work-orders/$id': {
       id: '/_authenticated/app/production/work-orders/$id'
       path: '/$id'
@@ -4598,8 +4638,23 @@ const AuthenticatedWorkspaceAdministrationRouteWithChildren =
     AuthenticatedWorkspaceAdministrationRouteChildren,
   )
 
+interface AuthenticatedWorkspaceCrmAccountsRouteChildren {
+  AuthenticatedWorkspaceCrmAccountsAccountIdRoute: typeof AuthenticatedWorkspaceCrmAccountsAccountIdRoute
+}
+
+const AuthenticatedWorkspaceCrmAccountsRouteChildren: AuthenticatedWorkspaceCrmAccountsRouteChildren =
+  {
+    AuthenticatedWorkspaceCrmAccountsAccountIdRoute:
+      AuthenticatedWorkspaceCrmAccountsAccountIdRoute,
+  }
+
+const AuthenticatedWorkspaceCrmAccountsRouteWithChildren =
+  AuthenticatedWorkspaceCrmAccountsRoute._addFileChildren(
+    AuthenticatedWorkspaceCrmAccountsRouteChildren,
+  )
+
 interface AuthenticatedWorkspaceCrmRouteChildren {
-  AuthenticatedWorkspaceCrmAccountsRoute: typeof AuthenticatedWorkspaceCrmAccountsRoute
+  AuthenticatedWorkspaceCrmAccountsRoute: typeof AuthenticatedWorkspaceCrmAccountsRouteWithChildren
   AuthenticatedWorkspaceCrmActivitiesRoute: typeof AuthenticatedWorkspaceCrmActivitiesRoute
   AuthenticatedWorkspaceCrmContactsRoute: typeof AuthenticatedWorkspaceCrmContactsRoute
   AuthenticatedWorkspaceCrmEmailHistoryRoute: typeof AuthenticatedWorkspaceCrmEmailHistoryRoute
@@ -4608,12 +4663,13 @@ interface AuthenticatedWorkspaceCrmRouteChildren {
   AuthenticatedWorkspaceCrmOpportunitiesRoute: typeof AuthenticatedWorkspaceCrmOpportunitiesRoute
   AuthenticatedWorkspaceCrmPipelineRoute: typeof AuthenticatedWorkspaceCrmPipelineRoute
   AuthenticatedWorkspaceCrmIndexRoute: typeof AuthenticatedWorkspaceCrmIndexRoute
+  AuthenticatedWorkspaceCrmSettingsStagesRoute: typeof AuthenticatedWorkspaceCrmSettingsStagesRoute
 }
 
 const AuthenticatedWorkspaceCrmRouteChildren: AuthenticatedWorkspaceCrmRouteChildren =
   {
     AuthenticatedWorkspaceCrmAccountsRoute:
-      AuthenticatedWorkspaceCrmAccountsRoute,
+      AuthenticatedWorkspaceCrmAccountsRouteWithChildren,
     AuthenticatedWorkspaceCrmActivitiesRoute:
       AuthenticatedWorkspaceCrmActivitiesRoute,
     AuthenticatedWorkspaceCrmContactsRoute:
@@ -4628,6 +4684,8 @@ const AuthenticatedWorkspaceCrmRouteChildren: AuthenticatedWorkspaceCrmRouteChil
     AuthenticatedWorkspaceCrmPipelineRoute:
       AuthenticatedWorkspaceCrmPipelineRoute,
     AuthenticatedWorkspaceCrmIndexRoute: AuthenticatedWorkspaceCrmIndexRoute,
+    AuthenticatedWorkspaceCrmSettingsStagesRoute:
+      AuthenticatedWorkspaceCrmSettingsStagesRoute,
   }
 
 const AuthenticatedWorkspaceCrmRouteWithChildren =
@@ -5047,13 +5105,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
