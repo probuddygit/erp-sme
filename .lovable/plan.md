@@ -1,87 +1,84 @@
-# CRM Module Revamp Plan
+# Sales Module Revamp — SAP-style Order-to-Cash
 
-Rebuild CRM to match the SAP-style spec (Accounts 360, Lead Inbox, Kanban with aging, AI assist, GSTIN validation, richer activities) while keeping the current UI theme (same tokens, sidebar, PageHeader, badges, cards).
+Aligns Sales with the CRM revamp (accounts/opportunities) and Indian MSME partial-dispatch reality. Current module backed up, then rebuilt around the ER you specified.
 
-Scope is strictly limited to CRM. No other module code, DB tables outside CRM/masters, or global UI will be touched. All work is additive so a revert is a clean rollback.
+## Backup & safety
 
-## Revert strategy (important)
+- Move current routes to `.lovable/backup/sales/` (quotations, sales-orders, delivery-notes, invoices, returns, payments, index).
+- Snapshot current `src/features/sales/` to `.lovable/backup/sales/features/`.
+- Keep `_authenticated.app.sales.*.tsx` (legacy `/app/sales/*`) untouched as a live fallback.
+- All DB changes additive — no drops on existing tables.
 
-Before starting, snapshot current CRM:
-- Copy `src/features/crm/**` → `src/features/crm/_backup_pre_revamp/**` (kept in repo, unused).
-- New DB objects go in ONE migration prefixed `crm_revamp_` with a matching `crm_revamp_rollback.sql` (drops added columns/tables/functions, restores prior policies). No destructive changes to existing rows.
-- If you dislike the revamp: run the rollback SQL, restore files from `_backup_pre_revamp`, delete new routes. No cross-module fallout because nothing else is edited.
+## Data model (additive migration)
 
-## Data model changes (CRM-only migration)
+New/extended columns on existing tables (no destructive changes):
 
-Additive columns / tables — existing data preserved:
+- `quotations`: `crm_account_id`, `opportunity_id`, `converted_order_id` (FK).
+- `sales_orders`: `quotation_id`, `crm_account_id`, `warehouse_id`, `promised_date`, `credit_hold bool`, `credit_hold_reason`, extend `sales_order_status` enum with `partially_dispatched`, `dispatched`, `invoiced`, `closed`, `credit_hold`.
+- `sales_order_items`: `qty_dispatched numeric default 0`, `qty_invoiced numeric default 0`, `item_id` (FK items, nullable for free-text lines).
+- `delivery_notes`: `vehicle_no`, `transporter_name`, `eway_bill_no`, `place_of_supply`.
+- `delivery_note_items`: `sales_order_item_id`, `batch_id` (FK stock_batches, nullable).
+- `invoices`: `place_of_supply`, `irn`, `qr_code_data`, `gstin_seq_no` (per-GSTIN sequence).
+- `invoice_items`: `hsn_code`, `sales_order_item_id`.
 
-- `crm_accounts` (new) — dedicated Accounts entity separate from `customers`
-  - gstin, pan, billing_address, shipping_address, credit_limit, credit_days, price_list_id (FK price_lists), territory, owner_id, status, gstin_verified_at, gstin_legal_name
-  - Kept separate from `customers` so Sales/Finance are untouched; a nullable `customer_id` link lets a converted account map to an existing customer without changing Sales joins.
-- `crm_contacts` — add: account_id (FK crm_accounts, nullable), first_name, last_name, designation, is_primary, whatsapp_opt_in. Keep existing `name` for back-compat (computed fallback).
-- `leads` — add: product_interest, territory, assigned_to, score numeric, score_factors jsonb, converted_account_id, disqualified_reason.
-- `crm_activities` — add: account_id (FK crm_accounts), opportunity_id (FK crm_opportunities), gps_lat, gps_lng, due_date, channel (call/visit/whatsapp/email), check-in flag. App-level check: at least one of account_id/contact_id/opportunity_id set.
-- `crm_opportunities` (new) — id, account_id, name, stage, value, probability, expected_close, owner_id, quotation_id (FK quotations, nullable), lost_reason, days_in_stage (generated), created_at.
-- `crm_stage_configs` (new) — tenant-configurable lead statuses & opportunity stages with order + aging threshold days.
+New table `credit_notes` + `credit_note_items` with `reason` enum (`return`, `pricing`, `discount`, `cancellation`), links to invoice, reverses AR + GST on post (trigger reuses existing journal/GST posting helpers).
 
-All new tables: standard company_id + RLS + GRANTs (authenticated CRUD, service_role all), updated_at trigger.
+New RPCs:
+- `check_customer_credit(_account_id, _order_total)` → returns `{ ok, available, reason }`.
+- `confirm_sales_order(_order_id)` → runs credit check, sets `confirmed` or `credit_hold`.
+- `next_invoice_number_per_gstin(_company_id, _gstin)` → per-GSTIN sequence.
 
-Extend `convert_lead_to_quotation` RPC path with a new `convert_lead` RPC that in one txn creates crm_accounts + crm_contacts + crm_opportunities and links lead. Existing RPC preserved.
+## API layer (`src/features/sales/api.ts`)
 
-## API / server functions
+Extend with:
+- `useConfirmSalesOrder`, `useReleaseCreditHold`.
+- `useDispatchOrder(orderId)` — creates DeliveryChallan, allocates from selected batches, decrements stock, updates `qty_dispatched`, flips SO status to `partially_dispatched`/`dispatched`.
+- `useInvoiceChallan(challanId)` — creates TaxInvoice from a challan (or multiple), computes CGST/SGST/IGST via existing `tax_type`, calls per-GSTIN numbering, marks SO `invoiced` when fully covered.
+- `useCreateCreditNote`, `useCreditNotes(invoiceId)`.
+- `useSalesDashboard()` — leaderboards, credit-hold count, overdue receivables.
 
-Add to `src/features/crm/api.ts` (no removals — old hooks stay for backup component):
-- Accounts: useAccounts, useAccount(id), useSaveAccount, useAccount360(id) (aggregates open SO, outstanding invoices, recent activities, credit gauge — read-only queries only).
-- Opportunities: useOpportunities, useSaveOpportunity, useMoveStage (updates stage + lost_reason, invalidates score).
-- Activities: useSaveActivity extended for GPS/check-in/due_date.
-- Stage config: useStageConfig, useSaveStageConfig.
-- GSTIN: `validateGstin` server function (calls existing GST adapter if configured, else marks unverified — no hard external dep).
-- AI (Lovable AI Gateway server functions, all under `src/features/crm/ai.functions.ts`):
-  - scoreLead → score + factors[]
-  - summarizeThread → structured activity from pasted text/email
-  - draftQuotationFromOpportunity → draft quote payload (does NOT insert — returns draft for user confirmation)
-  - churnRisk(accountId)
-- Audit: every AI call writes to `audit_logs` with kind `ai_suggestion`.
+Deterministic client-side heuristics for AI helpers (no external calls):
+- `deliveryFeasibility(order)` — flags if promised_date < today + item lead-time proxy or stock < qty.
+- `priceAnomaly(line, priceList)` — flags > 15% deviation from list price.
+- `dunningDraft(invoice)` — templated message with tone based on days overdue.
 
-## Screens (new routes, existing routes kept until swap)
+## UI (kept in current theme)
 
-New under `src/routes/_authenticated.workspace.crm.*`:
+Routes under `/workspace/sales`:
 
-1. **Lead Inbox** (`/crm/leads` — replaces existing list)
-   - Left rail filters (source, status, assigned rep, territory) using existing FilterBar patterns.
-   - Card list with color-coded score badge, last-activity timestamp, channel icon.
-   - Right slide-over: lead detail, AI "next best action", inline Convert button.
-2. **Account 360** (`/crm/accounts/$id`)
-   - Header: name, GSTIN + verified badge, credit gauge (limit vs outstanding from invoices).
-   - Tabs: Overview | Contacts | Opportunities | Orders | Ledger | Activities. Orders/Ledger tabs are read-only queries against existing sales_orders/invoices/payments — no writes to those modules.
-3. **Pipeline Kanban** (`/crm/pipeline` — upgrade existing)
-   - Columns = opportunity stages from stage config.
-   - Card shows value + days-in-stage with green→amber→red aging based on threshold.
-   - Drag-drop stage change → optimistic update → background AI re-forecast.
-4. **Opportunities list** (`/crm/opportunities`) — table + create/edit drawer, links to quotation.
-5. **Activities** (`/crm/activities`) — existing tab enhanced: type filter, GPS map preview for visits, due-date reminders.
-6. **Stage Settings** (`/crm/settings/stages`) — configure lead statuses and opportunity stages per tenant.
+1. **Quotations** — enrich existing list with account/opportunity link, "Convert to Order" action already exists; add per-row `ScoreBadge` for value tier.
+2. **Order Booking** (`sales-orders`) rebuild:
+   - Header: customer typeahead + inline `CreditGauge` (reuses CRM component).
+   - Line grid with live stock chip (green/amber/red) per item + warehouse.
+   - Rate autofill from price_lists; override prompts reason.
+   - Footer: totals + feasibility banner.
+   - Confirm button disabled with tooltip when credit hold.
+3. **Dispatch / Challans** (new `/workspace/sales/dispatch`):
+   - List of confirmed/partially dispatched SOs; drawer to pick lines, qty, batch (only shown when item is batch-tracked), vehicle, transporter, e-Way bill (auto-suggest when taxable value ≥ ₹50k).
+4. **Invoices** — read-mostly detail; prominent IRN/QR panel; timeline (Issued → Partial → Paid) built from `payments`; "Raise Credit Note" button gated by reason-code select.
+5. **Credit Notes** (new tab) — list + create dialog.
+6. **Sales Dashboard** (`/workspace/sales` index revamp):
+   - KPI tiles: Booked, Dispatched, Invoiced, Collected (MTD).
+   - Alert tile: credit-hold orders count.
+   - Overdue receivables tile from invoices.
+   - Rep-wise + product-wise leaderboards (Recharts bar).
 
-Mobile field-sales app is explicitly OUT of this plan (separate app per spec); the responsive web pipeline/activities screens will remain usable on phone but no separate PWA/native shell is built.
+Sidebar nav updated: Dashboard, Quotations, Sales Orders, Dispatch, Invoices, Credit Notes, Payments, Returns.
 
-## UI theme preservation
+## State machine enforcement
 
-- Reuse: PageHeader, Card, StatusBadge, KanbanBoard, FilterBar, RecordDrawer, FormDialog, existing color tokens, existing tab-chip nav in `_authenticated.workspace.crm.tsx`.
-- Only additions: an AccountGauge component (credit ring) and ScoreBadge (colored pill) built with existing tokens — no new palette, no new fonts.
+SO transitions guarded in `confirm_sales_order` RPC and dispatch/invoice hooks. `credit_hold` is a first-class status; release requires `admin`/`finance` role via existing `has_role`.
+
+## Out of scope (stubs only)
+
+- Real GSTN IRN/e-Way Bill calls — `irn`/`eway_bill_no` remain manual inputs with adapter seam (matches existing GST adapter pattern).
+- External AI calls — heuristics only, easy to swap later.
 
 ## Rollout order
 
-1. Snapshot backup + migration + rollback SQL.
-2. api.ts extensions + ai.functions.ts.
-3. Accounts + Account 360.
-4. Lead Inbox revamp + convert flow.
-5. Opportunities + Pipeline aging.
-6. Stage settings + Activities enhancements.
-7. Wire new tabs into existing CRM layout `TABS` array (add Accounts, keep old entries).
-
-## Out of scope (explicitly)
-
-- No edits to Sales, Procurement, Inventory, Finance, GST, HR, Production, Maintenance, Quality, Admin.
-- No changes to global layout, sidebar, auth, or theme tokens.
-- No dropping of existing CRM tables/columns.
-- No mobile-native app build.
+1. Migration (schema + enum + RPCs + credit_notes tables + GRANTs + RLS).
+2. Backup move of old route/feature files.
+3. New api.ts hooks + shared components (`StockChip`, `CreditHoldBadge`, `IRNPanel`, `CreditNoteDialog`).
+4. Rebuild Quotations, SO Booking, Dispatch, Invoices, Credit Notes, Dashboard routes.
+5. Update sidebar nav.
+6. Verify build.
