@@ -1,59 +1,87 @@
-## Goal
-Close the remaining data-flow integration gaps so every module ties end-to-end without manual re-entry.
+# CRM Module Revamp Plan
 
-## Scope (6 gaps)
+Rebuild CRM to match the SAP-style spec (Accounts 360, Lead Inbox, Kanban with aging, AI assist, GSTIN validation, richer activities) while keeping the current UI theme (same tokens, sidebar, PageHeader, badges, cards).
 
-### 1. CRM → Sales conversion
-- Add "Convert to Quotation" action on Opportunity/Lead detail drawer.
-- Server fn creates `quotations` row (customer auto-created from CRM contact if missing), copies items, calls `link_documents(lead → quotation)`, and records event.
-- Show source lead badge + `DocHistoryDialog` link on the resulting quotation.
+Scope is strictly limited to CRM. No other module code, DB tables outside CRM/masters, or global UI will be touched. All work is additive so a revert is a clean rollback.
 
-### 2. Sales Return & Vendor Return automation
-- DB triggers:
-  - `tg_post_sales_return`: on status `received`, post reverse journal (DR Sales Returns / GST Output, CR AR) and issue `post_stock_receipt` back to warehouse.
-  - `tg_post_vendor_return`: on status `dispatched`, post reverse journal (DR AP, CR Inventory/GST Input) and issue `post_stock_issue` from warehouse.
-- Reverse GST ledger entries (negative taxable_value) for GSTR consistency.
-- UI: "Post Return" button + status badge.
+## Revert strategy (important)
 
-### 3. Approvals coverage
-- Route Vendor Invoice, Supplier Payment, Journal Entry, Sales Return, Vendor Return, and PO (already partial) through the generic `approval_rules`/`approvals`/`approval_steps` engine.
-- Registry entry per doc type with threshold + approver role.
-- Downstream postings (journal, stock) only fire when status ∈ approved set — update existing status guards accordingly.
-- UI: Approvals inbox chip in header + per-doc Approvals tab.
+Before starting, snapshot current CRM:
+- Copy `src/features/crm/**` → `src/features/crm/_backup_pre_revamp/**` (kept in repo, unused).
+- New DB objects go in ONE migration prefixed `crm_revamp_` with a matching `crm_revamp_rollback.sql` (drops added columns/tables/functions, restores prior policies). No destructive changes to existing rows.
+- If you dislike the revamp: run the rollback SQL, restore files from `_backup_pre_revamp`, delete new routes. No cross-module fallout because nothing else is edited.
 
-### 4. Recurring Invoices scheduler
-- TanStack public route `src/routes/api/public/hooks/recurring-invoices.ts` protected by `apikey` header.
-- Iterates `recurring_invoice_templates` where `next_run_date <= today` & active, clones template into `invoices` + `invoice_items`, advances `next_run_date` by frequency, records event.
-- `pg_cron` daily job hitting stable preview/prod URL.
-- UI: "Run now" button on template + "Last generated" column.
+## Data model changes (CRM-only migration)
 
-### 5. Bank Reconciliation & Cash-Flow
-- New `bank_statements` + `bank_statement_lines` tables (date, description, amount, ref, matched_payment_id).
-- Manual CSV import + auto-match to `payments` / `supplier_payments` on amount+date±3d.
-- Reconciliation screen under Finance with match/unmatch actions and unreconciled totals.
-- Cash-flow report: aggregates from `journal_lines` where account_type ∈ (cash, bank) grouped by month, plus direct-method categories using source_module tags. Add to `/workspace/reports`.
+Additive columns / tables — existing data preserved:
 
-### 6. Notification dispatcher
-- Extend `notifications` insert triggers to fan out for: approval requests, low-stock alerts, invoice overdue, machine breakdown, ticket delayed.
-- Public server route `hooks/dispatch-notifications` picks `notif_status='pending'`, sends via Resend connector (email channel) using `email_templates`, marks sent/failed.
-- Pg_cron every 5 min.
-- User `notification_preferences` toggles (email on/off per category); WhatsApp/push stubbed as no-op with clear TODO.
-- In-app bell in header lists last 20 `in_app` notifications.
+- `crm_accounts` (new) — dedicated Accounts entity separate from `customers`
+  - gstin, pan, billing_address, shipping_address, credit_limit, credit_days, price_list_id (FK price_lists), territory, owner_id, status, gstin_verified_at, gstin_legal_name
+  - Kept separate from `customers` so Sales/Finance are untouched; a nullable `customer_id` link lets a converted account map to an existing customer without changing Sales joins.
+- `crm_contacts` — add: account_id (FK crm_accounts, nullable), first_name, last_name, designation, is_primary, whatsapp_opt_in. Keep existing `name` for back-compat (computed fallback).
+- `leads` — add: product_interest, territory, assigned_to, score numeric, score_factors jsonb, converted_account_id, disqualified_reason.
+- `crm_activities` — add: account_id (FK crm_accounts), opportunity_id (FK crm_opportunities), gps_lat, gps_lng, due_date, channel (call/visit/whatsapp/email), check-in flag. App-level check: at least one of account_id/contact_id/opportunity_id set.
+- `crm_opportunities` (new) — id, account_id, name, stage, value, probability, expected_close, owner_id, quotation_id (FK quotations, nullable), lost_reason, days_in_stage (generated), created_at.
+- `crm_stage_configs` (new) — tenant-configurable lead statuses & opportunity stages with order + aging threshold days.
 
-## Sequence
-1. Migrations for return triggers, approval registry expansion, bank rec tables, notification fan-out triggers.
-2. Server functions for CRM→Sales convert, return posting, recurring generator, dispatcher.
-3. Cron jobs (recurring, dispatcher) via `pg_net`.
-4. UI: convert action, approvals inbox, reconciliation screen, notifications bell, cash-flow report.
-5. Seed one demo record per new flow (recurring template, bank statement) and smoke-test.
+All new tables: standard company_id + RLS + GRANTs (authenticated CRUD, service_role all), updated_at trigger.
 
-## Technical notes
-- Reuse `post_journal`, `post_stock_issue`, `post_stock_receipt`, `link_documents`, `record_document_event` — no new posting primitives.
-- Resend via connector gateway; require `standard_connectors--connect` for Resend before dispatcher is enabled (dispatcher no-ops gracefully if unconnected).
-- All new triggers `SECURITY DEFINER` with `SET search_path = public` per existing pattern.
-- All new tables ship with GRANTs + RLS scoped to `company_id` via `get_user_company(auth.uid())`.
+Extend `convert_lead_to_quotation` RPC path with a new `convert_lead` RPC that in one txn creates crm_accounts + crm_contacts + crm_opportunities and links lead. Existing RPC preserved.
 
-## Out of scope
-- E-invoice/IRN live push (adapter already exists — remains stubbed).
-- WhatsApp/push actual delivery (channel scaffold only).
-- Bank feed API integrations (CSV import only).
+## API / server functions
+
+Add to `src/features/crm/api.ts` (no removals — old hooks stay for backup component):
+- Accounts: useAccounts, useAccount(id), useSaveAccount, useAccount360(id) (aggregates open SO, outstanding invoices, recent activities, credit gauge — read-only queries only).
+- Opportunities: useOpportunities, useSaveOpportunity, useMoveStage (updates stage + lost_reason, invalidates score).
+- Activities: useSaveActivity extended for GPS/check-in/due_date.
+- Stage config: useStageConfig, useSaveStageConfig.
+- GSTIN: `validateGstin` server function (calls existing GST adapter if configured, else marks unverified — no hard external dep).
+- AI (Lovable AI Gateway server functions, all under `src/features/crm/ai.functions.ts`):
+  - scoreLead → score + factors[]
+  - summarizeThread → structured activity from pasted text/email
+  - draftQuotationFromOpportunity → draft quote payload (does NOT insert — returns draft for user confirmation)
+  - churnRisk(accountId)
+- Audit: every AI call writes to `audit_logs` with kind `ai_suggestion`.
+
+## Screens (new routes, existing routes kept until swap)
+
+New under `src/routes/_authenticated.workspace.crm.*`:
+
+1. **Lead Inbox** (`/crm/leads` — replaces existing list)
+   - Left rail filters (source, status, assigned rep, territory) using existing FilterBar patterns.
+   - Card list with color-coded score badge, last-activity timestamp, channel icon.
+   - Right slide-over: lead detail, AI "next best action", inline Convert button.
+2. **Account 360** (`/crm/accounts/$id`)
+   - Header: name, GSTIN + verified badge, credit gauge (limit vs outstanding from invoices).
+   - Tabs: Overview | Contacts | Opportunities | Orders | Ledger | Activities. Orders/Ledger tabs are read-only queries against existing sales_orders/invoices/payments — no writes to those modules.
+3. **Pipeline Kanban** (`/crm/pipeline` — upgrade existing)
+   - Columns = opportunity stages from stage config.
+   - Card shows value + days-in-stage with green→amber→red aging based on threshold.
+   - Drag-drop stage change → optimistic update → background AI re-forecast.
+4. **Opportunities list** (`/crm/opportunities`) — table + create/edit drawer, links to quotation.
+5. **Activities** (`/crm/activities`) — existing tab enhanced: type filter, GPS map preview for visits, due-date reminders.
+6. **Stage Settings** (`/crm/settings/stages`) — configure lead statuses and opportunity stages per tenant.
+
+Mobile field-sales app is explicitly OUT of this plan (separate app per spec); the responsive web pipeline/activities screens will remain usable on phone but no separate PWA/native shell is built.
+
+## UI theme preservation
+
+- Reuse: PageHeader, Card, StatusBadge, KanbanBoard, FilterBar, RecordDrawer, FormDialog, existing color tokens, existing tab-chip nav in `_authenticated.workspace.crm.tsx`.
+- Only additions: an AccountGauge component (credit ring) and ScoreBadge (colored pill) built with existing tokens — no new palette, no new fonts.
+
+## Rollout order
+
+1. Snapshot backup + migration + rollback SQL.
+2. api.ts extensions + ai.functions.ts.
+3. Accounts + Account 360.
+4. Lead Inbox revamp + convert flow.
+5. Opportunities + Pipeline aging.
+6. Stage settings + Activities enhancements.
+7. Wire new tabs into existing CRM layout `TABS` array (add Accounts, keep old entries).
+
+## Out of scope (explicitly)
+
+- No edits to Sales, Procurement, Inventory, Finance, GST, HR, Production, Maintenance, Quality, Admin.
+- No changes to global layout, sidebar, auth, or theme tokens.
+- No dropping of existing CRM tables/columns.
+- No mobile-native app build.
