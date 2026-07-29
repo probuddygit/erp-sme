@@ -8,6 +8,7 @@ import {
   BellRing,
   Mail,
   GitCommitHorizontal,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -19,14 +20,15 @@ export const Route = createFileRoute("/_authenticated/workspace/crm")({
 
 const TABS: { path: string; label: string; icon: LucideIcon }[] = [
   { path: "/workspace/crm",                label: "Overview",       icon: Users2 },
-  { path: "/workspace/crm/leads",          label: "Leads",          icon: Users2 },
+  { path: "/workspace/crm/leads",          label: "Lead Inbox",     icon: Users2 },
   { path: "/workspace/crm/contacts",       label: "Contacts",       icon: UserRound },
   { path: "/workspace/crm/accounts",       label: "Accounts",       icon: Building2 },
   { path: "/workspace/crm/activities",     label: "Activities",     icon: ListChecks },
   { path: "/workspace/crm/opportunities",  label: "Opportunities",  icon: Trophy },
   { path: "/workspace/crm/follow-ups",     label: "Follow Ups",     icon: BellRing },
   { path: "/workspace/crm/email-history",  label: "Email History",  icon: Mail },
-  { path: "/workspace/crm/pipeline",       label: "Lead Pipeline",  icon: GitCommitHorizontal },
+  { path: "/workspace/crm/pipeline",       label: "Pipeline",       icon: GitCommitHorizontal },
+  { path: "/workspace/crm/settings/stages", label: "Stages",         icon: Settings },
 ];
 
 function CrmLayout() {

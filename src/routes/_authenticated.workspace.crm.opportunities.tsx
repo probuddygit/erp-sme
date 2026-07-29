@@ -2,42 +2,46 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Loader2 } from "lucide-react";
 import { FilterBar } from "@/features/crm/components/FilterBar";
 import { StatusBadge } from "@/features/crm/components/StatusBadge";
-import { useLeads, formatINR, formatDate } from "@/features/crm/api";
+import { FormDialog, Field } from "@/features/crm/components/FormDialog";
+import { RowActions } from "@/components/RowActions";
+import {
+  useOpportunities, useSaveOpportunity, useStageConfigs, useAccounts,
+  formatINR, formatDate, type OpportunityRow,
+} from "@/features/crm/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/crm/opportunities")({
   component: OpportunitiesPage,
 });
 
-// Opportunities in this build are qualified leads (status: qualified | proposal | won | lost).
-const OPP_STATUSES = [
-  { key: "qualified", label: "Qualified", tone: "bg-violet-50 text-violet-700 border-violet-200" },
-  { key: "proposal", label: "Proposal", tone: "bg-amber-50 text-amber-800 border-amber-200" },
-  { key: "won", label: "Won", tone: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  { key: "lost", label: "Lost", tone: "bg-rose-50 text-rose-700 border-rose-200" },
-];
+const empty: Partial<OpportunityRow> = { name: "", stage: "prospecting", value: 0, probability: 20 };
 
 function OpportunitiesPage() {
-  const { data: leads = [], isLoading } = useLeads();
+  const { data: opps = [], isLoading } = useOpportunities();
+  const { data: stages = [] } = useStageConfigs("opportunity");
+  const { data: accounts = [] } = useAccounts();
+  const save = useSaveOpportunity();
+
   const [search, setSearch] = useState("");
   const [stage, setStage] = useState("");
+  const [editing, setEditing] = useState<Partial<OpportunityRow> | null>(null);
 
-  const opps = useMemo(
-    () => leads.filter((l) => ["qualified", "proposal", "won", "lost"].includes(l.status)),
-    [leads],
-  );
+  const accountName = (id: string | null) => accounts.find((a) => a.id === id)?.name ?? "—";
+  const stageMeta = (key: string) => stages.find((s) => s.stage_key === key);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return opps.filter((o) => {
-      if (stage && o.status !== stage) return false;
+      if (stage && o.stage !== stage) return false;
       if (!term) return true;
-      return [o.title, o.company_name, o.contact_name].filter(Boolean).some((v) => (v as string).toLowerCase().includes(term));
+      return [o.name, accountName(o.account_id)].filter(Boolean).some((v) => (v as string).toLowerCase().includes(term));
     });
-  }, [opps, search, stage]);
+  }, [opps, search, stage, accounts]);
 
   return (
     <div className="space-y-4">
@@ -48,42 +52,51 @@ function OpportunitiesPage() {
             onSearchChange={setSearch}
             placeholder="Search opportunities…"
             filters={[
-              { key: "stage", label: "Stage", value: stage, onChange: setStage, options: OPP_STATUSES.map((s) => ({ value: s.key, label: s.label })) },
+              { key: "stage", label: "Stage", value: stage, onChange: setStage, options: stages.map((s) => ({ value: s.stage_key, label: s.label })) },
             ]}
-            actions={
-              <Button size="sm" asChild>
-                <Link to="/workspace/crm/leads"><Plus className="h-4 w-4 mr-1.5" /> New opportunity</Link>
-              </Button>
-            }
+            actions={<Button size="sm" onClick={() => setEditing({ ...empty })}><Plus className="h-4 w-4 mr-1.5" /> New opportunity</Button>}
           />
-
           <div className="rounded-lg border border-border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Opportunity</TableHead>
-                  <TableHead>Company</TableHead>
+                  <TableHead>Account</TableHead>
                   <TableHead>Stage</TableHead>
                   <TableHead className="text-right">Value</TableHead>
                   <TableHead className="text-right">Probability</TableHead>
                   <TableHead>Close date</TableHead>
+                  <TableHead className="w-24"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={6} className="py-10 text-center"><Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" /></TableCell></TableRow>
+                  <TableRow><TableCell colSpan={7} className="py-10 text-center"><Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" /></TableCell></TableRow>
                 ) : filtered.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="py-10 text-center text-muted-foreground">No opportunities. Qualify a lead to see it here.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={7} className="py-10 text-center text-muted-foreground">No opportunities. Convert a lead or create one.</TableCell></TableRow>
                 ) : filtered.map((o) => {
-                  const tone = OPP_STATUSES.find((s) => s.key === o.status)?.tone;
+                  const meta = stageMeta(o.stage);
                   return (
                     <TableRow key={o.id} className="hover:bg-muted/50">
-                      <TableCell className="font-medium">{o.title}</TableCell>
-                      <TableCell>{o.company_name ?? "—"}</TableCell>
-                      <TableCell><StatusBadge label={OPP_STATUSES.find((s) => s.key === o.status)?.label ?? o.status} tone={tone} /></TableCell>
-                      <TableCell className="text-right font-medium">{formatINR(Number(o.expected_value ?? 0))}</TableCell>
-                      <TableCell className="text-right text-sm">{o.win_probability}%</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{formatDate(o.expected_close_date)}</TableCell>
+                      <TableCell className="font-medium">{o.name}</TableCell>
+                      <TableCell>
+                        {o.account_id
+                          ? <Link to="/workspace/crm/accounts/$accountId" params={{ accountId: o.account_id }} className="hover:text-primary">{accountName(o.account_id)}</Link>
+                          : "—"}
+                      </TableCell>
+                      <TableCell><StatusBadge label={meta?.label ?? o.stage} tone={meta?.tone ?? undefined} /></TableCell>
+                      <TableCell className="text-right font-medium">{formatINR(Number(o.value ?? 0))}</TableCell>
+                      <TableCell className="text-right text-sm">{o.probability}%</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{formatDate(o.expected_close)}</TableCell>
+                      <TableCell className="text-right">
+                        <RowActions
+                          onEdit={() => setEditing(o)}
+                          table="crm_opportunities"
+                          id={o.id}
+                          invalidateKeys={[["crm", "opportunities_v2"]]}
+                          label="opportunity"
+                        />
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -92,6 +105,36 @@ function OpportunitiesPage() {
           </div>
         </CardContent>
       </Card>
+
+      {editing && (
+        <FormDialog
+          open={!!editing}
+          onOpenChange={(o) => !o && setEditing(null)}
+          title={editing.id ? "Edit opportunity" : "New opportunity"}
+          submitting={save.isPending}
+          onSubmit={async () => { await save.mutateAsync(editing); }}
+        >
+          <Field label="Name *"><Input required value={editing.name ?? ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} /></Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Account">
+              <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={editing.account_id ?? ""} onChange={(e) => setEditing({ ...editing, account_id: e.target.value || null })}>
+                <option value="">— None —</option>
+                {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            </Field>
+            <Field label="Stage">
+              <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={editing.stage ?? "prospecting"} onChange={(e) => setEditing({ ...editing, stage: e.target.value })}>
+                {stages.map((s) => <option key={s.stage_key} value={s.stage_key}>{s.label}</option>)}
+              </select>
+            </Field>
+            <Field label="Value (₹)"><Input type="number" value={editing.value ?? 0} onChange={(e) => setEditing({ ...editing, value: Number(e.target.value) })} /></Field>
+            <Field label="Probability (%)"><Input type="number" min={0} max={100} value={editing.probability ?? 0} onChange={(e) => setEditing({ ...editing, probability: Number(e.target.value) })} /></Field>
+            <Field label="Expected close"><Input type="date" value={editing.expected_close ?? ""} onChange={(e) => setEditing({ ...editing, expected_close: e.target.value || null })} /></Field>
+            {editing.stage === "lost" && <Field label="Lost reason"><Input value={editing.lost_reason ?? ""} onChange={(e) => setEditing({ ...editing, lost_reason: e.target.value })} /></Field>}
+          </div>
+          <Field label="Notes"><Textarea rows={3} value={editing.notes ?? ""} onChange={(e) => setEditing({ ...editing, notes: e.target.value })} /></Field>
+        </FormDialog>
+      )}
     </div>
   );
 }
