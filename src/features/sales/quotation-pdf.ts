@@ -149,13 +149,38 @@ export async function openQuotationPdf(input: QuotationPdfInput, action: "previe
   const { doc } = await buildQuotationPdf(input);
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
-  const win = window.open(url, "_blank");
-  if (action === "print" && win) {
-    win.addEventListener("load", () => {
-      try { win.focus(); win.print(); } catch { /* noop */ }
-    });
+  if (action === "print") {
+    // Use a hidden iframe to avoid popup blockers
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    iframe.src = url;
+    iframe.onload = () => {
+      try {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      } catch { /* noop */ }
+    };
+    document.body.appendChild(iframe);
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+      URL.revokeObjectURL(url);
+    }, 60_000);
+  } else {
+    // Preview: use anchor click (not blocked by popup blockers)
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 export async function shareQuotationPdf(input: QuotationPdfInput) {
