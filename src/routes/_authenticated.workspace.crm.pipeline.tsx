@@ -55,6 +55,7 @@ function PipelinePage() {
             columns={columns}
             getKey={(o) => o.id}
             summary={(items) => formatINR(items.reduce((s, o) => s + Number(o.value ?? 0), 0))}
+            onCardDrop={(id, toStage) => { move.mutate({ id, stage: toStage }); }}
             renderCard={(o) => {
               const days = daysBetween(o.stage_entered_at);
               const threshold = stages.find((s) => s.stage_key === o.stage)?.aging_threshold_days ?? 14;
