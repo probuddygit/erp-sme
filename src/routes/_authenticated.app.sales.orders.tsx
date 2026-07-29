@@ -36,6 +36,11 @@ const STATUS_VARIANT: Record<SOStatus, string> = {
   rejected: "bg-red-500/15 text-red-600 dark:text-red-400",
   fulfilled: "bg-green-500/15 text-green-600 dark:text-green-400",
   cancelled: "bg-muted text-muted-foreground",
+  partially_dispatched: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  dispatched: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400",
+  invoiced: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  closed: "bg-muted text-muted-foreground",
+  credit_hold: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
 };
 
 export const Route = createFileRoute("/_authenticated/app/sales/orders")({

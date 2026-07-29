@@ -91,6 +91,7 @@ import { Route as AuthenticatedWorkspaceSalesQuotationsRouteImport } from './rou
 import { Route as AuthenticatedWorkspaceSalesPaymentsRouteImport } from './routes/_authenticated.workspace.sales.payments'
 import { Route as AuthenticatedWorkspaceSalesInvoicesRouteImport } from './routes/_authenticated.workspace.sales.invoices'
 import { Route as AuthenticatedWorkspaceSalesDeliveryNotesRouteImport } from './routes/_authenticated.workspace.sales.delivery-notes'
+import { Route as AuthenticatedWorkspaceSalesCreditNotesRouteImport } from './routes/_authenticated.workspace.sales.credit-notes'
 import { Route as AuthenticatedWorkspaceReportsCategoryRouteImport } from './routes/_authenticated.workspace.reports.$category'
 import { Route as AuthenticatedWorkspaceProcurementVendorReturnsRouteImport } from './routes/_authenticated.workspace.procurement.vendor-returns'
 import { Route as AuthenticatedWorkspaceProcurementVendorQuotationsRouteImport } from './routes/_authenticated.workspace.procurement.vendor-quotations'
@@ -681,6 +682,12 @@ const AuthenticatedWorkspaceSalesDeliveryNotesRoute =
   AuthenticatedWorkspaceSalesDeliveryNotesRouteImport.update({
     id: '/delivery-notes',
     path: '/delivery-notes',
+    getParentRoute: () => AuthenticatedWorkspaceSalesRoute,
+  } as any)
+const AuthenticatedWorkspaceSalesCreditNotesRoute =
+  AuthenticatedWorkspaceSalesCreditNotesRouteImport.update({
+    id: '/credit-notes',
+    path: '/credit-notes',
     getParentRoute: () => AuthenticatedWorkspaceSalesRoute,
   } as any)
 const AuthenticatedWorkspaceReportsCategoryRoute =
@@ -1630,6 +1637,7 @@ export interface FileRoutesByFullPath {
   '/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
   '/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRouteWithChildren
+  '/workspace/sales/credit-notes': typeof AuthenticatedWorkspaceSalesCreditNotesRoute
   '/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -1820,6 +1828,7 @@ export interface FileRoutesByTo {
   '/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
   '/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRouteWithChildren
+  '/workspace/sales/credit-notes': typeof AuthenticatedWorkspaceSalesCreditNotesRoute
   '/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -2034,6 +2043,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/procurement/vendor-quotations': typeof AuthenticatedWorkspaceProcurementVendorQuotationsRoute
   '/_authenticated/workspace/procurement/vendor-returns': typeof AuthenticatedWorkspaceProcurementVendorReturnsRoute
   '/_authenticated/workspace/reports/$category': typeof AuthenticatedWorkspaceReportsCategoryRouteWithChildren
+  '/_authenticated/workspace/sales/credit-notes': typeof AuthenticatedWorkspaceSalesCreditNotesRoute
   '/_authenticated/workspace/sales/delivery-notes': typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   '/_authenticated/workspace/sales/invoices': typeof AuthenticatedWorkspaceSalesInvoicesRoute
   '/_authenticated/workspace/sales/payments': typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -2248,6 +2258,7 @@ export interface FileRouteTypes {
     | '/workspace/procurement/vendor-quotations'
     | '/workspace/procurement/vendor-returns'
     | '/workspace/reports/$category'
+    | '/workspace/sales/credit-notes'
     | '/workspace/sales/delivery-notes'
     | '/workspace/sales/invoices'
     | '/workspace/sales/payments'
@@ -2438,6 +2449,7 @@ export interface FileRouteTypes {
     | '/workspace/procurement/vendor-quotations'
     | '/workspace/procurement/vendor-returns'
     | '/workspace/reports/$category'
+    | '/workspace/sales/credit-notes'
     | '/workspace/sales/delivery-notes'
     | '/workspace/sales/invoices'
     | '/workspace/sales/payments'
@@ -2651,6 +2663,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/procurement/vendor-quotations'
     | '/_authenticated/workspace/procurement/vendor-returns'
     | '/_authenticated/workspace/reports/$category'
+    | '/_authenticated/workspace/sales/credit-notes'
     | '/_authenticated/workspace/sales/delivery-notes'
     | '/_authenticated/workspace/sales/invoices'
     | '/_authenticated/workspace/sales/payments'
@@ -3274,6 +3287,13 @@ declare module '@tanstack/react-router' {
       path: '/delivery-notes'
       fullPath: '/workspace/sales/delivery-notes'
       preLoaderRoute: typeof AuthenticatedWorkspaceSalesDeliveryNotesRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceSalesRoute
+    }
+    '/_authenticated/workspace/sales/credit-notes': {
+      id: '/_authenticated/workspace/sales/credit-notes'
+      path: '/credit-notes'
+      fullPath: '/workspace/sales/credit-notes'
+      preLoaderRoute: typeof AuthenticatedWorkspaceSalesCreditNotesRouteImport
       parentRoute: typeof AuthenticatedWorkspaceSalesRoute
     }
     '/_authenticated/workspace/reports/$category': {
@@ -4929,6 +4949,7 @@ const AuthenticatedWorkspaceReportsRouteWithChildren =
   )
 
 interface AuthenticatedWorkspaceSalesRouteChildren {
+  AuthenticatedWorkspaceSalesCreditNotesRoute: typeof AuthenticatedWorkspaceSalesCreditNotesRoute
   AuthenticatedWorkspaceSalesDeliveryNotesRoute: typeof AuthenticatedWorkspaceSalesDeliveryNotesRoute
   AuthenticatedWorkspaceSalesInvoicesRoute: typeof AuthenticatedWorkspaceSalesInvoicesRoute
   AuthenticatedWorkspaceSalesPaymentsRoute: typeof AuthenticatedWorkspaceSalesPaymentsRoute
@@ -4940,6 +4961,8 @@ interface AuthenticatedWorkspaceSalesRouteChildren {
 
 const AuthenticatedWorkspaceSalesRouteChildren: AuthenticatedWorkspaceSalesRouteChildren =
   {
+    AuthenticatedWorkspaceSalesCreditNotesRoute:
+      AuthenticatedWorkspaceSalesCreditNotesRoute,
     AuthenticatedWorkspaceSalesDeliveryNotesRoute:
       AuthenticatedWorkspaceSalesDeliveryNotesRoute,
     AuthenticatedWorkspaceSalesInvoicesRoute:

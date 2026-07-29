@@ -1,11 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ClipboardList, ReceiptText, Truck, ShieldCheck } from "lucide-react";
+import { ClipboardList, ReceiptText, Truck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
 import { DocumentFormDialog, type DocFormValue } from "@/features/sales/components/DocumentFormDialog";
-import { useSalesOrders, useSaveSalesOrder, useDeleteSalesOrder, useConvertSoToInvoice, useConvertSoToDeliveryNote, useConfirmSalesOrder, type SalesOrderInput } from "@/features/sales/api";
+import { useSalesOrders, useSaveSalesOrder, useDeleteSalesOrder, useConvertSoToInvoice, useConvertSoToDeliveryNote, type SalesOrderInput } from "@/features/sales/api";
 import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
 import { inr } from "@/lib/sales-utils";
 
@@ -19,7 +18,6 @@ function SalesOrdersPage() {
   const del = useDeleteSalesOrder();
   const toInv = useConvertSoToInvoice();
   const toDn = useConvertSoToDeliveryNote();
-  const confirmSo = useConfirmSalesOrder();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<DocFormValue | null>(null);
 
@@ -51,18 +49,6 @@ function SalesOrdersPage() {
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
         rowExtraActions={(r: any) => (
           <>
-            {(r.status === "draft" || r.status === "credit_hold") && (
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8"
-                title="Confirm order (runs credit check)"
-                disabled={confirmSo.isPending}
-                onClick={() => confirmSo.mutate(r.id)}
-              >
-                <ShieldCheck className="h-3.5 w-3.5" />
-              </Button>
-            )}
             <Button size="icon" variant="ghost" className="h-8 w-8" title="Create Invoice" disabled={r.status === "fulfilled" || toInv.isPending} onClick={() => toInv.mutate(r.id)}>
               <ReceiptText className="h-3.5 w-3.5" />
             </Button>
@@ -77,16 +63,7 @@ function SalesOrdersPage() {
           { header: "Customer", cell: (r: any) => r.customer?.name ?? "—" },
           { header: "Order Date", cell: (r: any) => fmtDate(r.order_date) },
           { header: "Delivery", cell: (r: any) => fmtDate(r.delivery_date) },
-          { header: "Status", cell: (r: any) => (
-            <div className="flex items-center gap-1.5">
-              <StatusChip value={r.status} tone={toneForStatus(r.status)} />
-              {r.credit_hold && (
-                <Badge variant="outline" className="text-[10px] text-rose-600 border-rose-300" title={r.credit_hold_reason ?? ""}>
-                  Credit hold
-                </Badge>
-              )}
-            </div>
-          ) },
+          { header: "Status", cell: (r: any) => <StatusChip value={r.status} tone={toneForStatus(r.status)} /> },
           { header: "Total", className: "text-right", cell: (r: any) => <span className="tabular-nums">{inr(r.grand_total)}</span> },
         ]}
       />
@@ -97,13 +74,8 @@ function SalesOrdersPage() {
         statuses={[
           { value: "draft", label: "Draft" },
           { value: "confirmed", label: "Confirmed" },
-          { value: "credit_hold", label: "Credit Hold" },
           { value: "processing", label: "Processing" },
-          { value: "partially_dispatched", label: "Partially Dispatched" },
-          { value: "dispatched", label: "Dispatched" },
-          { value: "invoiced", label: "Invoiced" },
           { value: "fulfilled", label: "Fulfilled" },
-          { value: "closed", label: "Closed" },
           { value: "cancelled", label: "Cancelled" },
         ]}
         initial={editing}
