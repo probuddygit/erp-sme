@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { StickyNote, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
