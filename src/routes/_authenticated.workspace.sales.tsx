@@ -7,6 +7,7 @@ import {
   ReceiptText,
   Undo2,
   Wallet,
+  StickyNote,
   type LucideIcon,
 } from "lucide-react";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -22,6 +23,7 @@ const TABS: { path: string; label: string; icon: LucideIcon }[] = [
   { path: "/workspace/sales/sales-orders",     label: "Sales Orders",      icon: ClipboardList },
   { path: "/workspace/sales/delivery-notes",   label: "Delivery Notes",    icon: Truck },
   { path: "/workspace/sales/invoices",         label: "Invoices",          icon: ReceiptText },
+  { path: "/workspace/sales/credit-notes",     label: "Credit Notes",      icon: StickyNote },
   { path: "/workspace/sales/returns",          label: "Returns",           icon: Undo2 },
   { path: "/workspace/sales/payments",         label: "Customer Payments", icon: Wallet },
 ];
