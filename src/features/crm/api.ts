@@ -71,7 +71,9 @@ export interface ActivityRow {
   channel: string | null;
   gps_lat: number | null;
   gps_lng: number | null;
-  check_in: string | null;
+  checked_in: boolean;
+  opportunity_id: string | null;
+  due_date: string | null;
   owner_id: string | null;
   scheduled_at: string;
   status: "planned" | "done" | "overdue";
