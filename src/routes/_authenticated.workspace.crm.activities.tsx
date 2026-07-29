@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Phone, Mail, ListChecks, CalendarDays, StickyNote, Loader2, type LucideIcon } from "lucide-react";
+import { Plus, Phone, Mail, ListChecks, CalendarDays, StickyNote, Loader2, MapPin, type LucideIcon } from "lucide-react";
+import { toast } from "sonner";
 import { FilterBar } from "@/features/crm/components/FilterBar";
 import { StatusBadge } from "@/features/crm/components/StatusBadge";
 import { FormDialog, Field } from "@/features/crm/components/FormDialog";
@@ -28,15 +29,36 @@ const STATUS_TONE: Record<ActivityRow["status"], string> = {
   overdue: "bg-rose-50 text-rose-700 border-rose-200",
 };
 
-const empty: Partial<ActivityRow> = { activity_type: "task", subject: "", scheduled_at: new Date().toISOString(), status: "planned" };
+const empty: Partial<ActivityRow> = { activity_type: "task", subject: "", scheduled_at: new Date().toISOString(), status: "planned", checked_in: false };
 
 function ActivitiesPage() {
   const { data: rows = [], isLoading } = useActivities();
   const save = useSaveActivity();
+  const [checkingIn, setCheckingIn] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [status, setStatus] = useState("");
   const [editing, setEditing] = useState<Partial<ActivityRow> | null>(null);
+
+  const checkIn = async (a: ActivityRow) => {
+    if (!navigator.geolocation) { toast.error("Geolocation not supported"); return; }
+    setCheckingIn(a.id);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          await save.mutateAsync({
+            id: a.id,
+            checked_in: true,
+            gps_lat: pos.coords.latitude,
+            gps_lng: pos.coords.longitude,
+            status: "done",
+          });
+        } finally { setCheckingIn(null); }
+      },
+      (err) => { toast.error(err.message || "Unable to fetch location"); setCheckingIn(null); },
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  };
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -71,7 +93,7 @@ function ActivitiesPage() {
                   <TableHead>Subject</TableHead>
                   <TableHead>When</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="w-24"></TableHead>
+                  <TableHead className="w-40 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -84,17 +106,41 @@ function ActivitiesPage() {
                   return (
                     <TableRow key={a.id} className="hover:bg-muted/50">
                       <TableCell><span className="inline-flex items-center gap-1.5 text-xs capitalize"><Icon className="h-3.5 w-3.5 text-muted-foreground" />{a.activity_type}</span></TableCell>
-                      <TableCell className="font-medium">{a.subject}</TableCell>
+                      <TableCell className="font-medium">
+                        <div>{a.subject}</div>
+                        {a.checked_in && a.gps_lat != null && a.gps_lng != null && (
+                          <a
+                            href={`https://www.google.com/maps?q=${a.gps_lat},${a.gps_lng}`}
+                            target="_blank" rel="noreferrer"
+                            className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-emerald-700 hover:underline"
+                          >
+                            <MapPin className="h-3 w-3" /> Checked in ({a.gps_lat.toFixed(4)}, {a.gps_lng.toFixed(4)})
+                          </a>
+                        )}
+                      </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{formatDateTime(a.scheduled_at)}</TableCell>
                       <TableCell><StatusBadge label={a.status} tone={STATUS_TONE[a.status]} /></TableCell>
                       <TableCell className="text-right">
-                        <RowActions
-                          onEdit={() => setEditing(a)}
-                          table="crm_activities"
-                          id={a.id}
-                          invalidateKeys={[["crm", "activities"]]}
-                          label="activity"
-                        />
+                        <div className="flex items-center justify-end gap-1">
+                          {!a.checked_in && a.activity_type !== "email" && a.activity_type !== "note" && (
+                            <Button
+                              size="sm" variant="ghost"
+                              className="h-7 text-xs text-emerald-700 hover:text-emerald-800"
+                              disabled={checkingIn === a.id}
+                              onClick={() => checkIn(a)}
+                            >
+                              {checkingIn === a.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <MapPin className="h-3.5 w-3.5 mr-1" />}
+                              Check in
+                            </Button>
+                          )}
+                          <RowActions
+                            onEdit={() => setEditing(a)}
+                            table="crm_activities"
+                            id={a.id}
+                            invalidateKeys={[["crm", "activities"]]}
+                            label="activity"
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
