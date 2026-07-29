@@ -99,7 +99,6 @@ function CreditNotesPage() {
       <PageHeader
         title="Credit Notes"
         description="Reverse invoices for returns, price corrections, discounts or cancellations."
-        icon={StickyNote}
         actions={
           <Button size="sm" onClick={() => setOpen(true)}>
             <Plus className="mr-1.5 h-3.5 w-3.5" />
