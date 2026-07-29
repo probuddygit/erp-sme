@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FileText, ClipboardList } from "lucide-react";
+import { FileText, ClipboardList, Printer, Download, Mail, Share2, Eye } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SalesDocList, StatusChip, toneForStatus, fmtDate } from "@/features/sales/components/SalesDocList";
@@ -7,18 +7,31 @@ import { DocumentFormDialog, type DocFormValue } from "@/features/sales/componen
 import { useQuotations, useSaveQuotation, useDeleteQuotation, useConvertQuotationToSalesOrder, type QuotationInput } from "@/features/sales/api";
 import { DocHistoryButton } from "@/features/shared/DocHistoryDialog";
 import { inr } from "@/lib/sales-utils";
+import {
+  downloadQuotationPdf,
+  openQuotationPdf,
+  shareQuotationPdf,
+  sendQuotationEmail,
+} from "@/features/sales/quotation-pdf";
+import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/_authenticated/workspace/sales/quotations")({
   component: QuotationsPage,
 });
 
 function QuotationsPage() {
+  const { company } = useAuth();
   const { data = [], isLoading } = useQuotations();
   const save = useSaveQuotation();
   const del = useDeleteQuotation();
   const toSo = useConvertQuotationToSalesOrder();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<DocFormValue | null>(null);
+
+  const runPdf = async (fn: () => Promise<any>) => {
+    try { await fn(); } catch (e: any) { toast.error(e?.message ?? "PDF failed"); }
+  };
 
   const openNew = () => { setEditing(null); setOpen(true); };
   const openEdit = (row: any) => {
@@ -54,6 +67,34 @@ function QuotationsPage() {
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}
         rowExtraActions={(r: any) => (
           <>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Preview PDF"
+              onClick={() => company && runPdf(() => openQuotationPdf({ quotationId: r.id, companyId: company.id }, "preview"))}>
+              <Eye className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Print"
+              onClick={() => company && runPdf(() => openQuotationPdf({ quotationId: r.id, companyId: company.id }, "print"))}>
+              <Printer className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Download PDF"
+              onClick={() => company && runPdf(() => downloadQuotationPdf({ quotationId: r.id, companyId: company.id }))}>
+              <Download className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Send by email"
+              onClick={async () => {
+                if (!company) return;
+                await runPdf(() => downloadQuotationPdf({ quotationId: r.id, companyId: company.id }));
+                sendQuotationEmail({ quotation_number: r.quotation_number, grand_total: Number(r.grand_total ?? 0) }, r.customer?.email);
+                toast.message("PDF downloaded — attach it in your email client.");
+              }}>
+              <Mail className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" title="Share"
+              onClick={() => company && runPdf(async () => {
+                const res = await shareQuotationPdf({ quotationId: r.id, companyId: company.id });
+                if (res === "downloaded") toast.message("Sharing not supported — PDF downloaded instead.");
+              })}>
+              <Share2 className="h-3.5 w-3.5" />
+            </Button>
             <Button size="icon" variant="ghost" className="h-8 w-8" title="Convert to Sales Order" disabled={r.status === "accepted" || toSo.isPending} onClick={() => toSo.mutate(r.id)}>
               <ClipboardList className="h-3.5 w-3.5" />
             </Button>
