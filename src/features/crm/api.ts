@@ -101,6 +101,60 @@ export interface CustomerRow {
   created_at: string;
 }
 
+// -------- New CRM Revamp Types --------
+export interface AccountRow {
+  id: string;
+  company_id: string;
+  name: string;
+  gstin: string | null;
+  pan: string | null;
+  billing_address: string | null;
+  shipping_address: string | null;
+  credit_limit: number;
+  credit_days: number;
+  price_list_id: string | null;
+  territory: string | null;
+  owner_id: string | null;
+  status: string;
+  gstin_verified_at: string | null;
+  gstin_legal_name: string | null;
+  customer_id: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OpportunityRow {
+  id: string;
+  company_id: string;
+  account_id: string | null;
+  lead_id: string | null;
+  name: string;
+  stage: string;
+  value: number;
+  probability: number;
+  expected_close: string | null;
+  owner_id: string | null;
+  quotation_id: string | null;
+  lost_reason: string | null;
+  stage_entered_at: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StageConfigRow {
+  id: string;
+  company_id: string;
+  kind: "lead" | "opportunity";
+  stage_key: string;
+  label: string;
+  sort_order: number;
+  tone: string | null;
+  aging_threshold_days: number;
+  is_terminal: boolean;
+}
+
 // -------- Helpers --------
 function useCompanyId() {
   const { company } = useAuth();
