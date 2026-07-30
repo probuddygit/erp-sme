@@ -339,6 +339,17 @@ export function ProcurementFormDialog({
         )}
 
         <DialogFooter>
+          {stockBlocked && (
+            <div className="mr-auto flex items-start gap-2 text-xs text-amber-600">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-px" />
+              <span>
+                {warehouseMissing && <>Select a warehouse so stock can be received. </>}
+                {unlinkedLines.length > 0 && (
+                  <>Link {unlinkedLines.length === 1 ? "line" : "lines"} {unlinkedLines.map(({ i }) => i + 1).join(", ")} to a stock item — unlinked lines never update inventory.</>
+                )}
+              </span>
+            </div>
+          )}
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>{savedId && attachmentsType ? "Close" : "Cancel"}</Button>
           <Button onClick={submit} disabled={!canSave || saving}>{saving ? "Saving…" : savedId ? "Save changes" : "Save"}</Button>
         </DialogFooter>
