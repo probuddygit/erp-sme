@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, AlertTriangle } from "lucide-react";
 import { useSuppliers, useItemsMaster, useWarehouses, usePurchaseOrders } from "@/features/procurement/api";
 import { AttachmentsPanel } from "@/features/attachments/components/AttachmentsPanel";
 import type { EntityType } from "@/features/attachments/api";
@@ -53,6 +53,8 @@ interface Props {
   showPricing?: boolean;
   showFreight?: boolean;
   showReason?: boolean;
+  /** Lines must resolve to a master item (and a warehouse must be set) for stock to post. */
+  requireItemLink?: boolean;
   attachmentsType?: EntityType;
   initial?: ProcurementFormValue | null;
   onSubmit: (v: ProcurementFormValue) => Promise<string | void>;
@@ -72,7 +74,7 @@ function emptyLine(showPricing?: boolean): FormLine {
 export function ProcurementFormDialog({
   open, onOpenChange, title, primaryDateLabel, secondaryDateLabel, statuses,
   showSupplier = true, showWarehouse, showPurchaseOrder, showTaxType, showPricing, showFreight, showReason,
-  attachmentsType, initial, onSubmit,
+  requireItemLink, attachmentsType, initial, onSubmit,
 }: Props) {
   const { data: suppliers = [] } = useSuppliers();
   const { data: items = [] } = useItemsMaster();
@@ -99,7 +101,17 @@ export function ProcurementFormDialog({
     ? computeTotals(value.lines.map(l => ({ quantity: l.quantity, unit_price: l.unit_price ?? 0, discount_percent: 0, tax_percent: l.tax_percent ?? 0 })), value.tax_type ?? "intra_state")
     : null;
 
-  const canSave = (!showSupplier || value.supplier_id) && value.lines.length > 0 && value.lines.every(l => l.item_name.trim() && l.quantity > 0);
+  const unlinkedLines = requireItemLink
+    ? value.lines.map((l, i) => ({ l, i })).filter(({ l }) => !l.item_id)
+    : [];
+  const warehouseMissing = !!requireItemLink && showWarehouse && !value.warehouse_id;
+  const stockBlocked = unlinkedLines.length > 0 || warehouseMissing;
+
+  const canSave =
+    (!showSupplier || value.supplier_id) &&
+    value.lines.length > 0 &&
+    value.lines.every((l) => l.item_name.trim() && l.quantity > 0) &&
+    !stockBlocked;
 
   const submit = async () => {
     if (!canSave) return;
