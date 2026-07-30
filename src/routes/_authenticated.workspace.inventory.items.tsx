@@ -4,7 +4,7 @@ import { InventoryTable, type Column } from "@/features/inventory/components/Inv
 import { StatusBadge } from "@/features/sales/components/StatusBadge";
 import { RowActions } from "@/components/RowActions";
 import { ItemFormDialog } from "@/features/inventory/components/ItemFormDialog";
-import { useItems, useStockLevels, fmtINR, fmtNum } from "@/features/inventory/api";
+import { useItems, useStockLevels, useLastMovementByItem, fmtINR, fmtNum, fmtDate } from "@/features/inventory/api";
 import { STATUS_TONES } from "@/features/inventory/data";
 import { useMemo, useState } from "react";
 import type { Database } from "@/integrations/supabase/types";
@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/workspace/inventory/items"
 function ItemsPage() {
   const { data: items = [], isLoading } = useItems();
   const { data: levels = [] } = useStockLevels();
+  const { data: lastMovement } = useLastMovementByItem();
   const [type, setType] = useState("");
   const [stockStatus, setStockStatus] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -54,7 +55,20 @@ function ItemsPage() {
       </div>
     ) },
     { header: "UoM", cell: (r) => <span className="text-sm">{r.unit}</span> },
-    { header: "On Hand", align: "right", cell: (r) => <span className="font-medium">{fmtNum(onHandByItem.get(r.id)?.qty ?? 0)} {r.unit}</span> },
+    { header: "On Hand", align: "right", cell: (r) => {
+      const qty = onHandByItem.get(r.id)?.qty ?? 0;
+      const last = lastMovement?.get(r.id);
+      return (
+        <div>
+          <div className="font-medium">{fmtNum(qty)} {r.unit}</div>
+          {qty === 0 && (
+            <div className="text-[11px] text-muted-foreground">
+              {last ? `Last movement ${fmtDate(last)}` : "No receipts yet"}
+            </div>
+          )}
+        </div>
+      );
+    } },
     { header: "Reorder", align: "right", cell: (r) => <span className="text-sm">{r.reorder_level ?? r.min_stock ?? 0}</span> },
     { header: "Cost",    align: "right", cell: (r) => fmtINR(Number(r.standard_cost ?? 0)) },
     { header: "Stock",   cell: (r) => {

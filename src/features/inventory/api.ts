@@ -137,6 +137,26 @@ export function useStockLevels() {
 }
 
 // ---------- Stock Transactions (Ledger) ----------
+export function useLastMovementByItem() {
+  const { profile } = useAuth();
+  return useQuery({
+    queryKey: ["inv", "last-movement", profile?.company_id],
+    enabled: !!profile?.company_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("stock_transactions")
+        .select("item_id, occurred_at")
+        .eq("company_id", profile!.company_id!)
+        .order("occurred_at", { ascending: false })
+        .limit(2000);
+      if (error) throw error;
+      const m = new Map<string, string>();
+      (data ?? []).forEach((r: any) => { if (!m.has(r.item_id)) m.set(r.item_id, r.occurred_at); });
+      return m;
+    },
+  });
+}
+
 export interface StockTxnRow {
   id: string;
   occurred_at: string;

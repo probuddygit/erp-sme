@@ -67,7 +67,7 @@ function GRNsPage() {
         statuses={[
           { value: "draft", label: "Draft" }, { value: "posted", label: "Posted" }, { value: "cancelled", label: "Cancelled" },
         ]}
-        showWarehouse showPurchaseOrder showPricing showFreight
+        showWarehouse showPurchaseOrder showPricing showFreight requireItemLink
         attachmentsType="grn" initial={editing}
         onSubmit={async (v) => {
           const input: GRNInput = {

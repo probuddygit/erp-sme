@@ -1,84 +1,52 @@
-# Sales Module Revamp — SAP-style Order-to-Cash
+## What "On Hand" actually reads
 
-Aligns Sales with the CRM revamp (accounts/opportunities) and Indian MSME partial-dispatch reality. Current module backed up, then rebuilt around the ER you specified.
+The Items grid does not sum transactions. It calls the `item_stock_levels` function, which returns, per item and warehouse:
 
-## Backup & safety
+`on_hand = SUM(stock_batches.qty_remaining)` and `value = SUM(qty_remaining × (unit_cost + landed_cost_per_unit))`
 
-- Move current routes to `.lovable/backup/sales/` (quotations, sales-orders, delivery-notes, invoices, returns, payments, index).
-- Snapshot current `src/features/sales/` to `.lovable/backup/sales/features/`.
-- Keep `_authenticated.app.sales.*.tsx` (legacy `/app/sales/*`) untouched as a live fallback.
-- All DB changes additive — no drops on existing tables.
+So an item shows 0 until at least one **stock batch** exists for it.
 
-## Data model (additive migration)
+## The workflow that creates batches
 
-New/extended columns on existing tables (no destructive changes):
+```text
+Purchase Order ──► GRN (draft) ──► GRN posted ──► post_stock_receipt()
+                                                    └─► stock_batches row (+qty_remaining)
+                                                    └─► stock_transactions ledger row
+                                                    └─► journal entry (Inventory Dr / AP Cr)
 
-- `quotations`: `crm_account_id`, `opportunity_id`, `converted_order_id` (FK).
-- `sales_orders`: `quotation_id`, `crm_account_id`, `warehouse_id`, `promised_date`, `credit_hold bool`, `credit_hold_reason`, extend `sales_order_status` enum with `partially_dispatched`, `dispatched`, `invoiced`, `closed`, `credit_hold`.
-- `sales_order_items`: `qty_dispatched numeric default 0`, `qty_invoiced numeric default 0`, `item_id` (FK items, nullable for free-text lines).
-- `delivery_notes`: `vehicle_no`, `transporter_name`, `eway_bill_no`, `place_of_supply`.
-- `delivery_note_items`: `sales_order_item_id`, `batch_id` (FK stock_batches, nullable).
-- `invoices`: `place_of_supply`, `irn`, `qr_code_data`, `gstin_seq_no` (per-GSTIN sequence).
-- `invoice_items`: `hsn_code`, `sales_order_item_id`.
+Other inbound: Production Output (FG), Stock Adjustment (+ variance),
+               Stock Transfer In, Opening Stock
+Outbound (reduces qty_remaining): Delivery Note / Invoice issue,
+               Material Consumption, Adjustment (−), Transfer Out
+```
 
-New table `credit_notes` + `credit_note_items` with `reason` enum (`return`, `pricing`, `discount`, `cancellation`), links to invoice, reverses AR + GST on post (trigger reuses existing journal/GST posting helpers).
+Requirements for a GRN line to hit stock (all must be true, verified in the trigger):
+1. GRN status = `posted`
+2. Line has a linked **item_id** (not just a typed item name)
+3. A warehouse is set on the line or the GRN header
+4. Quantity > 0
 
-New RPCs:
-- `check_customer_credit(_account_id, _order_total)` → returns `{ ok, available, reason }`.
-- `confirm_sales_order(_order_id)` → runs credit check, sets `confirmed` or `credit_hold`.
-- `next_invoice_number_per_gstin(_company_id, _gstin)` → per-GSTIN sequence.
+## Current state in your data (verified)
 
-## API layer (`src/features/sales/api.ts`)
+| Company | Items | Batches | Why |
+|---|---|---|---|
+| Guru Auto | 7 | 2 (Steel Sheet 2mm 1,850; Brake Assembly 100) | GRN-2026-0001 posted with a linked item — worked correctly |
+| Pops Auto | 4 | 0 | GRN-26-72542 is posted but its line has **item_id = NULL** ("New Item 1" typed as free text) → trigger skipped |
+| John Auto | 3 | 0 | No GRNs / no receipts at all |
 
-Extend with:
-- `useConfirmSalesOrder`, `useReleaseCreditHold`.
-- `useDispatchOrder(orderId)` — creates DeliveryChallan, allocates from selected batches, decrements stock, updates `qty_dispatched`, flips SO status to `partially_dispatched`/`dispatched`.
-- `useInvoiceChallan(challanId)` — creates TaxInvoice from a challan (or multiple), computes CGST/SGST/IGST via existing `tax_type`, calls per-GSTIN numbering, marks SO `invoiced` when fully covered.
-- `useCreateCreditNote`, `useCreditNotes(invoiceId)`.
-- `useSalesDashboard()` — leaderboards, credit-hold count, overdue receivables.
+So the 0s you see are two different things: items that genuinely have no receipts yet, and a real defect where a posted GRN silently produced no stock because the line wasn't linked to a master item.
 
-Deterministic client-side heuristics for AI helpers (no external calls):
-- `deliveryFeasibility(order)` — flags if promised_date < today + item lead-time proxy or stock < qty.
-- `priceAnomaly(line, priceList)` — flags > 15% deviation from list price.
-- `dunningDraft(invoice)` — templated message with tone based on days overdue.
+## Proposed fixes
 
-## UI (kept in current theme)
+1. **Make item linkage mandatory in the GRN line editor** — the item picker must resolve to a master item; block posting when any line has no `item_id`, with a clear inline error instead of a silent no-op.
+2. **Warn on post** — if a GRN is about to post with lines that cannot affect stock (no item or no warehouse), show a confirm/blocking message naming those lines.
+3. **Backfill the stuck Pops Auto GRN** — either link "New Item 1" to a real item and re-trigger the receipt, or reverse and re-enter it, so its stock lands in the batch table.
+4. **Surface the source on the Items page** — small "Last receipt" / "no receipts yet" hint on 0-qty rows so an empty item is distinguishable from a broken posting.
+5. **Optional seed** — post sample opening-stock receipts for John Auto and Pops Auto items so Inventory, Valuation and Reports show meaningful numbers.
 
-Routes under `/workspace/sales`:
+## Technical notes
 
-1. **Quotations** — enrich existing list with account/opportunity link, "Convert to Order" action already exists; add per-row `ScoreBadge` for value tier.
-2. **Order Booking** (`sales-orders`) rebuild:
-   - Header: customer typeahead + inline `CreditGauge` (reuses CRM component).
-   - Line grid with live stock chip (green/amber/red) per item + warehouse.
-   - Rate autofill from price_lists; override prompts reason.
-   - Footer: totals + feasibility banner.
-   - Confirm button disabled with tooltip when credit hold.
-3. **Dispatch / Challans** (new `/workspace/sales/dispatch`):
-   - List of confirmed/partially dispatched SOs; drawer to pick lines, qty, batch (only shown when item is batch-tracked), vehicle, transporter, e-Way bill (auto-suggest when taxable value ≥ ₹50k).
-4. **Invoices** — read-mostly detail; prominent IRN/QR panel; timeline (Issued → Partial → Paid) built from `payments`; "Raise Credit Note" button gated by reason-code select.
-5. **Credit Notes** (new tab) — list + create dialog.
-6. **Sales Dashboard** (`/workspace/sales` index revamp):
-   - KPI tiles: Booked, Dispatched, Invoiced, Collected (MTD).
-   - Alert tile: credit-hold orders count.
-   - Overdue receivables tile from invoices.
-   - Rep-wise + product-wise leaderboards (Recharts bar).
-
-Sidebar nav updated: Dashboard, Quotations, Sales Orders, Dispatch, Invoices, Credit Notes, Payments, Returns.
-
-## State machine enforcement
-
-SO transitions guarded in `confirm_sales_order` RPC and dispatch/invoice hooks. `credit_hold` is a first-class status; release requires `admin`/`finance` role via existing `has_role`.
-
-## Out of scope (stubs only)
-
-- Real GSTN IRN/e-Way Bill calls — `irn`/`eway_bill_no` remain manual inputs with adapter seam (matches existing GST adapter pattern).
-- External AI calls — heuristics only, easy to swap later.
-
-## Rollout order
-
-1. Migration (schema + enum + RPCs + credit_notes tables + GRANTs + RLS).
-2. Backup move of old route/feature files.
-3. New api.ts hooks + shared components (`StockChip`, `CreditHoldBadge`, `IRNPanel`, `CreditNoteDialog`).
-4. Rebuild Quotations, SO Booking, Dispatch, Invoices, Credit Notes, Dashboard routes.
-5. Update sidebar nav.
-6. Verify build.
+- Function: `public.item_stock_levels(_company_id)` — batch-based, security definer, tenant-checked.
+- Trigger: `tg_grn_item_to_stock` on `grn_items` → `post_stock_receipt(...)`; it is a no-op when `item_id IS NULL`, which is exactly the silent failure above.
+- Frontend: `src/features/inventory/api.ts` (`useStockLevels`), `src/routes/_authenticated.workspace.inventory.items.tsx`, GRN form under `src/features/procurement/`.
+- No schema change is required for fixes 1, 2 and 4; fix 3 is a data operation.
