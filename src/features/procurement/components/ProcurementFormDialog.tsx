@@ -258,6 +258,32 @@ export function ProcurementFormDialog({
                 const lineTotal = (l.quantity ?? 0) * (l.unit_price ?? 0) * (1 + (l.tax_percent ?? 0) / 100);
                 return (
                   <div key={i} className={`px-3 py-2 grid gap-2 items-center ${showPricing ? "grid-cols-12" : "grid-cols-8"}`}>
+                    {requireItemLink ? (
+                      <div className={`${showPricing ? "col-span-4" : "col-span-5"} flex items-center gap-1.5`}>
+                        <Select
+                          value={l.item_id ?? ""}
+                          onValueChange={(id) => {
+                            const match = (items as any[]).find((it) => it.id === id);
+                            if (!match) return;
+                            updateLine(i, {
+                              item_id: match.id,
+                              item_name: match.name,
+                              item_code: match.sku ?? undefined,
+                              unit: l.unit || match.unit || "Nos",
+                              unit_price: showPricing && !l.unit_price ? Number(match.standard_cost ?? 0) : l.unit_price,
+                            });
+                          }}
+                        >
+                          <SelectTrigger className="h-8 flex-1"><SelectValue placeholder={l.item_name || "Select stock item"} /></SelectTrigger>
+                          <SelectContent>
+                            {(items as any[]).map((it) => (
+                              <SelectItem key={it.id} value={it.id}>{it.sku ? `${it.sku} — ${it.name}` : it.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {!l.item_id && <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" aria-label="Not linked to a stock item" />}
+                      </div>
+                    ) : (
                     <Input list={`items-${i}`} className={`h-8 ${showPricing ? "col-span-4" : "col-span-5"}`} placeholder="Item name / SKU" value={l.item_name} onChange={(e) => {
                       const name = e.target.value;
                       const match = items.find((it: any) => it.name === name || it.sku === name);
@@ -265,6 +291,7 @@ export function ProcurementFormDialog({
                         ? { item_name: match.name, item_id: match.id, item_code: match.sku ?? undefined, unit: l.unit || match.unit || "Nos" }
                         : { item_name: name, item_id: null });
                     }} />
+                    )}
                     <datalist id={`items-${i}`}>
                       {items.map((it: any) => <option key={it.id} value={it.name}>{it.sku ? `${it.sku} — ${it.name}` : it.name}</option>)}
                     </datalist>
