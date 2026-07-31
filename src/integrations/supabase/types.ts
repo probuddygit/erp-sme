@@ -1540,6 +1540,130 @@ export type Database = {
         }
         Relationships: []
       }
+      cycle_count_lines: {
+        Row: {
+          company_id: string
+          count_id: string
+          counted_qty: number
+          created_at: string
+          id: string
+          item_id: string
+          notes: string | null
+          system_qty: number
+          unit_cost: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          count_id: string
+          counted_qty?: number
+          created_at?: string
+          id?: string
+          item_id: string
+          notes?: string | null
+          system_qty?: number
+          unit_cost?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          count_id?: string
+          counted_qty?: number
+          created_at?: string
+          id?: string
+          item_id?: string
+          notes?: string | null
+          system_qty?: number
+          unit_cost?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cycle_count_lines_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cycle_count_lines_count_id_fkey"
+            columns: ["count_id"]
+            isOneToOne: false
+            referencedRelation: "cycle_counts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cycle_count_lines_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cycle_counts: {
+        Row: {
+          company_id: string
+          completed_at: string | null
+          count_number: string
+          counted_by: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          scheduled_date: string
+          status: string
+          updated_at: string
+          warehouse_id: string
+          zone: string | null
+        }
+        Insert: {
+          company_id: string
+          completed_at?: string | null
+          count_number: string
+          counted_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          scheduled_date?: string
+          status?: string
+          updated_at?: string
+          warehouse_id: string
+          zone?: string | null
+        }
+        Update: {
+          company_id?: string
+          completed_at?: string | null
+          count_number?: string
+          counted_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          scheduled_date?: string
+          status?: string
+          updated_at?: string
+          warehouse_id?: string
+          zone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cycle_counts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cycle_counts_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_note_items: {
         Row: {
           batch_id: string | null
@@ -2335,6 +2459,72 @@ export type Database = {
           },
         ]
       }
+      inventory_bins: {
+        Row: {
+          capacity: number
+          code: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          rack: string | null
+          shelf: string | null
+          updated_at: string
+          used: number
+          warehouse_id: string
+          zone: string | null
+        }
+        Insert: {
+          capacity?: number
+          code: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          rack?: string | null
+          shelf?: string | null
+          updated_at?: string
+          used?: number
+          warehouse_id: string
+          zone?: string | null
+        }
+        Update: {
+          capacity?: number
+          code?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          rack?: string | null
+          shelf?: string | null
+          updated_at?: string
+          used?: number
+          warehouse_id?: string
+          zone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_bins_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_bins_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -2628,6 +2818,134 @@ export type Database = {
             columns: ["sales_order_id"]
             isOneToOne: false
             referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      item_barcodes: {
+        Row: {
+          barcode: string
+          company_id: string
+          created_at: string
+          format: string
+          id: string
+          item_id: string
+          last_printed_at: string | null
+          printed_count: number
+          updated_at: string
+        }
+        Insert: {
+          barcode: string
+          company_id: string
+          created_at?: string
+          format?: string
+          id?: string
+          item_id: string
+          last_printed_at?: string | null
+          printed_count?: number
+          updated_at?: string
+        }
+        Update: {
+          barcode?: string
+          company_id?: string
+          created_at?: string
+          format?: string
+          id?: string
+          item_id?: string
+          last_printed_at?: string | null
+          printed_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_barcodes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "item_barcodes_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      item_serials: {
+        Row: {
+          batch_no: string | null
+          company_id: string
+          created_at: string
+          customer_id: string | null
+          id: string
+          item_id: string
+          notes: string | null
+          received_on: string | null
+          serial_no: string
+          status: string
+          updated_at: string
+          warehouse_id: string | null
+          warranty_end: string | null
+        }
+        Insert: {
+          batch_no?: string | null
+          company_id: string
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          item_id: string
+          notes?: string | null
+          received_on?: string | null
+          serial_no: string
+          status?: string
+          updated_at?: string
+          warehouse_id?: string | null
+          warranty_end?: string | null
+        }
+        Update: {
+          batch_no?: string | null
+          company_id?: string
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          item_id?: string
+          notes?: string | null
+          received_on?: string | null
+          serial_no?: string
+          status?: string
+          updated_at?: string
+          warehouse_id?: string | null
+          warranty_end?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_serials_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "item_serials_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "item_serials_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "item_serials_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
             referencedColumns: ["id"]
           },
         ]
@@ -6689,6 +7007,10 @@ export type Database = {
       confirm_sales_order: { Args: { _order_id: string }; Returns: Json }
       convert_lead_to_account: { Args: { _lead_id: string }; Returns: Json }
       convert_lead_to_quotation: { Args: { _lead_id: string }; Returns: string }
+      create_indent_from_reorder: {
+        Args: { _company_id: string }
+        Returns: Json
+      }
       explode_bom: {
         Args: { _bom_id: string; _qty: number }
         Returns: {
@@ -6788,6 +7110,7 @@ export type Database = {
         Returns: string
       }
       next_wo_number: { Args: { _company_id: string }; Returns: string }
+      post_cycle_count: { Args: { _count_id: string }; Returns: Json }
       post_journal: {
         Args: {
           _company_id: string
