@@ -2,17 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ReportCard } from "@/features/finance/components/ReportCard";
 import { StatCard } from "@/shared/components/StatCard";
 import { PieChart, IndianRupee } from "lucide-react";
-import { CHART_OF_ACCOUNTS, accountBalance, formatINR } from "@/features/finance/data";
+import { formatINR } from "@/features/finance/data";
+import { useFinanceBook } from "@/features/finance/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/finance/profit-loss")({
   component: ProfitLossPage,
 });
 
+const COGS_CODES = ["5000", "5200"];
+
 function ProfitLossPage() {
-  const leaves = (type: string) => CHART_OF_ACCOUNTS.filter((a) => a.type === type && !a.isGroup);
-  const revenue = leaves("revenue").map((a) => ({ ...a, bal: -accountBalance(a.code) }));
-  const cogs = leaves("expense").filter((a) => a.group === "COGS").map((a) => ({ ...a, bal: accountBalance(a.code) }));
-  const opex = leaves("expense").filter((a) => a.group !== "COGS").map((a) => ({ ...a, bal: accountBalance(a.code) }));
+  const book = useFinanceBook();
+  const revenue = book.leaves("revenue").map((a) => ({ ...a, bal: -book.accountBalance(a.code) }));
+  const expenses = book.leaves("expense").map((a) => ({ ...a, bal: book.accountBalance(a.code) }));
+  const cogs = expenses.filter((a) => COGS_CODES.includes(a.code) || a.group === "COGS");
+  const opex = expenses.filter((a) => !cogs.includes(a));
 
   const totalRevenue = revenue.reduce((s, a) => s + a.bal, 0);
   const totalCogs = cogs.reduce((s, a) => s + a.bal, 0);
@@ -30,7 +34,7 @@ function ProfitLossPage() {
         <StatCard label="Net profit" value={formatINR(netProfit)} icon={PieChart} trend={{ value: `${margin.toFixed(1)}% margin`, positive: netProfit >= 0 }} />
       </div>
 
-      <ReportCard title="Profit & Loss" subtitle="Statement of earnings for the current period.">
+      <ReportCard title="Profit & Loss" subtitle={book.isLoading ? "Loading live ledger balances…" : "Earnings built from invoices, consumption, payroll and expenses posted this period."}>
         <div className="space-y-4">
           <Section title="Revenue" rows={revenue.map((a) => ({ label: `${a.code} · ${a.name}`, value: a.bal }))} total={totalRevenue} />
           <Section title="Cost of goods sold" rows={cogs.map((a) => ({ label: `${a.code} · ${a.name}`, value: a.bal }))} total={totalCogs} />
@@ -54,7 +58,9 @@ function Section({ title, rows, total }: { title: string; rows: { label: string;
     <div className="rounded-lg border border-border">
       <div className="border-b border-border bg-muted/40 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</div>
       <div className="divide-y divide-border">
-        {rows.map((r) => (
+        {rows.length === 0 ? (
+          <div className="px-3 py-3 text-sm text-muted-foreground">No balances yet.</div>
+        ) : rows.map((r) => (
           <div key={r.label} className="flex items-center justify-between px-3 py-2 text-sm">
             <span className="text-muted-foreground">{r.label}</span>
             <span>{formatINR(r.value)}</span>
