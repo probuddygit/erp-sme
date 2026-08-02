@@ -1,17 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Wallet } from "lucide-react";
 import { EntriesPage } from "@/features/finance/components/EntriesPage";
-import { PAYMENTS } from "@/features/finance/data";
+import { useFinanceBook } from "@/features/finance/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/finance/payments")({
-  component: () => (
+  component: PaymentsPage,
+});
+
+function PaymentsPage() {
+  const book = useFinanceBook();
+  return (
     <EntriesPage
       title="Payments"
-      description="Vendor and statutory payments made from cash or bank."
+      description="Vendor, payroll and statutory payments posted from Procurement and HR."
       icon={Wallet}
-      data={PAYMENTS}
+      entryType="payment"
+      data={book.byType("payment")}
+      loading={book.isLoading}
       showParty
-      showMode
     />
-  ),
-});
+  );
+}

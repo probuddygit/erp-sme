@@ -11,6 +11,17 @@ import {
   ENTRY_META, STATUS_TONES, formatDate, formatINR,
   type FinanceEntry,
 } from "@/features/finance/data";
+import { exportCsv } from "@/features/finance/api";
+
+function exportEntries(title: string, rows: FinanceEntry[]) {
+  exportCsv(
+    `${title.toLowerCase().replace(/\s+/g, "-")}.csv`,
+    rows.map((e) => ({
+      Voucher: e.number, Date: e.date, Source: e.party ?? "", Reference: e.reference ?? "",
+      Narration: e.narration, Status: e.status, Debit: e.totalDebit, Credit: e.totalCredit,
+    })),
+  );
+}
 
 interface Props {
   title: string;
