@@ -1,16 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FileMinus } from "lucide-react";
 import { EntriesPage } from "@/features/finance/components/EntriesPage";
-import { CREDIT_NOTES } from "@/features/finance/data";
+import { useFinanceBook } from "@/features/finance/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/finance/credit-notes")({
-  component: () => (
+  component: CreditNotesPage,
+});
+
+function CreditNotesPage() {
+  const book = useFinanceBook();
+  return (
     <EntriesPage
       title="Credit Notes"
-      description="Sales returns, rate reductions and post-sale adjustments issued to customers."
+      description="Sales returns and post-sale adjustments reversed into the ledger from the Sales module."
       icon={FileMinus}
-      data={CREDIT_NOTES}
+      entryType="credit_note"
+      data={book.byType("credit_note")}
+      loading={book.isLoading}
       showParty
     />
-  ),
-});
+  );
+}
