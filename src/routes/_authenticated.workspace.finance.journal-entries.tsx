@@ -1,15 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BookOpen } from "lucide-react";
 import { EntriesPage } from "@/features/finance/components/EntriesPage";
-import { JOURNAL_ENTRIES } from "@/features/finance/data";
+import { useFinanceBook } from "@/features/finance/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/finance/journal-entries")({
-  component: () => (
+  component: JournalEntriesPage,
+});
+
+function JournalEntriesPage() {
+  const book = useFinanceBook();
+  return (
     <EntriesPage
       title="Journal Entries"
-      description="Manual double-entry adjustments — accruals, provisions, depreciation and reclassifications."
+      description="Every ledger posting — auto-generated from Sales, Procurement, Inventory, Production and Payroll documents, plus manual adjustments."
       icon={BookOpen}
-      data={JOURNAL_ENTRIES}
+      entryType="journal"
+      data={book.entries}
+      loading={book.isLoading}
+      showParty
     />
-  ),
-});
+  );
+}

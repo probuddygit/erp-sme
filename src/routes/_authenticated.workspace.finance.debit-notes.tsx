@@ -1,16 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FilePlus } from "lucide-react";
 import { EntriesPage } from "@/features/finance/components/EntriesPage";
-import { DEBIT_NOTES } from "@/features/finance/data";
+import { useFinanceBook } from "@/features/finance/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/finance/debit-notes")({
-  component: () => (
+  component: DebitNotesPage,
+});
+
+function DebitNotesPage() {
+  const book = useFinanceBook();
+  return (
     <EntriesPage
       title="Debit Notes"
-      description="Purchase returns and vendor claims raised to suppliers."
+      description="Vendor returns and supplier claims posted from the Procurement module."
       icon={FilePlus}
-      data={DEBIT_NOTES}
+      entryType="debit_note"
+      data={book.byType("debit_note")}
+      loading={book.isLoading}
       showParty
     />
-  ),
-});
+  );
+}

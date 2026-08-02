@@ -3,7 +3,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ReportCard } from "@/features/finance/components/ReportCard";
 import { StatCard } from "@/shared/components/StatCard";
 import { Scale } from "lucide-react";
-import { computeTrialBalance, formatINR } from "@/features/finance/data";
+import { formatINR } from "@/features/finance/data";
+import { useFinanceBook } from "@/features/finance/api";
 import { StatusBadge } from "@/features/finance/components/StatusBadge";
 
 export const Route = createFileRoute("/_authenticated/workspace/finance/trial-balance")({
@@ -11,7 +12,8 @@ export const Route = createFileRoute("/_authenticated/workspace/finance/trial-ba
 });
 
 function TrialBalancePage() {
-  const rows = computeTrialBalance();
+  const book = useFinanceBook();
+  const rows = book.computeTrialBalance();
   const debitTotal = rows.reduce((s, r) => s + r.debit, 0);
   const creditTotal = rows.reduce((s, r) => s + r.credit, 0);
   const balanced = Math.round(debitTotal - creditTotal) === 0;
@@ -26,7 +28,7 @@ function TrialBalancePage() {
 
       <ReportCard
         title="Trial Balance"
-        subtitle="All ledger accounts with their debit and credit balances."
+        subtitle="Live balances built from every posting made by Sales, Procurement, Inventory, Production and Payroll."
         actions={<StatusBadge label={balanced ? "Balanced" : "Out of balance"} tone={balanced ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"} />}
       >
         <div className="overflow-x-auto rounded-lg border border-border">
@@ -41,7 +43,11 @@ function TrialBalancePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => (
+              {book.isLoading ? (
+                <TableRow><TableCell colSpan={5} className="py-10 text-center text-muted-foreground">Loading balances…</TableCell></TableRow>
+              ) : rows.length === 0 ? (
+                <TableRow><TableCell colSpan={5} className="py-10 text-center text-muted-foreground">No accounts found for this company.</TableCell></TableRow>
+              ) : rows.map((r) => (
                 <TableRow key={r.code}>
                   <TableCell className="font-mono text-xs">{r.code}</TableCell>
                   <TableCell>{r.name}</TableCell>

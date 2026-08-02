@@ -2,19 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ReportCard } from "@/features/finance/components/ReportCard";
 import { StatCard } from "@/shared/components/StatCard";
 import { Landmark } from "lucide-react";
-import { CHART_OF_ACCOUNTS, accountBalance, formatINR } from "@/features/finance/data";
+import { formatINR } from "@/features/finance/data";
+import { useFinanceBook } from "@/features/finance/api";
 
 export const Route = createFileRoute("/_authenticated/workspace/finance/balance-sheet")({
   component: BalanceSheetPage,
 });
 
 function BalanceSheetPage() {
-  const leaves = (type: string) => CHART_OF_ACCOUNTS.filter((a) => a.type === type && !a.isGroup);
-  const assets = leaves("asset").map((a) => ({ ...a, bal: accountBalance(a.code) }));
-  const liabilities = leaves("liability").map((a) => ({ ...a, bal: -accountBalance(a.code) }));
-  const equity = leaves("equity").map((a) => ({ ...a, bal: -accountBalance(a.code) }));
-  const revenue = leaves("revenue").reduce((s, a) => s + -accountBalance(a.code), 0);
-  const expense = leaves("expense").reduce((s, a) => s + accountBalance(a.code), 0);
+  const book = useFinanceBook();
+  const assets = book.leaves("asset").map((a) => ({ ...a, bal: book.accountBalance(a.code) }));
+  const liabilities = book.leaves("liability").map((a) => ({ ...a, bal: -book.accountBalance(a.code) }));
+  const equity = book.leaves("equity").map((a) => ({ ...a, bal: -book.accountBalance(a.code) }));
+  const revenue = book.leaves("revenue").reduce((s, a) => s + -book.accountBalance(a.code), 0);
+  const expense = book.leaves("expense").reduce((s, a) => s + book.accountBalance(a.code), 0);
   const netProfit = revenue - expense;
 
   const totalAssets = assets.reduce((s, a) => s + a.bal, 0);
@@ -29,11 +30,11 @@ function BalanceSheetPage() {
         <StatCard label="Total equity" value={formatINR(totalEquity)} icon={Landmark} hint={`Includes net profit ${formatINR(netProfit)}`} />
       </div>
 
-      <ReportCard title="Balance Sheet" subtitle="Statement of financial position — as of today.">
+      <ReportCard title="Balance Sheet" subtitle={book.isLoading ? "Loading live ledger balances…" : "Statement of financial position, live from posted transactions."}>
         <div className="grid gap-4 md:grid-cols-2">
           <Section title="Assets" rows={assets.map((a) => ({ label: `${a.code} · ${a.name}`, value: a.bal }))} total={totalAssets} />
           <div className="space-y-4">
-            <Section title="Liabilities" rows={liabilities.map((a) => ({ label: `${a.code} · ${a.name}`, value: a.bal }))} total={liabilities.reduce((s, a) => s + a.bal, 0)} />
+            <Section title="Liabilities" rows={liabilities.map((a) => ({ label: `${a.code} · ${a.name}`, value: a.bal }))} total={totalLiabilities} />
             <Section
               title="Equity"
               rows={[
@@ -58,7 +59,9 @@ function Section({ title, rows, total }: { title: string; rows: { label: string;
     <div className="rounded-lg border border-border">
       <div className="border-b border-border bg-muted/40 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</div>
       <div className="divide-y divide-border">
-        {rows.map((r) => (
+        {rows.length === 0 ? (
+          <div className="px-3 py-3 text-sm text-muted-foreground">No balances yet.</div>
+        ) : rows.map((r) => (
           <div key={r.label} className="flex items-center justify-between px-3 py-2 text-sm">
             <span className="text-muted-foreground">{r.label}</span>
             <span>{formatINR(r.value)}</span>
