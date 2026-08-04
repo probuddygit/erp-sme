@@ -1,30 +1,68 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 import { DataListPage, Pill } from "@/features/admin/DataListPage";
+import { Button } from "@/components/ui/button";
+import { useSettingsDoc, exportRowsToCsv } from "@/features/admin/admin-api";
+import { ROLE_OPTIONS } from "@/features/admin/roles";
+import { KeyRound } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/workspace/administration/roles")({
-  component: () => (
-    <DataListPage
-      actionLabel="New role"
+  component: RolesPage,
+});
+
+interface RoleRow { id: string; name: string; type: string; users: number; permissions: number | string }
+
+function RolesPage() {
+  const { company } = useAuth();
+  const { value: permMap } = useSettingsDoc<Record<string, string[]>>("admin.role_permissions", {});
+
+  const { data: counts = {}, isLoading } = useQuery({
+    enabled: !!company?.id,
+    queryKey: ["admin-role-counts", company?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("user_roles").select("role").eq("company_id", company!.id);
+      if (error) throw error;
+      return (data ?? []).reduce<Record<string, number>>((a, r: any) => ({ ...a, [r.role]: (a[r.role] ?? 0) + 1 }), {});
+    },
+  });
+
+  const { data: catalogCount = 0 } = useQuery({
+    queryKey: ["permissions-count"],
+    queryFn: async () => {
+      const { count } = await supabase.from("permissions").select("key", { count: "exact", head: true });
+      return count ?? 0;
+    },
+  });
+
+  const rows: RoleRow[] = ROLE_OPTIONS.map((r) => ({
+    id: r.value,
+    name: r.label,
+    type: "System",
+    users: counts[r.value] ?? 0,
+    permissions: permMap[r.value]?.length ?? (r.value === "admin" ? catalogCount : "Default"),
+  }));
+
+  return (
+    <DataListPage<RoleRow>
+      rows={rows}
+      loading={isLoading}
       searchKeys={["name"]}
       columns={[
         { key: "name", header: "Role" },
-        { key: "type", header: "Type", render: (r: any) => <Pill tone={r.type === "System" ? "info" : "default"}>{r.type}</Pill> },
-        { key: "users", header: "Users" },
+        { key: "type", header: "Type", render: (r) => <Pill tone="info">{r.type}</Pill> },
+        { key: "users", header: "Users in company" },
         { key: "permissions", header: "Permissions" },
-        { key: "updated", header: "Updated" },
       ]}
-      rows={[
-        { id: "1", name: "Super Admin", type: "System", users: 1, permissions: "All", updated: "—" },
-        { id: "2", name: "Administrator", type: "System", users: 3, permissions: 128, updated: "12 Jul 2026" },
-        { id: "3", name: "Finance", type: "System", users: 8, permissions: 42, updated: "18 Jul 2026" },
-        { id: "4", name: "Sales", type: "System", users: 22, permissions: 36, updated: "18 Jul 2026" },
-        { id: "5", name: "Purchase", type: "System", users: 12, permissions: 34, updated: "18 Jul 2026" },
-        { id: "6", name: "Inventory", type: "System", users: 9, permissions: 28, updated: "18 Jul 2026" },
-        { id: "7", name: "Warehouse", type: "System", users: 6, permissions: 22, updated: "18 Jul 2026" },
-        { id: "8", name: "Management", type: "System", users: 4, permissions: 60, updated: "18 Jul 2026" },
-        { id: "9", name: "Plant Manager – Pune", type: "Custom", users: 2, permissions: 48, updated: "20 Jul 2026" },
-        { id: "10", name: "Auditor (Read-only)", type: "Custom", users: 1, permissions: 96, updated: "22 Jul 2026" },
-      ] as any}
+      onExport={() => exportRowsToCsv("roles", rows, [
+        { key: "name", header: "Role" }, { key: "users", header: "Users" }, { key: "permissions", header: "Permissions" },
+      ])}
+      rowExtra={(r) => (
+        <Button asChild variant="ghost" size="icon" className="h-8 w-8" title="Edit permissions">
+          <Link to="/workspace/administration/permissions" search={{ role: r.id } as never}><KeyRound className="h-3.5 w-3.5" /></Link>
+        </Button>
+      )}
     />
-  ),
-});
+  );
+}
