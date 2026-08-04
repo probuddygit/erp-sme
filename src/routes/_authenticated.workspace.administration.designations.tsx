@@ -1,10 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DataListPage } from "@/features/admin/DataListPage";
+import { CrudList } from "@/features/admin/CrudList";
+import { useSettingsCollection, type CollectionRow } from "@/features/admin/admin-api";
 
 export const Route = createFileRoute("/_authenticated/workspace/administration/designations")({
-  component: () => (
-    <DataListPage
-      actionLabel="New designation"
+  component: DesignationsPage,
+});
+
+const SEED: CollectionRow[] = [
+  { id: "g1", title: "Plant Manager", grade: "M3", department: "Manufacturing", reportsTo: "VP – Operations", headcount: 3 },
+  { id: "g2", title: "Shift Supervisor", grade: "S1", department: "Manufacturing", reportsTo: "Plant Manager", headcount: 12 },
+  { id: "g3", title: "Accounts Executive", grade: "E2", department: "Finance", reportsTo: "Finance Controller", headcount: 6 },
+  { id: "g4", title: "Sales Manager", grade: "M3", department: "Sales", reportsTo: "MD", headcount: 4 },
+];
+
+function DesignationsPage() {
+  const { rows, isLoading, create, update, remove } = useSettingsCollection("admin.designations", SEED);
+  return (
+    <CrudList
+      entity="Designation"
+      loading={isLoading}
+      rows={rows}
       searchKeys={["title", "grade", "department"]}
       columns={[
         { key: "title", header: "Designation" },
@@ -13,16 +28,16 @@ export const Route = createFileRoute("/_authenticated/workspace/administration/d
         { key: "reportsTo", header: "Reports to" },
         { key: "headcount", header: "Headcount" },
       ]}
-      rows={[
-        { id: "1", title: "Managing Director", grade: "M1", department: "Executive", reportsTo: "Board", headcount: 1 },
-        { id: "2", title: "VP – Operations", grade: "M2", department: "Manufacturing", reportsTo: "MD", headcount: 1 },
-        { id: "3", title: "Plant Manager", grade: "M3", department: "Manufacturing", reportsTo: "VP – Operations", headcount: 3 },
-        { id: "4", title: "Shift Supervisor", grade: "S1", department: "Manufacturing", reportsTo: "Plant Manager", headcount: 12 },
-        { id: "5", title: "Finance Controller", grade: "M3", department: "Finance", reportsTo: "MD", headcount: 1 },
-        { id: "6", title: "Accounts Executive", grade: "E2", department: "Finance", reportsTo: "Finance Controller", headcount: 6 },
-        { id: "7", title: "Sales Manager", grade: "M3", department: "Sales", reportsTo: "MD", headcount: 4 },
-        { id: "8", title: "Purchase Officer", grade: "E2", department: "Procurement", reportsTo: "Head – Procurement", headcount: 8 },
-      ] as any}
+      fields={[
+        { name: "title", label: "Designation", required: true },
+        { name: "grade", label: "Grade" },
+        { name: "department", label: "Department" },
+        { name: "reportsTo", label: "Reports to" },
+        { name: "headcount", label: "Headcount", type: "number", default: 0 },
+      ]}
+      onCreate={(v) => create(v as any)}
+      onUpdate={(id, v) => update(id, v)}
+      onDelete={(r) => remove(r.id)}
     />
-  ),
-});
+  );
+}
