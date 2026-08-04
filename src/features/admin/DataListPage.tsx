@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Pencil, Trash2, MoreHorizontal, Download } from "lucide-react";
+import { Search, Plus, Pencil, Trash2, Download } from "lucide-react";
 
 export interface Column<T> {
   key: keyof T | string;
@@ -21,10 +21,16 @@ interface Props<T> {
   extraActions?: ReactNode;
   emptyLabel?: string;
   rowActions?: boolean;
+  loading?: boolean;
+  onEdit?: (row: T) => void;
+  onDelete?: (row: T) => void;
+  onExport?: () => void;
+  rowExtra?: (row: T) => ReactNode;
 }
 
 export function DataListPage<T extends { id: string | number }>({
   columns, rows, searchKeys = [], actionLabel = "New", onAction, extraActions, emptyLabel = "No records", rowActions = true,
+  loading = false, onEdit, onDelete, onExport, rowExtra,
 }: Props<T>) {
   const [q, setQ] = useState("");
   const filtered = useMemo(() => {
@@ -44,7 +50,9 @@ export function DataListPage<T extends { id: string | number }>({
             <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" className="pl-9" />
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-1.5" />Export</Button>
+            <Button variant="outline" size="sm" onClick={onExport} disabled={!onExport}>
+              <Download className="h-4 w-4 mr-1.5" />Export
+            </Button>
             {extraActions}
             {onAction && (
               <Button size="sm" onClick={onAction}>
@@ -66,7 +74,13 @@ export function DataListPage<T extends { id: string | number }>({
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={columns.length + (rowActions ? 1 : 0)} className="p-10 text-center text-sm text-muted-foreground">
+                    Loading…
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length + (rowActions ? 1 : 0)} className="p-10 text-center text-sm text-muted-foreground">
                     {emptyLabel}
@@ -83,9 +97,17 @@ export function DataListPage<T extends { id: string | number }>({
                     {rowActions && (
                       <td className="px-4 py-3 text-right">
                         <div className="inline-flex items-center gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Pencil className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Trash2 className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-3.5 w-3.5" /></Button>
+                          {rowExtra?.(r)}
+                          {onEdit && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" onClick={() => onEdit(r)}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                          {onDelete && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Delete" onClick={() => onDelete(r)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                         </div>
                       </td>
                     )}
