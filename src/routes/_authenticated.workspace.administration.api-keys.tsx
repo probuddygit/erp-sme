@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CrudList } from "@/features/admin/CrudList";
 import { Pill } from "@/features/admin/DataListPage";
-import { useSettingsCollection } from "@/features/admin/admin-api";
+import { useSettingsCollection, type CollectionRow } from "@/features/admin/admin-api";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/workspace/administration/api-keys")({
@@ -15,7 +15,7 @@ function randomKey() {
 }
 
 function ApiKeysPage() {
-  const { rows, isLoading, create, update, remove } = useSettingsCollection("admin.api_keys", []);
+  const { rows, isLoading, create, update, remove } = useSettingsCollection<CollectionRow>("admin.api_keys", []);
   return (
     <CrudList
       entity="API key"
