@@ -1,48 +1,35 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SettingsGrid, SettingsSection, FieldRow } from "@/features/admin/SettingsShell";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { SettingsForm } from "@/features/admin/SettingsForm";
 
 export const Route = createFileRoute("/_authenticated/workspace/administration/workflow-settings")({
   component: () => (
-    <div className="space-y-4">
-      <SettingsGrid>
-        <SettingsSection title="Defaults" description="Applied to all workflows unless overridden">
-          <FieldRow label="Auto-escalate after"><Input defaultValue="48" /></FieldRow>
-          <FieldRow label="Escalation unit">
-            <Select defaultValue="hours"><SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="hours">Hours</SelectItem>
-                <SelectItem value="days">Days</SelectItem>
-              </SelectContent>
-            </Select>
-          </FieldRow>
-          <FieldRow label="Reminder cadence"><Input defaultValue="Every 12h until action" /></FieldRow>
-          <FieldRow label="Skip absent approvers"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="Allow delegation"><Switch defaultChecked /></FieldRow>
-        </SettingsSection>
-        <SettingsSection title="Notifications" description="Channels used for workflow events">
-          <FieldRow label="Email notifications"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="In-app"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="Push"><Switch /></FieldRow>
-          <FieldRow label="SMS on escalation"><Switch /></FieldRow>
-        </SettingsSection>
-        <SettingsSection title="Comments & attachments">
-          <FieldRow label="Require comment on reject"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="Allow attachments"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="Max attachment size"><Input defaultValue="10 MB" /></FieldRow>
-        </SettingsSection>
-        <SettingsSection title="History & audit">
-          <FieldRow label="Retain workflow history"><Input defaultValue="7 years" /></FieldRow>
-          <FieldRow label="Signed approvals"><Switch defaultChecked /></FieldRow>
-        </SettingsSection>
-      </SettingsGrid>
-      <div className="flex justify-end gap-2">
-        <Button variant="outline">Reset defaults</Button>
-        <Button>Save changes</Button>
-      </div>
-    </div>
+    <SettingsForm settingsKey="admin.workflow" groups={[
+      { title: "Escalation", fields: [
+        { name: "escalate_after_hours", label: "Escalate after (hours)", type: "number", default: 24 },
+        { name: "escalate_to", label: "Escalate to", type: "select", default: "manager", options: [
+          { label: "Reporting manager", value: "manager" },
+          { label: "Department head", value: "dept_head" },
+          { label: "Company admin", value: "admin" },
+        ] },
+        { name: "auto_approve_on_timeout", label: "Auto-approve on timeout", type: "switch", default: false },
+        { name: "reminder_interval_hours", label: "Reminder interval (hours)", type: "number", default: 8 },
+      ] },
+      { title: "SLA defaults", fields: [
+        { name: "sla_quotation_hours", label: "Quotation approval SLA (hours)", type: "number", default: 12 },
+        { name: "sla_po_hours", label: "Purchase order SLA (hours)", type: "number", default: 24 },
+        { name: "sla_invoice_hours", label: "Invoice approval SLA (hours)", type: "number", default: 12 },
+        { name: "business_hours_only", label: "Count business hours only", type: "switch", default: true },
+      ] },
+      { title: "Delegation", fields: [
+        { name: "allow_delegation", label: "Allow approver delegation", type: "switch", default: true },
+        { name: "allow_self_approval", label: "Allow self-approval", type: "switch", default: false },
+        { name: "require_comment_on_reject", label: "Require comment on reject", type: "switch", default: true },
+      ] },
+      { title: "Notifications", fields: [
+        { name: "notify_requester", label: "Notify requester on decision", type: "switch", default: true },
+        { name: "notify_watchers", label: "Notify watchers", type: "switch", default: false },
+        { name: "daily_pending_digest", label: "Daily pending digest", type: "switch", default: true },
+      ] },
+    ]} />
   ),
 });
