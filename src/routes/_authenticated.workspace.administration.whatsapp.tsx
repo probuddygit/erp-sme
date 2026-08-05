@@ -1,56 +1,74 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SettingsGrid, SettingsSection, FieldRow } from "@/features/admin/SettingsShell";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DataListPage, Pill } from "@/features/admin/DataListPage";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SettingsForm } from "@/features/admin/SettingsForm";
+import { CrudList } from "@/features/admin/CrudList";
+import { useSettingsCollection, type CollectionRow } from "@/features/admin/admin-api";
+import { Pill } from "@/features/admin/DataListPage";
 
 export const Route = createFileRoute("/_authenticated/workspace/administration/whatsapp")({
-  component: () => (
-    <div className="space-y-4">
-      <SettingsGrid>
-        <SettingsSection title="WhatsApp Business API">
-          <FieldRow label="Provider">
-            <Select defaultValue="meta"><SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="meta">Meta Cloud API</SelectItem>
-                <SelectItem value="gupshup">Gupshup</SelectItem>
-                <SelectItem value="twilio">Twilio</SelectItem>
-              </SelectContent>
-            </Select>
-          </FieldRow>
-          <FieldRow label="Business phone number"><Input defaultValue="+91 98200 00000" /></FieldRow>
-          <FieldRow label="Phone number ID"><Input defaultValue="10241234567890" /></FieldRow>
-          <FieldRow label="Access token"><Input type="password" defaultValue="••••••••••••••••" /></FieldRow>
-          <FieldRow label="Webhook verify token"><Input defaultValue="ig-erp-verify-2026" /></FieldRow>
-        </SettingsSection>
-        <SettingsSection title="Behaviour">
-          <FieldRow label="Enabled"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="Opt-in required"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="Business hours only"><Switch /></FieldRow>
-          <FieldRow label="Fallback to SMS"><Switch defaultChecked /></FieldRow>
-        </SettingsSection>
-      </SettingsGrid>
-
-      <DataListPage
-        actionLabel="New template" searchKeys={["name"]}
-        columns={[
-          { key: "name", header: "Template" },
-          { key: "language", header: "Language" },
-          { key: "category", header: "Category", render: (r: any) => <Pill tone="info">{r.category}</Pill> },
-          { key: "status", header: "Status", render: (r: any) => <Pill tone={r.status === "Approved" ? "success" : "warn"}>{r.status}</Pill> },
-          { key: "updated", header: "Updated" },
-        ]}
-        rows={[
-          { id: "1", name: "invoice_ready", language: "en_IN", category: "Utility", status: "Approved", updated: "18 Jul 2026" },
-          { id: "2", name: "payment_reminder", language: "en_IN", category: "Utility", status: "Approved", updated: "18 Jul 2026" },
-          { id: "3", name: "otp_login", language: "en_IN", category: "Authentication", status: "Approved", updated: "12 Jun 2026" },
-          { id: "4", name: "festive_offer", language: "en_IN", category: "Marketing", status: "Pending", updated: "22 Jul 2026" },
-        ] as any}
-      />
-
-      <div className="flex justify-end gap-2"><Button variant="outline">Send test</Button><Button>Save</Button></div>
-    </div>
-  ),
+  component: WhatsAppPage,
 });
+
+interface WaTpl extends CollectionRow { name: string; category: string; language: string; status: string; body: string }
+
+function WaTemplates() {
+  const { rows, isLoading, create, update, remove } = useSettingsCollection<WaTpl>("admin.whatsapp.templates");
+  return (
+    <CrudList<WaTpl>
+      entity="WhatsApp template"
+      loading={isLoading}
+      rows={rows}
+      searchKeys={["name", "category"]}
+      columns={[
+        { key: "name", header: "Template" },
+        { key: "category", header: "Category" },
+        { key: "language", header: "Language" },
+        { key: "status", header: "Approval", render: (r) => <Pill tone={r.status === "Approved" ? "success" : r.status === "Rejected" ? "danger" : "warn"}>{r.status || "Pending"}</Pill> },
+      ]}
+      fields={[
+        { name: "name", label: "Template name", required: true },
+        { name: "category", label: "Category", type: "select", default: "Utility", options: [
+          { label: "Utility", value: "Utility" }, { label: "Marketing", value: "Marketing" }, { label: "Authentication", value: "Authentication" },
+        ] },
+        { name: "language", label: "Language", default: "en_IN" },
+        { name: "status", label: "Approval status", type: "select", default: "Pending", options: [
+          { label: "Pending", value: "Pending" }, { label: "Approved", value: "Approved" }, { label: "Rejected", value: "Rejected" },
+        ] },
+        { name: "body", label: "Body", type: "textarea" },
+      ]}
+      onCreate={(v) => create(v as any)}
+      onUpdate={(id, v) => update(id, v as any)}
+      onDelete={(r) => remove(r.id)}
+    />
+  );
+}
+
+function WhatsAppPage() {
+  return (
+    <Tabs defaultValue="setup" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="setup">Business API</TabsTrigger>
+        <TabsTrigger value="templates">Templates</TabsTrigger>
+      </TabsList>
+      <TabsContent value="setup">
+        <SettingsForm settingsKey="admin.whatsapp.setup" groups={[
+          { title: "Connection", fields: [
+            { name: "enabled", label: "WhatsApp enabled", type: "switch", default: false },
+            { name: "provider", label: "Provider", default: "Meta Cloud API" },
+            { name: "phone", label: "Business phone", default: "" },
+            { name: "phone_number_id", label: "Phone number ID", default: "" },
+            { name: "waba_id", label: "WABA ID", default: "" },
+            { name: "access_token", label: "Access token", type: "password", default: "" },
+          ] },
+          { title: "Behaviour", fields: [
+            { name: "namespace", label: "Template namespace", default: "" },
+            { name: "send_invoices", label: "Send invoices on WhatsApp", type: "switch", default: false },
+            { name: "send_dispatch", label: "Send dispatch updates", type: "switch", default: false },
+            { name: "opt_in_required", label: "Require customer opt-in", type: "switch", default: true },
+          ] },
+        ]} />
+      </TabsContent>
+      <TabsContent value="templates"><WaTemplates /></TabsContent>
+    </Tabs>
+  );
+}

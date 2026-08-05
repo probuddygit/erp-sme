@@ -1,55 +1,69 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SettingsGrid, SettingsSection, FieldRow } from "@/features/admin/SettingsShell";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DataListPage, Pill } from "@/features/admin/DataListPage";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SettingsForm } from "@/features/admin/SettingsForm";
+import { CrudList } from "@/features/admin/CrudList";
+import { useSettingsCollection, type CollectionRow } from "@/features/admin/admin-api";
+import { Pill } from "@/features/admin/DataListPage";
 
 export const Route = createFileRoute("/_authenticated/workspace/administration/sms")({
-  component: () => (
-    <div className="space-y-4">
-      <SettingsGrid>
-        <SettingsSection title="SMS gateway">
-          <FieldRow label="Provider">
-            <Select defaultValue="msg91"><SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="msg91">MSG91</SelectItem>
-                <SelectItem value="textlocal">TextLocal</SelectItem>
-                <SelectItem value="kaleyra">Kaleyra</SelectItem>
-                <SelectItem value="twilio">Twilio</SelectItem>
-              </SelectContent>
-            </Select>
-          </FieldRow>
-          <FieldRow label="Sender ID"><Input defaultValue="INDGRU" /></FieldRow>
-          <FieldRow label="Route"><Input defaultValue="Transactional (DLT)" /></FieldRow>
-          <FieldRow label="Auth key"><Input type="password" defaultValue="••••••••••" /></FieldRow>
-          <FieldRow label="DLT entity ID"><Input defaultValue="110200011122334455" /></FieldRow>
-        </SettingsSection>
-        <SettingsSection title="Options">
-          <FieldRow label="Enabled"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="Retry on failure"><Switch defaultChecked /></FieldRow>
-          <FieldRow label="Unicode support"><Switch /></FieldRow>
-          <FieldRow label="Balance"><span className="text-sm font-medium">₹ 12,480 · ~18,400 SMS</span></FieldRow>
-        </SettingsSection>
-      </SettingsGrid>
-
-      <DataListPage rowActions={false} searchKeys={["to"]}
-        columns={[
-          { key: "ts", header: "Sent" },
-          { key: "to", header: "To" },
-          { key: "template", header: "Template" },
-          { key: "status", header: "Status", render: (r: any) => <Pill tone={r.status === "Delivered" ? "success" : r.status === "Sent" ? "info" : "danger"}>{r.status}</Pill> },
-        ]}
-        rows={[
-          { id: "1", ts: "10:22", to: "+91 98••••2231", template: "otp_login", status: "Delivered" },
-          { id: "2", ts: "10:18", to: "+91 96••••1180", template: "invoice_ready", status: "Delivered" },
-          { id: "3", ts: "10:12", to: "+91 90••••4402", template: "payment_reminder", status: "Sent" },
-          { id: "4", ts: "09:41", to: "+91 84••••7710", template: "otp_login", status: "Failed" },
-        ] as any}
-      />
-
-      <div className="flex justify-end gap-2"><Button variant="outline">Send test</Button><Button>Save</Button></div>
-    </div>
-  ),
+  component: SmsPage,
 });
+
+interface TplRow extends CollectionRow { name: string; dlt_id: string; body: string; active: boolean }
+
+function SmsTemplates() {
+  const { rows, isLoading, create, update, remove } = useSettingsCollection<TplRow>("admin.sms.templates");
+  return (
+    <CrudList<TplRow>
+      entity="SMS template"
+      loading={isLoading}
+      rows={rows}
+      searchKeys={["name", "dlt_id"]}
+      columns={[
+        { key: "name", header: "Template" },
+        { key: "dlt_id", header: "DLT template ID" },
+        { key: "body", header: "Body" },
+        { key: "active", header: "Status", render: (r) => <Pill tone={r.active ? "success" : "warn"}>{r.active ? "Active" : "Paused"}</Pill> },
+      ]}
+      fields={[
+        { name: "name", label: "Template name", required: true },
+        { name: "dlt_id", label: "DLT template ID" },
+        { name: "body", label: "Message body", type: "textarea", required: true },
+        { name: "active", label: "Active", type: "switch", default: true },
+      ]}
+      onCreate={(v) => create(v as any)}
+      onUpdate={(id, v) => update(id, v as any)}
+      onDelete={(r) => remove(r.id)}
+    />
+  );
+}
+
+function SmsPage() {
+  return (
+    <Tabs defaultValue="gateway" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="gateway">Gateway</TabsTrigger>
+        <TabsTrigger value="templates">Templates</TabsTrigger>
+      </TabsList>
+      <TabsContent value="gateway">
+        <SettingsForm settingsKey="admin.sms.gateway" groups={[
+          { title: "Provider", fields: [
+            { name: "provider", label: "Provider", type: "select", default: "msg91", options: [
+              { label: "MSG91", value: "msg91" }, { label: "Twilio", value: "twilio" }, { label: "Gupshup", value: "gupshup" },
+            ] },
+            { name: "sender_id", label: "Sender ID", default: "" },
+            { name: "api_key", label: "API key", type: "password", default: "" },
+            { name: "route", label: "Route", default: "Transactional" },
+          ] },
+          { title: "Delivery", fields: [
+            { name: "enabled", label: "SMS enabled", type: "switch", default: false },
+            { name: "retry", label: "Retry attempts", type: "number", default: 2 },
+            { name: "unicode", label: "Allow unicode", type: "switch", default: false },
+            { name: "callback_url", label: "Delivery callback URL", default: "" },
+          ] },
+        ]} />
+      </TabsContent>
+      <TabsContent value="templates"><SmsTemplates /></TabsContent>
+    </Tabs>
+  );
+}

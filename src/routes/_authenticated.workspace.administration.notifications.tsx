@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SettingsGrid, SettingsSection, FieldRow } from "@/features/admin/SettingsShell";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { SettingsForm } from "@/features/admin/SettingsForm";
+import { useSettingsDoc, useSaveSettingsDoc } from "@/features/admin/admin-api";
+import { Save } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/workspace/administration/notifications")({
   component: NotifPage,
@@ -15,33 +16,47 @@ const EVENTS = [
   "Purchase order raised", "PO approved", "GRN posted",
   "Low stock", "Expiring subscription", "Password changed",
 ];
+const CHANNELS = ["Email", "SMS", "WhatsApp", "Push", "Slack", "Teams"];
 
 function EventMatrix() {
+  const { value, isLoading } = useSettingsDoc<Record<string, boolean>>("admin.notifications.matrix", {});
+  const save = useSaveSettingsDoc("admin.notifications.matrix");
+  const [draft, setDraft] = useState<Record<string, boolean> | null>(null);
+  const state = draft ?? value;
+  const toggle = (k: string, v: boolean) => setDraft({ ...state, [k]: v });
+
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-          <tr>
-            <th className="px-4 py-2.5 text-left font-medium">Event</th>
-            <th className="px-4 py-2.5 text-center font-medium">Email</th>
-            <th className="px-4 py-2.5 text-center font-medium">SMS</th>
-            <th className="px-4 py-2.5 text-center font-medium">WhatsApp</th>
-            <th className="px-4 py-2.5 text-center font-medium">Push</th>
-            <th className="px-4 py-2.5 text-center font-medium">Slack</th>
-            <th className="px-4 py-2.5 text-center font-medium">Teams</th>
-          </tr>
-        </thead>
-        <tbody>
-          {EVENTS.map((e) => (
-            <tr key={e} className="border-t border-border">
-              <td className="px-4 py-2 font-medium">{e}</td>
-              {[true, false, true, true, false, false].map((v, i) => (
-                <td key={i} className="px-4 py-2 text-center"><Switch defaultChecked={v} /></td>
-              ))}
+    <div className="space-y-4">
+      <div className="rounded-lg border border-border bg-card overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+            <tr>
+              <th className="px-4 py-2.5 text-left font-medium">Event</th>
+              {CHANNELS.map((c) => <th key={c} className="px-4 py-2.5 text-center font-medium">{c}</th>)}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {EVENTS.map((e) => (
+              <tr key={e} className="border-t border-border">
+                <td className="px-4 py-2 font-medium">{e}</td>
+                {CHANNELS.map((c) => {
+                  const key = `${e}::${c}`;
+                  return (
+                    <td key={c} className="px-4 py-2 text-center">
+                      <Switch checked={!!state[key]} disabled={isLoading} onCheckedChange={(v) => toggle(key, v)} />
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex justify-end">
+        <Button onClick={() => save.mutate(state)} disabled={save.isPending || isLoading}>
+          <Save className="mr-1.5 h-4 w-4" />{save.isPending ? "Saving…" : "Save matrix"}
+        </Button>
+      </div>
     </div>
   );
 }
@@ -55,49 +70,70 @@ function NotifPage() {
         <TabsTrigger value="sms">SMS</TabsTrigger>
         <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
         <TabsTrigger value="push">Push</TabsTrigger>
-        <TabsTrigger value="slack">Slack</TabsTrigger>
-        <TabsTrigger value="teams">Teams</TabsTrigger>
+        <TabsTrigger value="chat">Slack / Teams</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="events"><div className="rounded-lg border border-border bg-card"><EventMatrix /></div></TabsContent>
+      <TabsContent value="events"><EventMatrix /></TabsContent>
 
-      <TabsContent value="email"><SettingsGrid>
-        <SettingsSection title="Sender">
-          <FieldRow label="From name"><Input defaultValue="Ind Guru ERP" /></FieldRow>
-          <FieldRow label="From address"><Input defaultValue="noreply@indguru.com" /></FieldRow>
-          <FieldRow label="Reply-to"><Input defaultValue="support@indguru.com" /></FieldRow>
-        </SettingsSection>
-        <SettingsSection title="Templates"><FieldRow label="Digest cadence"><Input defaultValue="Daily 09:00 IST" /></FieldRow></SettingsSection>
-      </SettingsGrid></TabsContent>
+      <TabsContent value="email">
+        <SettingsForm settingsKey="admin.notifications.email" groups={[
+          { title: "Sender", fields: [
+            { name: "from_name", label: "From name", default: "" },
+            { name: "from_address", label: "From address", type: "email", default: "" },
+            { name: "reply_to", label: "Reply-to", type: "email", default: "" },
+          ] },
+          { title: "Digest", fields: [
+            { name: "digest_enabled", label: "Daily digest", type: "switch", default: true },
+            { name: "digest_time", label: "Digest time", default: "09:00 IST" },
+          ] },
+        ]} />
+      </TabsContent>
 
-      <TabsContent value="sms"><SettingsSection title="SMS gateway">
-        <FieldRow label="Provider"><Badge variant="secondary">MSG91</Badge></FieldRow>
-        <FieldRow label="Sender ID"><Input defaultValue="INDGRU" /></FieldRow>
-        <FieldRow label="Route"><Input defaultValue="Transactional" /></FieldRow>
-      </SettingsSection></TabsContent>
+      <TabsContent value="sms">
+        <SettingsForm columns={1} settingsKey="admin.notifications.sms" groups={[
+          { title: "SMS gateway", fields: [
+            { name: "provider", label: "Provider", type: "select", default: "msg91", options: [
+              { label: "MSG91", value: "msg91" }, { label: "Twilio", value: "twilio" }, { label: "Gupshup", value: "gupshup" },
+            ] },
+            { name: "sender_id", label: "Sender ID", default: "" },
+            { name: "route", label: "Route", default: "Transactional" },
+          ] },
+        ]} />
+      </TabsContent>
 
-      <TabsContent value="whatsapp"><SettingsSection title="WhatsApp Business API">
-        <FieldRow label="Provider"><Badge variant="secondary">Meta Cloud API</Badge></FieldRow>
-        <FieldRow label="Business phone"><Input defaultValue="+91 98200 00000" /></FieldRow>
-        <FieldRow label="Namespace"><Input defaultValue="indguru_erp_v1" /></FieldRow>
-      </SettingsSection></TabsContent>
+      <TabsContent value="whatsapp">
+        <SettingsForm columns={1} settingsKey="admin.notifications.whatsapp" groups={[
+          { title: "WhatsApp Business API", fields: [
+            { name: "provider", label: "Provider", default: "Meta Cloud API" },
+            { name: "phone", label: "Business phone", default: "" },
+            { name: "namespace", label: "Namespace", default: "" },
+          ] },
+        ]} />
+      </TabsContent>
 
-      <TabsContent value="push"><SettingsSection title="Push (Web / Mobile)">
-        <FieldRow label="Enabled"><Switch defaultChecked /></FieldRow>
-        <FieldRow label="Silent hours"><Input defaultValue="22:00 – 07:00" /></FieldRow>
-      </SettingsSection></TabsContent>
+      <TabsContent value="push">
+        <SettingsForm columns={1} settingsKey="admin.notifications.push" groups={[
+          { title: "Push (Web / Mobile)", fields: [
+            { name: "enabled", label: "Enabled", type: "switch", default: true },
+            { name: "silent_hours", label: "Silent hours", default: "22:00 – 07:00" },
+          ] },
+        ]} />
+      </TabsContent>
 
-      <TabsContent value="slack"><SettingsSection title="Slack">
-        <FieldRow label="Workspace"><Input defaultValue="indguru.slack.com" /></FieldRow>
-        <FieldRow label="Default channel"><Input defaultValue="#erp-alerts" /></FieldRow>
-      </SettingsSection></TabsContent>
-
-      <TabsContent value="teams"><SettingsSection title="Microsoft Teams">
-        <FieldRow label="Tenant"><Input defaultValue="indguru.onmicrosoft.com" /></FieldRow>
-        <FieldRow label="Default channel"><Input defaultValue="ERP Alerts" /></FieldRow>
-      </SettingsSection></TabsContent>
-
-      <div className="flex justify-end gap-2"><Button variant="outline">Cancel</Button><Button>Save</Button></div>
+      <TabsContent value="chat">
+        <SettingsForm settingsKey="admin.notifications.chat" groups={[
+          { title: "Slack", fields: [
+            { name: "slack_workspace", label: "Workspace", default: "" },
+            { name: "slack_channel", label: "Default channel", default: "#erp-alerts" },
+            { name: "slack_webhook", label: "Incoming webhook URL", default: "" },
+          ] },
+          { title: "Microsoft Teams", fields: [
+            { name: "teams_tenant", label: "Tenant", default: "" },
+            { name: "teams_channel", label: "Default channel", default: "ERP Alerts" },
+            { name: "teams_webhook", label: "Incoming webhook URL", default: "" },
+          ] },
+        ]} />
+      </TabsContent>
     </Tabs>
   );
 }
