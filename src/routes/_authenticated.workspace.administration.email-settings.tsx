@@ -1,16 +1,43 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SettingsSection, FieldRow, SettingsGrid } from "@/features/admin/SettingsShell";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DataListPage, Pill } from "@/features/admin/DataListPage";
+import { SettingsForm } from "@/features/admin/SettingsForm";
+import { CrudList } from "@/features/admin/CrudList";
+import { useSettingsCollection, type CollectionRow } from "@/features/admin/admin-api";
+import { Pill } from "@/features/admin/DataListPage";
 
 export const Route = createFileRoute("/_authenticated/workspace/administration/email-settings")({
   component: EmailPage,
 });
+
+interface EmailTpl extends CollectionRow { name: string; event: string; subject: string; body: string; active: boolean }
+
+function Templates() {
+  const { rows, isLoading, create, update, remove } = useSettingsCollection<EmailTpl>("admin.email.templates");
+  return (
+    <CrudList<EmailTpl>
+      entity="Email template"
+      loading={isLoading}
+      rows={rows}
+      searchKeys={["name", "event", "subject"]}
+      columns={[
+        { key: "name", header: "Template" },
+        { key: "event", header: "Event" },
+        { key: "subject", header: "Subject" },
+        { key: "active", header: "Status", render: (r) => <Pill tone={r.active ? "success" : "warn"}>{r.active ? "Active" : "Paused"}</Pill> },
+      ]}
+      fields={[
+        { name: "name", label: "Template name", required: true },
+        { name: "event", label: "Event key", placeholder: "invoice.created", required: true },
+        { name: "subject", label: "Subject", full: true, required: true },
+        { name: "body", label: "Body", type: "textarea" },
+        { name: "active", label: "Active", type: "switch", default: true },
+      ]}
+      onCreate={(v) => create(v as any)}
+      onUpdate={(id, v) => update(id, v as any)}
+      onDelete={(r) => remove(r.id)}
+    />
+  );
+}
 
 function EmailPage() {
   return (
@@ -22,58 +49,41 @@ function EmailPage() {
       </TabsList>
 
       <TabsContent value="smtp">
-        <SettingsGrid>
-          <SettingsSection title="Outbound SMTP">
-            <FieldRow label="Provider">
-              <Select defaultValue="ses"><SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ses">Amazon SES</SelectItem>
-                  <SelectItem value="sendgrid">SendGrid</SelectItem>
-                  <SelectItem value="smtp">Custom SMTP</SelectItem>
-                </SelectContent>
-              </Select>
-            </FieldRow>
-            <FieldRow label="Host"><Input defaultValue="email-smtp.ap-south-1.amazonaws.com" /></FieldRow>
-            <FieldRow label="Port"><Input defaultValue="587" /></FieldRow>
-            <FieldRow label="TLS"><Switch defaultChecked /></FieldRow>
-            <FieldRow label="Username"><Input defaultValue="AKIA••••••••••" /></FieldRow>
-            <FieldRow label="Password"><Input type="password" defaultValue="••••••••••" /></FieldRow>
-          </SettingsSection>
-          <SettingsSection title="Defaults">
-            <FieldRow label="From name"><Input defaultValue="Ind Guru ERP" /></FieldRow>
-            <FieldRow label="From address"><Input defaultValue="noreply@indguru.com" /></FieldRow>
-            <FieldRow label="BCC (audit)"><Input defaultValue="audit-mail@indguru.com" /></FieldRow>
-            <FieldRow label="Footer signature"><Textarea rows={3} defaultValue="Ind Guru Enterprises Pvt Ltd — Pune, IN" /></FieldRow>
-          </SettingsSection>
-        </SettingsGrid>
-        <div className="flex justify-end gap-2 mt-4"><Button variant="outline">Send test email</Button><Button>Save</Button></div>
+        <SettingsForm settingsKey="admin.email.smtp" groups={[
+          { title: "Outbound SMTP", fields: [
+            { name: "provider", label: "Provider", type: "select", default: "ses", options: [
+              { label: "Amazon SES", value: "ses" }, { label: "SendGrid", value: "sendgrid" },
+              { label: "Resend", value: "resend" }, { label: "Custom SMTP", value: "smtp" },
+            ] },
+            { name: "host", label: "Host", default: "" },
+            { name: "port", label: "Port", type: "number", default: 587 },
+            { name: "tls", label: "TLS", type: "switch", default: true },
+            { name: "username", label: "Username", default: "" },
+            { name: "password", label: "Password", type: "password", default: "" },
+          ] },
+          { title: "Defaults", fields: [
+            { name: "from_name", label: "From name", default: "" },
+            { name: "from_address", label: "From address", type: "email", default: "" },
+            { name: "bcc", label: "BCC (audit)", type: "email", default: "" },
+            { name: "footer", label: "Footer signature", type: "textarea", default: "" },
+          ] },
+        ]} />
       </TabsContent>
 
-      <TabsContent value="templates">
-        <DataListPage searchKeys={["name"]} actionLabel="New template"
-          columns={[
-            { key: "name", header: "Template" },
-            { key: "event", header: "Event" },
-            { key: "channel", header: "Channel", render: (r: any) => <Pill tone="info">{r.channel}</Pill> },
-            { key: "updated", header: "Updated" },
-          ]}
-          rows={[
-            { id: "1", name: "Invoice sent", event: "invoice.created", channel: "Email", updated: "12 Jul 2026" },
-            { id: "2", name: "Payment received", event: "payment.received", channel: "Email", updated: "12 Jul 2026" },
-            { id: "3", name: "PO approval request", event: "po.pending_approval", channel: "Email", updated: "18 Jul 2026" },
-            { id: "4", name: "Low stock alert", event: "inventory.low", channel: "Email", updated: "20 Jul 2026" },
-            { id: "5", name: "Password reset", event: "auth.password_reset", channel: "Email", updated: "01 Jun 2026" },
-          ] as any}
-        />
-      </TabsContent>
+      <TabsContent value="templates"><Templates /></TabsContent>
 
       <TabsContent value="dkim">
-        <SettingsSection title="Deliverability">
-          <FieldRow label="SPF"><Pill tone="success">Verified</Pill></FieldRow>
-          <FieldRow label="DKIM"><Pill tone="success">Verified</Pill></FieldRow>
-          <FieldRow label="DMARC"><Pill tone="warn">Policy: none</Pill></FieldRow>
-          <FieldRow label="Bounce webhook"><Input defaultValue="https://api.indguru.com/webhooks/bounce" /></FieldRow>
-        </SettingsSection>
+        <SettingsForm columns={1} settingsKey="admin.email.deliverability" groups={[
+          { title: "Deliverability", fields: [
+            { name: "sending_domain", label: "Sending domain", default: "" },
+            { name: "spf", label: "SPF verified", type: "switch", default: false },
+            { name: "dkim", label: "DKIM verified", type: "switch", default: false },
+            { name: "dmarc_policy", label: "DMARC policy", type: "select", default: "none", options: [
+              { label: "none", value: "none" }, { label: "quarantine", value: "quarantine" }, { label: "reject", value: "reject" },
+            ] },
+            { name: "bounce_webhook", label: "Bounce webhook", default: "" },
+          ] },
+        ]} />
       </TabsContent>
     </Tabs>
   );
