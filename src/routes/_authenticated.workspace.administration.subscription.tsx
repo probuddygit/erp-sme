@@ -66,7 +66,7 @@ function SubPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("platform_invoices")
-        .select("id, invoice_number, amount, status, period_start, period_end, created_at")
+        .select("id, invoice_number, amount, tax, status, due_date, created_at")
         .eq("company_id", company!.id)
         .order("created_at", { ascending: false });
       if (error) return [];
@@ -78,8 +78,8 @@ function SubPage() {
     id: i.id,
     number: i.invoice_number ?? i.id.slice(0, 8),
     date: fmtTs(i.created_at),
-    period: [i.period_start, i.period_end].filter(Boolean).join(" → ") || "—",
-    amount: `₹ ${Number(i.amount ?? 0).toLocaleString("en-IN")}`,
+    period: i.due_date ? `Due ${i.due_date}` : "—",
+    amount: `₹ ${(Number(i.amount ?? 0) + Number(i.tax ?? 0)).toLocaleString("en-IN")}`,
     status: i.status ?? "—",
   }));
 
