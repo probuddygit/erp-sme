@@ -13,7 +13,7 @@ function MastersIndex() {
       {MASTERS.map((m) => {
         const Icon = m.icon;
         return (
-          <Link key={m.key} to={`/workspace/masters/${m.key}`}>
+          <Link key={m.key} to="/workspace/masters/$master" params={{ master: m.key }}>
             <Card className="h-full transition-shadow hover:shadow-md">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">

@@ -151,3 +151,15 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
 ];
 
 export const paletteByKind = (k: NodeKind) => NODE_PALETTE.find((p) => p.kind === k)!;
+/** Build a starter node chain for a template. */
+export function templateNodes(name: string, count: number): CanvasNode[] {
+  const middle: NodeKind[] = ["condition", "approval", "approval", "notify", "email", "update"];
+  const kinds: NodeKind[] = ["start", ...middle.slice(0, Math.max(1, count - 2)), "end"];
+  return kinds.map((kind, i) => ({
+    id: `n${i + 1}-${Math.random().toString(36).slice(2, 6)}`,
+    kind,
+    label: i === 0 ? `${name} triggered` : i === kinds.length - 1 ? "Complete" : paletteByKind(kind).label,
+    x: 40 + i * 220,
+    y: 80 + (i % 2 === 0 ? 0 : 60),
+  }));
+}

@@ -141,7 +141,7 @@ function InvitesTab() {
   const { data: rows = [], isLoading } = useQuery({
     enabled: !!company?.id,
     queryKey: ["admin-invites", company?.id],
-    queryFn: async () => (await list()) as any[],
+    queryFn: async () => (await list({ data: { company_id: company!.id } })) as any[],
   });
 
   return (
@@ -181,7 +181,7 @@ function InvitesTab() {
         ]}
         submitLabel="Send invite"
         onSubmit={async (v) => {
-          if (!company?.id || !organization?.id) return toast.error("Company/organization missing");
+          if (!company?.id || !organization?.id) { toast.error("Company/organization missing"); return; }
           const res: any = await invite({ data: { email: v.email, role: v.role, company_id: company.id, organization_id: organization.id } });
           qc.invalidateQueries({ queryKey: ["admin-invites", company?.id] });
           const link = `${window.location.origin}/auth?invite=${res.token}`;

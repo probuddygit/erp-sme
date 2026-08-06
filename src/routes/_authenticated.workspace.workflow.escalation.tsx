@@ -1,55 +1,51 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, AlarmClock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AlarmClock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { ESCALATION_RULES } from "@/features/workflow/data";
+import { CrudList } from "@/features/admin/CrudList";
+import { useEscalationRules, type EscalationRuleRow } from "@/features/workflow/workflow-api";
 
 export const Route = createFileRoute("/_authenticated/workspace/workflow/escalation")({
   component: Page,
 });
 
+const ACTIONS = ["Notify", "Reassign", "Auto-approve", "Cancel"];
+
 function Page() {
+  const { rows, isLoading, create, update, remove } = useEscalationRules();
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-sm font-semibold">Escalation rules</div>
-          <div className="text-xs text-muted-foreground">Auto-escalate stuck approvals to keep operations flowing.</div>
-        </div>
-        <Button size="sm"><Plus className="mr-1 h-4 w-4" />New escalation</Button>
+      <div>
+        <div className="text-sm font-semibold">Escalation rules</div>
+        <div className="text-xs text-muted-foreground">Auto-escalate stuck approvals to keep operations flowing.</div>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        {ESCALATION_RULES.map((r) => (
-          <div key={r.id} className="rounded-xl border border-border bg-card p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-md bg-amber-500/10 text-amber-600">
-                  <AlarmClock className="h-4 w-4" />
-                </div>
-                <div>
-                  <div className="text-sm font-medium">{r.workflow}</div>
-                  <div className="text-[11px] text-muted-foreground">{r.id}</div>
-                </div>
-              </div>
-              <Switch defaultChecked={r.enabled} />
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-3 text-xs">
-              <Field label="After">{r.after}</Field>
-              <Field label="Action">{r.action}</Field>
-              <Field label="Escalate to">{r.escalateTo}</Field>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-md border border-border bg-muted/40 p-2">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="mt-0.5 font-medium">{children}</div>
+      <CrudList<EscalationRuleRow>
+        entity="Escalation rule"
+        actionLabel="New escalation"
+        loading={isLoading}
+        rows={rows}
+        searchKeys={["workflow", "escalate_to", "action"]}
+        columns={[
+          { key: "workflow", header: "Workflow", render: (r) => (
+            <div className="flex items-center gap-2"><AlarmClock className="h-4 w-4 text-amber-600" /><span className="font-medium">{r.workflow}</span></div>
+          ) },
+          { key: "after_hours", header: "After", render: (r) => `${r.after_hours} hours` },
+          { key: "action", header: "Action" },
+          { key: "escalate_to", header: "Escalate to" },
+          { key: "enabled", header: "Enabled", render: (r) => (
+            <Switch checked={!!r.enabled} onCheckedChange={(v) => update(r.id, { enabled: v })} />
+          ) },
+        ]}
+        fields={[
+          { name: "workflow", label: "Workflow", required: true },
+          { name: "after_hours", label: "Escalate after (hours)", type: "number", default: 24 },
+          { name: "action", label: "Action", type: "select", default: "Notify", options: ACTIONS.map((a) => ({ label: a, value: a })) },
+          { name: "escalate_to", label: "Escalate to", default: "Manager" },
+          { name: "enabled", label: "Enabled", type: "switch", default: true },
+        ]}
+        onCreate={(v) => create({ workflow: v.workflow, after_hours: Number(v.after_hours) || 24, action: v.action, escalate_to: v.escalate_to, enabled: !!v.enabled } as any)}
+        onUpdate={(id, v) => update(id, { workflow: v.workflow, after_hours: Number(v.after_hours) || 24, action: v.action, escalate_to: v.escalate_to, enabled: !!v.enabled })}
+        onDelete={(r) => remove(r.id)}
+      />
     </div>
   );
 }
