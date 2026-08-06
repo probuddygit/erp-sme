@@ -11,20 +11,17 @@ export const Route = createFileRoute("/_authenticated/workspace/workflow/templat
 });
 
 function Page() {
-  const { rows, create } = useFlows();
+  const { rows, replaceAll } = useFlows();
   const navigate = useNavigate();
 
   const use = async (name: string, nodeCount: number) => {
     const id = crypto.randomUUID();
-    await create({
-      name: `${name} (copy)`,
-      status: "Draft",
-      nodes: templateNodes(name, nodeCount),
-      updated_at: new Date().toISOString(),
-    } as any);
+    await replaceAll([
+      ...rows,
+      { id, name: `${name} (copy)`, status: "Draft", nodes: templateNodes(name, nodeCount), updated_at: new Date().toISOString() },
+    ]);
     toast.success("Workflow created from template");
-    const created = rows.find((r) => r.name === `${name} (copy)`);
-    navigate({ to: "/workspace/workflow/designer", search: { flow: created?.id ?? id } });
+    navigate({ to: "/workspace/workflow/designer", search: { flow: id } });
   };
 
   return (
