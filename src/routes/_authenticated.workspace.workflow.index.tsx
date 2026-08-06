@@ -1,18 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Workflow as WorkflowIcon, ShieldCheck, Bell, AlarmClock, Play, CheckCircle2, XCircle, Loader2, Bot } from "lucide-react";
-import { WORKFLOW_HISTORY, APPROVAL_RULES, NOTIFICATION_RULES } from "@/features/workflow/data";
 import { Badge } from "@/components/ui/badge";
+import { useCompanyTable } from "@/features/admin/admin-api";
+import { useEscalationRules, useFlows, useNotificationRules, useWorkflowRuns } from "@/features/workflow/workflow-api";
 
 export const Route = createFileRoute("/_authenticated/workspace/workflow/")({
   component: Overview,
 });
 
 function Overview() {
+  const { rows: flows } = useFlows();
+  const { rows: notifRules } = useNotificationRules();
+  const { rows: escalations } = useEscalationRules();
+  const { rows: runs } = useWorkflowRuns();
+  const { rows: approvalRules } = useCompanyTable<{ id: string; active: boolean }>("approval_rules");
+
   const kpis = [
-    { label: "Active workflows",  value: 12, icon: WorkflowIcon, tone: "text-blue-600" },
-    { label: "Approval rules",    value: APPROVAL_RULES.filter((r) => r.status === "Active").length, icon: ShieldCheck, tone: "text-emerald-600" },
-    { label: "Notification rules",value: NOTIFICATION_RULES.filter((r) => r.enabled).length, icon: Bell, tone: "text-rose-600" },
-    { label: "Escalations today", value: 3, icon: AlarmClock, tone: "text-amber-600" },
+    { label: "Active workflows",  value: flows.filter((f) => f.status === "Active").length, icon: WorkflowIcon, tone: "text-blue-600" },
+    { label: "Approval rules",    value: approvalRules.filter((r) => r.active).length, icon: ShieldCheck, tone: "text-emerald-600" },
+    { label: "Notification rules",value: notifRules.filter((r) => r.enabled).length, icon: Bell, tone: "text-rose-600" },
+    { label: "Escalations active",value: escalations.filter((r) => r.enabled).length, icon: AlarmClock, tone: "text-amber-600" },
   ];
   return (
     <div className="space-y-6">
@@ -38,22 +45,25 @@ function Overview() {
             <Link to="/workspace/workflow/history" className="text-xs font-medium text-primary hover:underline">View all →</Link>
           </div>
           <div className="divide-y divide-border">
-            {WORKFLOW_HISTORY.slice(0, 6).map((r) => {
-              const map = {
-                Completed: { icon: CheckCircle2, tone: "text-emerald-600" },
-                Running:   { icon: Loader2,      tone: "text-blue-600" },
-                Failed:    { icon: XCircle,      tone: "text-rose-600" },
-                Waiting:   { icon: Play,         tone: "text-amber-600" },
-              }[r.status];
+            {runs.length === 0 && (
+              <div className="p-6 text-center text-xs text-muted-foreground">No workflow runs yet</div>
+            )}
+            {runs.slice(0, 6).map((r) => {
+              const map = ({
+                approved:  { icon: CheckCircle2, tone: "text-emerald-600" },
+                pending:   { icon: Loader2,      tone: "text-blue-600" },
+                rejected:  { icon: XCircle,      tone: "text-rose-600" },
+                cancelled: { icon: Play,         tone: "text-amber-600" },
+              } as Record<string, { icon: any; tone: string }>)[r.status] ?? { icon: Play, tone: "text-amber-600" };
               const Icon = map.icon;
               return (
                 <div key={r.id} className="flex items-center gap-3 p-4 text-sm">
-                  <Icon className={`h-4 w-4 shrink-0 ${map.tone} ${r.status === "Running" ? "animate-spin" : ""}`} />
+                  <Icon className={`h-4 w-4 shrink-0 ${map.tone} ${r.status === "pending" ? "animate-spin" : ""}`} />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium">{r.workflow}</div>
-                    <div className="truncate text-xs text-muted-foreground">{r.trigger}</div>
+                    <div className="truncate font-medium">{r.rule_name ?? "Ad-hoc approval"}</div>
+                    <div className="truncate text-xs text-muted-foreground">{r.entity_type.replace(/_/g, " ")} · step {r.current_step}/{r.total_steps}</div>
                   </div>
-                  <div className="hidden text-xs text-muted-foreground md:block">{r.startedAt}</div>
+                  <div className="hidden text-xs text-muted-foreground md:block">{new Date(r.created_at).toLocaleString("en-IN")}</div>
                   <Badge variant="secondary" className="text-[10px]">{r.status}</Badge>
                 </div>
               );
