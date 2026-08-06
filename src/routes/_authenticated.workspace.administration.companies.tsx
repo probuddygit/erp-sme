@@ -38,7 +38,7 @@ function CompaniesPage() {
 
   const update = useMutation({
     mutationFn: async ({ id, ...patch }: Record<string, any> & { id: string }) => {
-      const { error } = await supabase.from("companies").update(patch).eq("id", id);
+      const { error } = await supabase.from("companies").update(patch as never).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey }); refresh(); toast.success("Company updated"); },
