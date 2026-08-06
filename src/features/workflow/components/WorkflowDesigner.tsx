@@ -1,4 +1,8 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useFlows } from "@/features/workflow/workflow-api";
 import { NODE_PALETTE, SAMPLE_NODES, paletteByKind, type CanvasNode, type NodeKind } from "@/features/workflow/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +15,65 @@ import { cn } from "@/lib/utils";
 const NODE_W = 176;
 const NODE_H = 68;
 
-export function WorkflowDesigner() {
+export function WorkflowDesigner({ flowId }: { flowId?: string }) {
+  const navigate = useNavigate();
+  const { rows: flows, isLoading, replaceAll } = useFlows();
+  const current = flows.find((f) => f.id === flowId) ?? null;
+
   const [nodes, setNodes] = useState<CanvasNode[]>(SAMPLE_NODES);
+  const [name, setName] = useState("New workflow");
+  const [status, setStatus] = useState("Draft");
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [loadedKey, setLoadedKey] = useState<string>("");
+
+  // hydrate the editor when the selected flow changes
+  const key = `${flowId ?? "new"}-${isLoading ? "l" : "r"}`;
+  if (key !== loadedKey && !isLoading) {
+    setLoadedKey(key);
+    setNodes(current?.nodes?.length ? current.nodes : SAMPLE_NODES);
+    setName(current?.name ?? "New workflow");
+    setStatus(current?.status ?? "Draft");
+  }
+
+  const selectFlow = (id: string) => navigate({ to: "/workspace/workflow/designer", search: id === "__new" ? {} : { flow: id } });
+
+  const saveFlow = async () => {
+    const id = flowId ?? crypto.randomUUID();
+    const row = { id, name, status, nodes, updated_at: new Date().toISOString() };
+    const next = flows.some((f) => f.id === id) ? flows.map((f) => (f.id === id ? { ...f, ...row } : f)) : [...flows, row];
+    await replaceAll(next as any);
+    toast.success("Workflow saved");
+    if (!flowId) navigate({ to: "/workspace/workflow/designer", search: { flow: id } });
+  };
+
+  const deleteFlow = async () => {
+    if (!flowId) return;
+    await replaceAll(flows.filter((f) => f.id !== flowId) as any);
+    toast.success("Workflow deleted");
+    navigate({ to: "/workspace/workflow/designer", search: {} });
+  };
+
+  const toggleActive = async () => {
+    const next = status === "Active" ? "Draft" : "Active";
+    setStatus(next);
+    if (flowId) {
+      await replaceAll(flows.map((f) => (f.id === flowId ? { ...f, status: next } : f)) as any);
+    }
+    toast.success(next === "Active" ? "Workflow activated" : "Workflow paused");
+  };
+
+  const testRun = () => {
+    if (!nodes.length) { toast.error("Add nodes before running a test"); return; }
+    toast.success(`Test run simulated — ${nodes.length} steps executed`);
+  };
+
+  const aiSuggest = () => {
+    const meta = paletteByKind("approval");
+    const id = `n${Date.now()}`;
+    setNodes((prev) => [...prev, { id, kind: "approval", label: "Suggested: Finance approval", x: 40 + prev.length * 40, y: 320 }]);
+    setSelectedId(id);
+    toast.success(`AI added a ${meta.label} step`);
+  };
   const [selectedId, setSelectedId] = useState<string | null>("n2");
   const [dragging, setDragging] = useState<{ id: string; ox: number; oy: number } | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -104,14 +165,27 @@ export function WorkflowDesigner() {
 
       <div className="rounded-xl border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border p-3">
-          <div className="flex items-center gap-2">
-            <Input defaultValue="PO Approval Flow" className="h-8 w-64 text-sm" />
-            <span className="rounded bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">Draft v1</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={flowId ?? "__new"} onValueChange={selectFlow}>
+              <SelectTrigger className="h-8 w-48 text-xs"><SelectValue placeholder="Select workflow" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__new">+ New workflow</SelectItem>
+                {flows.map((f) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Input value={name} onChange={(e) => setName(e.target.value)} className="h-8 w-56 text-sm" />
+            <button
+              onClick={toggleActive}
+              className="rounded bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground hover:bg-muted/70"
+            >
+              {status}
+            </button>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="ghost"><Sparkles className="mr-1 h-3.5 w-3.5" />AI suggest</Button>
-            <Button size="sm" variant="ghost"><Play className="mr-1 h-3.5 w-3.5" />Test run</Button>
-            <Button size="sm"><Save className="mr-1 h-3.5 w-3.5" />Save</Button>
+            <Button size="sm" variant="ghost" onClick={aiSuggest}><Sparkles className="mr-1 h-3.5 w-3.5" />AI suggest</Button>
+            <Button size="sm" variant="ghost" onClick={testRun}><Play className="mr-1 h-3.5 w-3.5" />Test run</Button>
+            {flowId && <Button size="sm" variant="ghost" className="text-destructive" onClick={deleteFlow}><Trash2 className="mr-1 h-3.5 w-3.5" />Delete</Button>}
+            <Button size="sm" onClick={saveFlow}><Save className="mr-1 h-3.5 w-3.5" />Save</Button>
           </div>
         </div>
         <div
@@ -193,7 +267,12 @@ export function WorkflowDesigner() {
             </div>
             <div>
               <Label className="text-xs">Notes</Label>
-              <Textarea placeholder="Describe this step…" className="mt-1 h-20 text-sm" />
+              <Textarea
+                placeholder="Describe this step…"
+                value={notes[selected.id] ?? ""}
+                onChange={(e) => setNotes((p) => ({ ...p, [selected.id]: e.target.value }))}
+                className="mt-1 h-20 text-sm"
+              />
             </div>
             <Separator />
             <Button variant="destructive" size="sm" className="w-full" onClick={deleteSelected}>
