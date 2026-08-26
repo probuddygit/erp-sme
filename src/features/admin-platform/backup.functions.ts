@@ -57,7 +57,7 @@ export const exportBackupTables = createServerFn({ method: 'POST' })
     const admin = await loadAdminClient();
     const limit = data.limit ?? 10000;
 
-    const out: Record<string, Record<string, unknown>[]> = {};
+    const out: Record<string, any[]> = {};
     let total = 0;
     for (const name of data.tables) {
       const entry = resolveTable(name);
@@ -65,7 +65,7 @@ export const exportBackupTables = createServerFn({ method: 'POST' })
       if (data.companyId && entry.tenantScoped) q = q.eq('company_id', data.companyId);
       const { data: rows, error } = await q;
       if (error) throw new Error(`${entry.table}: ${error.message}`);
-      out[entry.table] = (rows ?? []) as Record<string, unknown>[];
+      out[entry.table] = (rows ?? []) as any[];
       total += out[entry.table].length;
     }
 
