@@ -1,62 +1,41 @@
-# SAP-style Integration: Current Status and Gap Closure
+# Phase 1 & 2 — Outbound Inventory and Warehouse Fulfilment
 
-## Verified status (checked against the live database and code)
+Approved scope: close the two structural gaps found in the integration review — sales never reduces stock, and there is no reservation/picking/packing/dispatch chain. Later phases (banking, live dashboards, AI) stay out of this build.
 
-Already implemented
-- Universal document metadata on transaction tables: status, workflow status, approval status, financial/inventory/GST/notification posting status, source document kind + id, version, created/modified by. Present on quotations, sales orders, delivery notes, invoices, payments, indents, RFQs, POs, GRNs, vendor invoices, returns.
-- Document history, events, links, comments, attachments tables plus the lineage dialog in the UI.
-- Auto journal posting (108 triggers total) for: sales invoice, customer payment, GRN, vendor invoice, supplier payment, payroll run, sales return, vendor return, material consumption.
-- GST output ledger written automatically from sales invoices (15 ledger rows present); e-Invoice / e-Way payload columns and screens exist.
-- Inbound inventory automation: GRN → stock batch + stock ledger + reorder check; production output, cycle count, consumption, vendor return all post stock.
-- Procure-to-Pay chain: Indent → RFQ → PO → GRN → Vendor Invoice → Payment with conversions and approvals.
-- Approval engine, workflow rules/escalation/notification configuration, audit logs.
+## Phase 1 — Sales must move inventory and cost
 
-Confirmed gaps
-1. Outbound inventory is missing. No function or trigger reduces stock for a Delivery Note or Invoice — sales never touch the stock ledger, so no COGS entry, no batch/serial depletion.
-2. No reservation model at all: no allocation, reserved-quantity, pick list, packing or dispatch tables/steps.
-3. Sales Order creation does not run the automation chain (credit validation exists as an RPC but is not enforced on create; no ATP check, no reservation, no warehouse notification, no pick list).
-4. No bank reconciliation and no bank statement model; cash flow is derived only from journal lines.
-5. Dashboard still renders from a dummy-data module, not live ledger/inventory aggregates.
-6. e-Invoice IRN generated on only 2 of 11 invoices and is a manual action; not triggered automatically on invoice posting.
-7. No budget reservation or expected-receipt object on Purchase Orders.
-8. Notification fan-out exists only for alerts; approvals, escalations, email/WhatsApp/push dispatch are configuration-only.
-9. No AI integration anywhere in the app (no AI calls in the codebase) — lead scoring, forecasting, NL queries, executive summaries are all absent.
+- Posting a Delivery Note (status dispatched or delivered) automatically:
+  - issues stock for every line, depleting batches oldest-first through the existing issue routine
+  - consumes the matching reservation for that sales order
+  - increases dispatched quantity on the sales order line and moves the order to Partially Dispatched / Dispatched
+  - books the Cost of Goods Sold entry (COGS Dr / Inventory Cr) at actual batch cost
+  - stamps inventory and financial posting status on the document
+- An invoice posted with no delivery note for its order does the same, so stock can never be bypassed. When a delivery note already moved the goods, the invoice is marked "not applicable" instead of double-issuing.
+- Item resolution falls back to matching the invoice line against item name or SKU when the line is not linked to an order line.
 
-## Plan
+## Phase 2 — Reservation, picking, packing, dispatch
 
-### Phase 1 — Close the outbound inventory hole (highest impact)
-- Add `post_stock_issue` wiring for delivery notes and for invoices shipped without a delivery note, with batch/serial depletion in FIFO order.
-- Post the COGS journal (Cost of Goods Sold Dr / Inventory Cr) in the same trigger, and stamp `inventory_posting_status`.
-- Block posting when available stock is insufficient, with a clear message naming the lines.
+New records
+- Stock reservations: quantity of an item held in a warehouse for a specific sales order, with consumed quantity and status.
+- Pick lists and pick list lines: what the warehouse must pick, requested vs picked quantity, optional bin.
+- Packing slips: packages, gross weight, packing status against a pick list.
+- Dispatches: vehicle, transporter, driver and dispatch time, linked to the delivery note.
 
-### Phase 2 — Reservation, picking, packing, dispatch
-- New tables: `stock_reservations`, `pick_lists` + lines, `packing_slips`, `dispatches`, each with the universal metadata columns.
-- Sales Order confirmation runs one transactional RPC: credit check → availability check → reserve stock → create allocation → generate pick list → notify warehouse → record document events.
-- Reserved and available quantities surfaced in Inventory (available = on hand − reserved).
-- Delivery Note consumes the reservation instead of double-counting.
+New automation
+- Confirming a Sales Order runs one transactional step: validate customer credit, check availability, reserve stock, generate the pick list, notify the warehouse, and write the document event. Failing credit puts the order on credit hold with the reason recorded.
+- Availability is reported as on hand minus active reservations, so Inventory shows what can actually be promised. Shortages are returned with the confirmation result instead of silently over-committing.
+- Reservations are released as they are consumed by dispatch.
 
-### Phase 3 — Finance and banking completion
-- `bank_accounts` and `bank_statement_lines` with an import + match screen; reconciliation marks payments cleared and updates cash position.
-- Expense entry and journal voucher screens posting through the existing `post_journal`.
-- Customer and vendor ledger views driven from journal lines and open items.
+## What stays unchanged
 
-### Phase 4 — GST and document compliance automation
-- Auto-build e-Invoice and e-Way Bill payloads on invoice/delivery-note posting, set `gst_status`, keep manual IRN generation as the submit action.
-- Input GST ledger rows from vendor invoices (currently output-only).
-
-### Phase 5 — Live dashboards, reports and notifications
-- Replace dummy dashboard data with live aggregates: revenue, purchases, inventory value, AR/AP outstanding, cash position, margins, top customers/products, low stock, pending orders.
-- Query invalidation on every posting mutation so dashboards and reports refresh with no manual action.
-- Notification fan-out on approval request, approval decision, escalation and posting failures, delivered in-app; email/WhatsApp dispatch behind the existing channel settings.
-
-### Phase 6 — AI services
-- One reusable AI service endpoint with per-module context builders: lead summary and scoring, quotation drafting and cross/upsell, demand forecast and reorder suggestion, vendor recommendation, cash-flow forecast and anomaly flags, executive summary and natural-language report queries, workflow and role suggestions.
+No UI redesign. New capability attaches to existing pages: a Confirm action and reservation/shortage feedback on Sales Orders, pick list and dispatch views under Sales, an Available column alongside On Hand in Inventory.
 
 ## Technical notes
-- All posting logic stays in Postgres functions/triggers so it applies regardless of entry point; the UI only calls RPCs.
-- New tables follow the existing tenant pattern: company scoping, grants for authenticated/service_role, RLS with `is_super_admin` / `get_user_company` / `has_company_role`.
-- No UI redesign: new capabilities attach to existing Sales, Inventory, Finance, GST and Dashboard pages as tabs, actions and columns.
-- AI runs through the Lovable AI gateway from server functions; no keys in the client.
 
-## Suggested order
-Phase 1 and 2 first — until sales issues stock, inventory, COGS, margins and dashboards are all structurally wrong. Phases 3-5 then make finance and reporting self-updating; Phase 6 is additive.
+- All posting logic lives in Postgres functions and triggers so it applies no matter which screen or import creates the document.
+- New tables carry company scoping, grants for authenticated and service_role, and RLS mirroring the existing pattern (own company read; admin/manager/sales/production write).
+- `confirm_sales_order` is corrected to use the `approved` order status — the current version sets a status value that does not exist in the order status list and fails.
+- New functions: `item_availability`, `default_warehouse`, `reserve_stock_for_order`, `generate_pick_list`, `consume_reservation`, plus delivery-note and invoice stock-issue triggers.
+- Frontend: new API hooks for reservations, pick lists and dispatches; Sales Order and Delivery Note screens call the RPCs and invalidate inventory, finance and dashboard queries after posting.
+
+Switch to build mode to apply the database migration and the accompanying UI wiring.
