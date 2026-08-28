@@ -48,11 +48,13 @@ export function useSetPickListStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const patch: Record<string, unknown> = { status, modified_by: user?.id ?? null };
-      if (status === "picked") {
-        patch['picked_by'] = user?.id ?? null;
-        patch['picked_at'] = new Date().toISOString();
-      }
+      const patch = {
+        status,
+        modified_by: user?.id ?? null,
+        ...(status === "picked"
+          ? { picked_by: user?.id ?? null, picked_at: new Date().toISOString() }
+          : {}),
+      };
       const { error } = await supabase.from("pick_lists").update(patch).eq("id", id);
       if (error) throw error;
     },
