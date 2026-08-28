@@ -1,0 +1,11 @@
+REVOKE ALL ON FUNCTION public.tg_delivery_note_issue_stock() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.tg_invoice_issue_stock() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.default_warehouse(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.item_availability(uuid) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.reserve_stock_for_order(uuid) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.generate_pick_list(uuid) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.confirm_sales_order(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.item_availability(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.reserve_stock_for_order(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.generate_pick_list(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.confirm_sales_order(uuid) TO authenticated;
