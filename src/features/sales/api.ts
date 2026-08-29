@@ -834,8 +834,20 @@ export function useConfirmSalesOrder() {
     },
     onSuccess: (res: any) => {
       qc.invalidateQueries({ queryKey: ["sales", "sales_orders"] });
-      if (res?.ok) toast.success("Sales order confirmed");
-      else toast.warning(`Credit hold — available ₹${Number(res?.available ?? 0).toLocaleString("en-IN")}`);
+      qc.invalidateQueries({ queryKey: ["sales", "pick_lists"] });
+      qc.invalidateQueries({ queryKey: ["inventory"] });
+      if (!res?.confirmed) {
+        toast.warning(`Credit hold — available ₹${Number(res?.available ?? 0).toLocaleString("en-IN")}`);
+        return;
+      }
+      const shortages = (res?.reservation?.shortages ?? []) as { item: string; required: number; available: number }[];
+      if (shortages.length) {
+        toast.warning(
+          `Order confirmed with shortages: ${shortages.map((s) => `${s.item} (${s.available}/${s.required})`).join(", ")}`,
+        );
+      } else {
+        toast.success("Order confirmed — stock reserved and pick list generated");
+      }
     },
     onError: (e: any) => toast.error(e?.message ?? "Confirm failed"),
   });

@@ -5,6 +5,7 @@ import { StatusBadge } from "@/features/sales/components/StatusBadge";
 import { RowActions } from "@/components/RowActions";
 import { ItemFormDialog } from "@/features/inventory/components/ItemFormDialog";
 import { useItems, useStockLevels, useLastMovementByItem, fmtINR, fmtNum, fmtDate } from "@/features/inventory/api";
+import { useAvailability } from "@/features/sales/fulfilment-api";
 import { STATUS_TONES } from "@/features/inventory/data";
 import { useMemo, useState } from "react";
 import type { Database } from "@/integrations/supabase/types";
@@ -24,6 +25,8 @@ function ItemsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<ItemRow | null>(null);
 
+  const { data: availability = [] } = useAvailability();
+
   const onHandByItem = useMemo(() => {
     const m = new Map<string, { qty: number; value: number }>();
     levels.forEach((l) => {
@@ -32,6 +35,18 @@ function ItemsPage() {
     });
     return m;
   }, [levels]);
+
+  const availabilityByItem = useMemo(() => {
+    const m = new Map<string, { reserved: number; available: number }>();
+    availability.forEach((a) => {
+      const prev = m.get(a.item_id) ?? { reserved: 0, available: 0 };
+      m.set(a.item_id, {
+        reserved: prev.reserved + Number(a.reserved ?? 0),
+        available: prev.available + Number(a.available ?? 0),
+      });
+    });
+    return m;
+  }, [availability]);
 
   const stockStatusOf = (i: ItemRow) => {
     const onHand = onHandByItem.get(i.id)?.qty ?? 0;
@@ -66,6 +81,17 @@ function ItemsPage() {
               {last ? `Last movement ${fmtDate(last)}` : "No receipts yet"}
             </div>
           )}
+        </div>
+      );
+    } },
+    { header: "Available", align: "right", cell: (r) => {
+      const a = availabilityByItem.get(r.id);
+      const reserved = a?.reserved ?? 0;
+      const available = a?.available ?? (onHandByItem.get(r.id)?.qty ?? 0);
+      return (
+        <div>
+          <div className="font-medium">{fmtNum(available)} {r.unit}</div>
+          {reserved > 0 && <div className="text-[11px] text-muted-foreground">{fmtNum(reserved)} reserved</div>}
         </div>
       );
     } },
