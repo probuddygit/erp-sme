@@ -4,6 +4,7 @@ import {
   FileText,
   ClipboardList,
   Truck,
+  Boxes,
   ReceiptText,
   Undo2,
   Wallet,
