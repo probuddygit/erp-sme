@@ -5,6 +5,7 @@ import { StatusBadge } from "@/features/sales/components/StatusBadge";
 import { RowActions } from "@/components/RowActions";
 import { ItemFormDialog } from "@/features/inventory/components/ItemFormDialog";
 import { useItems, useStockLevels, useLastMovementByItem, fmtINR, fmtNum, fmtDate } from "@/features/inventory/api";
+import { useAvailability } from "@/features/sales/fulfilment-api";
 import { STATUS_TONES } from "@/features/inventory/data";
 import { useMemo, useState } from "react";
 import type { Database } from "@/integrations/supabase/types";
