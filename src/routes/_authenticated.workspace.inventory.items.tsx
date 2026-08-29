@@ -69,6 +69,17 @@ function ItemsPage() {
         </div>
       );
     } },
+    { header: "Available", align: "right", cell: (r) => {
+      const a = availabilityByItem.get(r.id);
+      const reserved = a?.reserved ?? 0;
+      const available = a?.available ?? (onHandByItem.get(r.id)?.qty ?? 0);
+      return (
+        <div>
+          <div className="font-medium">{fmtNum(available)} {r.unit}</div>
+          {reserved > 0 && <div className="text-[11px] text-muted-foreground">{fmtNum(reserved)} reserved</div>}
+        </div>
+      );
+    } },
     { header: "Reorder", align: "right", cell: (r) => <span className="text-sm">{r.reorder_level ?? r.min_stock ?? 0}</span> },
     { header: "Cost",    align: "right", cell: (r) => fmtINR(Number(r.standard_cost ?? 0)) },
     { header: "Stock",   cell: (r) => {
