@@ -21,6 +21,7 @@ const TABS: { path: string; label: string; icon: LucideIcon }[] = [
   { path: "/workspace/sales",                  label: "Overview",          icon: LayoutDashboard },
   { path: "/workspace/sales/quotations",       label: "Quotations",        icon: FileText },
   { path: "/workspace/sales/sales-orders",     label: "Sales Orders",      icon: ClipboardList },
+  { path: "/workspace/sales/fulfilment",       label: "Fulfilment",        icon: Boxes },
   { path: "/workspace/sales/delivery-notes",   label: "Delivery Notes",    icon: Truck },
   { path: "/workspace/sales/invoices",         label: "Invoices",          icon: ReceiptText },
   { path: "/workspace/sales/credit-notes",     label: "Credit Notes",      icon: StickyNote },
