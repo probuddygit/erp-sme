@@ -37,7 +37,11 @@ function POPage() {
       <SalesDocList
         title="Purchase Orders" description="Formal POs issued to vendors with terms and approvals."
         icon={ShoppingCart} rows={data as any[]} isLoading={isLoading}
-        entityType="purchase_order" searchable={(r: any) => `${r.po_number} ${r.supplier?.name ?? ""} ${r.status}`}
+        entityType="purchase_order"
+        docKind="purchase_order"
+        docTitle={(r: any) => `Purchase Order · ${r.po_number}`}
+        docSubtitle={(r: any) => `${r.supplier?.name ?? "—"}`}
+        docStatus={(r: any) => String(r.status ?? "")} searchable={(r: any) => `${r.po_number} ${r.supplier?.name ?? ""} ${r.status}`}
         totalOf={(r: any) => Number(r.grand_total ?? 0)}
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}

@@ -37,7 +37,11 @@ function GRNsPage() {
       <SalesDocList
         title="Goods Receipts" description="Materials received against POs, with warehouse posting and inspection."
         icon={PackageCheck} rows={data as any[]} isLoading={isLoading}
-        entityType="grn" searchable={(r: any) => `${r.grn_number} ${r.supplier?.name ?? ""} ${r.status}`}
+        entityType="grn"
+        docKind="grn"
+        docTitle={(r: any) => `GRN · ${r.grn_number}`}
+        docSubtitle={(r: any) => `${r.supplier?.name ?? "—"}`}
+        docStatus={(r: any) => String(r.status ?? "")} searchable={(r: any) => `${r.grn_number} ${r.supplier?.name ?? ""} ${r.status}`}
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}

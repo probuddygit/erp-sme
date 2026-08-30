@@ -32,7 +32,11 @@ function VRetPage() {
       <SalesDocList
         title="Vendor Returns" description="Return of received goods to vendors — debit note / refund."
         icon={Undo2} rows={data as any[]} isLoading={isLoading}
-        entityType="vendor_return" searchable={(r: any) => `${r.vret_number} ${r.supplier?.name ?? ""} ${r.status}`}
+        entityType="vendor_return"
+        docKind="vendor_return"
+        docTitle={(r: any) => `Vendor Return · ${r.vret_number}`}
+        docSubtitle={(r: any) => `${r.supplier?.name ?? "—"}`}
+        docStatus={(r: any) => String(r.status ?? "")} searchable={(r: any) => `${r.vret_number} ${r.supplier?.name ?? ""} ${r.status}`}
         totalOf={(r: any) => Number(r.grand_total ?? 0)}
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}

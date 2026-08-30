@@ -185,3 +185,22 @@ export function useMarkNotificationRead() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
   });
 }
+// ---------- Comment counts (list views) ----------
+export function useCommentCounts(kind: DocKind, ids: string[]) {
+  const uniq = [...new Set(ids)].filter(Boolean).sort();
+  return useQuery({
+    enabled: uniq.length > 0,
+    queryKey: ["doc-comment-counts", kind, uniq.join(",")],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("document_comments")
+        .select("doc_id")
+        .eq("doc_kind", kind)
+        .in("doc_id", uniq);
+      if (error) throw error;
+      const map: Record<string, number> = {};
+      for (const r of data ?? []) map[r.doc_id] = (map[r.doc_id] ?? 0) + 1;
+      return map;
+    },
+  });
+}

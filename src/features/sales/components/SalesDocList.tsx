@@ -11,6 +11,8 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { StatCard } from "@/shared/components/StatCard";
 import { RowActions } from "@/components/RowActions";
 import { inr } from "@/lib/sales-utils";
+import { DocDrawer } from "@/features/shared/DocDrawer";
+import type { DocKind } from "@/features/shared/doc-integration";
 
 export interface DocColumn<T> {
   header: string;
@@ -35,13 +37,21 @@ interface Props<T extends { id: string }> {
   headerActions?: React.ReactNode;
   entityType?: EntityType;
   rowExtraActions?: (row: T) => React.ReactNode;
+  /** Enables the document drawer (details, files, approval, activity, comments, links). */
+  docKind?: DocKind;
+  docTitle?: (row: T) => string;
+  docSubtitle?: (row: T) => string;
+  docStatus?: (row: T) => string | undefined;
+  docDetails?: (row: T) => React.ReactNode;
 }
 
 export function SalesDocList<T extends { id: string }>({
   title, description, icon: Icon, rows, isLoading, searchable, columns,
   totalOf, onCreate, onEdit, onDelete, canEdit, canDelete, headerActions, entityType, rowExtraActions,
+  docKind, docTitle, docSubtitle, docStatus, docDetails,
 }: Props<T>) {
   const [q, setQ] = useState("");
+  const [selected, setSelected] = useState<T | null>(null);
 
   const filtered = useMemo(() => {
     if (!q.trim()) return rows;
@@ -94,12 +104,24 @@ export function SalesDocList<T extends { id: string }>({
                 ) : (
                   filtered.map((row) => (
                     <TableRow key={row.id}>
-                      {columns.map((c) => (
-                        <TableCell key={c.header} className={c.className}>{c.cell(row)}</TableCell>
+                      {columns.map((c, ci) => (
+                        <TableCell key={c.header} className={c.className}>
+                          {docKind && ci === 0 ? (
+                            <button type="button" className="text-left hover:underline" onClick={() => setSelected(row)}>
+                              {c.cell(row)}
+                            </button>
+                          ) : c.cell(row)}
+                        </TableCell>
                       ))}
                       {entityType && (
                         <TableCell className="text-center">
-                          <FilesCountCell entityType={entityType} entityIds={ids} entityId={row.id} />
+                          <FilesCountCell
+                            entityType={entityType}
+                            entityIds={ids}
+                            entityId={row.id}
+                            docKind={docKind}
+                            onClick={docKind ? () => setSelected(row) : undefined}
+                          />
                         </TableCell>
                       )}
                       <TableCell className="text-right">
@@ -122,6 +144,31 @@ export function SalesDocList<T extends { id: string }>({
           </div>
         </CardContent>
       </Card>
+
+      {docKind && entityType && selected && (
+        <DocDrawer
+          open={!!selected}
+          onOpenChange={(o) => !o && setSelected(null)}
+          docKind={docKind}
+          entityType={entityType}
+          entityId={selected.id}
+          title={docTitle?.(selected) ?? title.replace(/s$/, "")}
+          subtitle={docSubtitle?.(selected)}
+          status={docStatus?.(selected)}
+          details={
+            docDetails?.(selected) ?? (
+              <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-card p-3 text-sm">
+                {columns.map((c) => (
+                  <div key={c.header}>
+                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{c.header}</div>
+                    <div className="mt-0.5">{c.cell(selected)}</div>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+        />
+      )}
     </div>
   );
 }
