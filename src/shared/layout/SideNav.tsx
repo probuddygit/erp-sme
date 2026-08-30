@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
-import { modulesForRoles } from "@/shared/modules";
+import { modulesForRoles, type ModuleDef } from "@/shared/modules";
 import { Cog } from "lucide-react";
 
 interface Props {
@@ -9,10 +9,28 @@ interface Props {
   onClose: () => void;
 }
 
+const NAV_GROUPS: { label: string; keys: string[] }[] = [
+  { label: "Org Setup", keys: ["administration", "masters", "workflow"] },
+  {
+    label: "Business Operations",
+    keys: ["crm", "sales", "procurement", "inventory", "finance", "gst", "reports"],
+  },
+];
+
 export function SideNav({ open, onClose }: Props) {
   const { roles, isSuperAdmin } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const modules = modulesForRoles(roles, isSuperAdmin);
+  const allModules = modulesForRoles(roles, isSuperAdmin);
+  const dashboard = allModules.filter((m) => m.key === "dashboard");
+  const grouped = NAV_GROUPS.map((g) => ({
+    label: g.label,
+    items: g.keys
+      .map((k) => allModules.find((m) => m.key === k))
+      .filter(Boolean) as ModuleDef[],
+  })).filter((g) => g.items.length > 0);
+  const ungrouped = allModules.filter(
+    (m) => m.key !== "dashboard" && !NAV_GROUPS.some((g) => g.keys.includes(m.key)),
+  );
 
   const isActive = (path: string) =>
     path === "/workspace" ? pathname === "/workspace" : pathname.startsWith(path);
