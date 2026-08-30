@@ -39,6 +39,10 @@ function PurchaseRequestsPage() {
         icon={ClipboardList}
         rows={data as any[]} isLoading={isLoading}
         entityType="purchase_indent"
+        docKind="purchase_indent"
+        docTitle={(r: any) => `Purchase Request · ${r.indent_number}`}
+        docSubtitle={(r: any) => `${r.source ?? "—"}`}
+        docStatus={(r: any) => String(r.status ?? "")}
         searchable={(r: any) => `${r.indent_number} ${r.source ?? ""} ${r.status}`}
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}

@@ -37,7 +37,11 @@ function VInvPage() {
       <SalesDocList
         title="Vendor Invoices" description="Vendor bills booked against POs/GRNs with GST breakup."
         icon={ReceiptText} rows={data as any[]} isLoading={isLoading}
-        entityType="vendor_invoice" searchable={(r: any) => `${r.vinv_number} ${r.supplier?.name ?? ""} ${r.status}`}
+        entityType="vendor_invoice"
+        docKind="vendor_invoice"
+        docTitle={(r: any) => `Purchase Invoice · ${r.vinv_number}`}
+        docSubtitle={(r: any) => `${r.supplier?.name ?? "—"}`}
+        docStatus={(r: any) => String(r.status ?? "")} searchable={(r: any) => `${r.vinv_number} ${r.supplier?.name ?? ""} ${r.status}`}
         totalOf={(r: any) => Number(r.grand_total ?? 0)}
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}

@@ -30,7 +30,11 @@ function RFQsPage() {
       <SalesDocList
         title="RFQs" description="Requests for Quotation issued to vendors."
         icon={FileQuestion} rows={data as any[]} isLoading={isLoading}
-        entityType="rfq" searchable={(r: any) => `${r.rfq_number} ${r.status}`}
+        entityType="rfq"
+        docKind="rfq"
+        docTitle={(r: any) => `RFQ · ${r.rfq_number}`}
+        docSubtitle={(r: any) => `${r.status ?? "—"}`}
+        docStatus={(r: any) => String(r.status ?? "")} searchable={(r: any) => `${r.rfq_number} ${r.status}`}
         onCreate={() => { setEditing(null); setOpen(true); }}
         onEdit={openEdit}
         onDelete={async (r: any) => { await del.mutateAsync(r.id); }}

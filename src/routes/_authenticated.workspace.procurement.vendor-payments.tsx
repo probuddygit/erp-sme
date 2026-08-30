@@ -26,6 +26,11 @@ function VPayPage() {
   return (
     <>
       <SalesDocList
+        entityType="supplier_payment"
+        docKind="supplier_payment"
+        docTitle={(r: any) => `Vendor Payment · ${r.payment_number}`}
+        docSubtitle={(r: any) => `${r.supplier?.name ?? "—"}`}
+        docStatus={(r: any) => String(r.method ?? "")}
         title="Vendor Payments" description="Outward payments to suppliers with invoice allocation."
         icon={Wallet} rows={data as any[]} isLoading={isLoading}
         searchable={(r: any) => `${r.payment_number} ${r.supplier?.name ?? ""} ${r.method}`}
