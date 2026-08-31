@@ -13,8 +13,9 @@ const NAV_GROUPS: { label: string; keys: string[] }[] = [
   { label: "Org Setup", keys: ["administration", "masters", "workflow"] },
   {
     label: "Business Operations",
-    keys: ["crm", "sales", "procurement", "inventory", "finance", "gst", "reports"],
+    keys: ["crm", "sales", "procurement", "inventory"],
   },
+  { label: "Accounting & Finance", keys: ["finance", "gst", "reports"] },
 ];
 
 export function SideNav({ open, onClose }: Props) {
