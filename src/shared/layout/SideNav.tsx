@@ -67,31 +67,25 @@ export function SideNav({ open, onClose }: Props) {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
-          <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-            Modules
-          </div>
           <div className="space-y-0.5">
-            {modules.map((m) => {
-              const active = isActive(m.path);
-              const Icon = m.icon;
-              return (
-                <Link
-                  key={m.key}
-                  to={m.path}
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                  )}
-                >
-                  <Icon className={cn("h-4 w-4", active ? "text-sidebar-primary" : "")} />
-                  {m.label}
-                </Link>
-              );
-            })}
+            {dashboard.map((m) => renderItem(m))}
           </div>
+          {grouped.map((g) => (
+            <div key={g.label} className="mt-4">
+              <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
+                {g.label}
+              </div>
+              <div className="space-y-0.5">{g.items.map((m) => renderItem(m))}</div>
+            </div>
+          ))}
+          {ungrouped.length > 0 && (
+            <div className="mt-4">
+              <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
+                Other
+              </div>
+              <div className="space-y-0.5">{ungrouped.map((m) => renderItem(m))}</div>
+            </div>
+          )}
         </nav>
 
         <div className="border-t border-sidebar-border p-4 text-[10px] text-sidebar-foreground/50">
