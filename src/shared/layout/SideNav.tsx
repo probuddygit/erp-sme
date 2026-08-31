@@ -80,7 +80,7 @@ export function SideNav({ open, onClose }: Props) {
           </div>
           <div>
             <div className="text-sm font-semibold tracking-tight text-sidebar-foreground">
-              ProBuddy ERP for SMEs
+              ProBuddy ERP
             </div>
             <div className="text-[10px] uppercase tracking-wider text-sidebar-foreground/60">
               SME Cloud
