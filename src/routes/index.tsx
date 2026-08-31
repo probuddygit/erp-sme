@@ -26,7 +26,7 @@ function Index() {
             <div className="h-9 w-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-accent)" }}>
               <Cog className="h-5 w-5 text-accent-foreground" />
             </div>
-            <span className="font-bold tracking-tight">Ind Guru ERP</span>
+            <span className="font-bold tracking-tight">ProBuddy ERP for SMEs</span>
           </div>
           <div className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
@@ -42,7 +42,7 @@ function Index() {
       <section className="relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
         <div className="mx-auto max-w-6xl px-6 py-24 md:py-32 text-primary-foreground">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs uppercase tracking-widest text-accent">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Multi-tenant ERP
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Multi-tenant ERP for SMEs
           </div>
           <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight max-w-3xl leading-[1.05]">
             The factory floor,<br />
@@ -77,7 +77,7 @@ function Index() {
 
       <footer className="border-t border-border">
         <div className="mx-auto max-w-6xl px-6 py-6 text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Ind Guru ERP
+          © {new Date().getFullYear()} ProBuddy ERP for SMEs
         </div>
       </footer>
     </div>

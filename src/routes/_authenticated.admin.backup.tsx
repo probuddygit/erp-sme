@@ -58,13 +58,13 @@ export const Route = createFileRoute("/_authenticated/admin/backup")({
   component: BackupCentre,
   head: () => ({
     meta: [
-      { title: "Backup & Export Centre | Ind Guru ERP Operator" },
+      { title: "Backup & Export Centre | ProBuddy ERP for SMEs Operator" },
       {
         name: "description",
         content:
           "Operator-only backup and export centre: export tenant data to CSV or JSON, schedule automated backups, and review export history.",
       },
-      { property: "og:title", content: "Backup & Export Centre | Ind Guru ERP Operator" },
+      { property: "og:title", content: "Backup & Export Centre | ProBuddy ERP for SMEs Operator" },
       {
         property: "og:description",
         content: "Export tenant data, schedule backups, and audit every export run.",

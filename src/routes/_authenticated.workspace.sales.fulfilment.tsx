@@ -25,10 +25,10 @@ export const Route = createFileRoute("/_authenticated/workspace/sales/fulfilment
   component: FulfilmentPage,
   head: () => ({
     meta: [
-      { title: "Fulfilment — Pick, Pack & Dispatch | Ind Guru ERP" },
-      { name: "description", content: "Warehouse fulfilment for sales orders: reservations, pick lists, packing slips and dispatches with automatic stock and COGS posting." },
-      { property: "og:title", content: "Fulfilment — Pick, Pack & Dispatch | Ind Guru ERP" },
-      { property: "og:description", content: "Reserve stock, pick, pack and dispatch sales orders with automatic inventory and cost posting." },
+      { title: "Fulfilment — Pick, Pack & Dispatch | ProBuddy ERP for SMEs" },
+      { name: "description", content: "Warehouse fulfilment, pick lists, packing slips and dispatch tracking." },
+      { property: "og:title", content: "Fulfilment — Pick, Pack & Dispatch | ProBuddy ERP for SMEs" },
+      { property: "og:description", content: "Warehouse fulfilment, pick lists, packing slips and dispatch tracking." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
