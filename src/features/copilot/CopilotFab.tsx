@@ -20,7 +20,7 @@ export function CopilotFab() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Msg[]>([
-    { id: "m0", role: "assistant", text: "Hi! I'm your Ind Guru Copilot. Ask me anything about your ERP — try a suggestion below." },
+    { id: "m0", role: "assistant", text: "Hi! I'm your ProBuddy Copilot. Ask me anything about your ERP — try a suggestion below." },
   ]);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +65,7 @@ export function CopilotFab() {
               <Bot className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold">Ind Guru Copilot</div>
+              <div className="text-sm font-semibold">ProBuddy Copilot</div>
               <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 UI preview · model not connected
