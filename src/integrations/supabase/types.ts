@@ -399,6 +399,153 @@ export type Database = {
           },
         ]
       }
+      bank_accounts: {
+        Row: {
+          account_number: string | null
+          account_type: string
+          bank_name: string | null
+          branch: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          gl_account_id: string | null
+          id: string
+          ifsc: string | null
+          is_active: boolean
+          name: string
+          notes: string | null
+          opening_balance: number
+          updated_at: string
+        }
+        Insert: {
+          account_number?: string | null
+          account_type?: string
+          bank_name?: string | null
+          branch?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          gl_account_id?: string | null
+          id?: string
+          ifsc?: string | null
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          opening_balance?: number
+          updated_at?: string
+        }
+        Update: {
+          account_number?: string | null
+          account_type?: string
+          bank_name?: string | null
+          branch?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          gl_account_id?: string | null
+          id?: string
+          ifsc?: string | null
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          opening_balance?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_accounts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_accounts_gl_account_id_fkey"
+            columns: ["gl_account_id"]
+            isOneToOne: false
+            referencedRelation: "chart_of_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_statement_lines: {
+        Row: {
+          bank_account_id: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          deposit: number
+          description: string | null
+          id: string
+          import_batch: string | null
+          match_status: string
+          matched_doc_id: string | null
+          matched_doc_kind: string | null
+          reconciled_at: string | null
+          reconciled_by: string | null
+          reference: string | null
+          running_balance: number | null
+          txn_date: string
+          withdrawal: number
+        }
+        Insert: {
+          bank_account_id: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          deposit?: number
+          description?: string | null
+          id?: string
+          import_batch?: string | null
+          match_status?: string
+          matched_doc_id?: string | null
+          matched_doc_kind?: string | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          reference?: string | null
+          running_balance?: number | null
+          txn_date: string
+          withdrawal?: number
+        }
+        Update: {
+          bank_account_id?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          deposit?: number
+          description?: string | null
+          id?: string
+          import_batch?: string | null
+          match_status?: string
+          matched_doc_id?: string | null
+          matched_doc_kind?: string | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          reference?: string | null
+          running_balance?: number | null
+          txn_date?: string
+          withdrawal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_statement_lines_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_statement_lines_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bills_of_materials: {
         Row: {
           company_id: string
@@ -1738,6 +1885,7 @@ export type Database = {
           driver_name: string | null
           driver_phone: string | null
           eway_bill_no: string | null
+          eway_payload: Json | null
           financial_posting_status:
             | Database["public"]["Enums"]["posting_status"]
             | null
@@ -1773,6 +1921,7 @@ export type Database = {
           driver_name?: string | null
           driver_phone?: string | null
           eway_bill_no?: string | null
+          eway_payload?: Json | null
           financial_posting_status?:
             | Database["public"]["Enums"]["posting_status"]
             | null
@@ -1808,6 +1957,7 @@ export type Database = {
           driver_name?: string | null
           driver_phone?: string | null
           eway_bill_no?: string | null
+          eway_payload?: Json | null
           financial_posting_status?:
             | Database["public"]["Enums"]["posting_status"]
             | null
@@ -4154,6 +4304,7 @@ export type Database = {
         Row: {
           amount: number
           approval_status: string | null
+          bank_account_id: string | null
           company_id: string
           created_at: string
           created_by: string | null
@@ -4173,6 +4324,7 @@ export type Database = {
             | Database["public"]["Enums"]["posting_status"]
             | null
           payment_date: string
+          reconciled_at: string | null
           reference: string | null
           source_doc_id: string | null
           source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
@@ -4182,6 +4334,7 @@ export type Database = {
         Insert: {
           amount: number
           approval_status?: string | null
+          bank_account_id?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
@@ -4201,6 +4354,7 @@ export type Database = {
             | Database["public"]["Enums"]["posting_status"]
             | null
           payment_date?: string
+          reconciled_at?: string | null
           reference?: string | null
           source_doc_id?: string | null
           source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
@@ -4210,6 +4364,7 @@ export type Database = {
         Update: {
           amount?: number
           approval_status?: string | null
+          bank_account_id?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
@@ -4229,6 +4384,7 @@ export type Database = {
             | Database["public"]["Enums"]["posting_status"]
             | null
           payment_date?: string
+          reconciled_at?: string | null
           reference?: string | null
           source_doc_id?: string | null
           source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
@@ -4236,6 +4392,13 @@ export type Database = {
           workflow_status?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "payments_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payments_invoice_id_fkey"
             columns: ["invoice_id"]
@@ -6549,6 +6712,7 @@ export type Database = {
         Row: {
           amount: number
           approval_status: string | null
+          bank_account_id: string | null
           company_id: string
           created_at: string
           created_by: string | null
@@ -6568,6 +6732,7 @@ export type Database = {
             | null
           payment_date: string
           payment_number: string
+          reconciled_at: string | null
           reference: string | null
           source_doc_id: string | null
           source_doc_kind: Database["public"]["Enums"]["doc_kind"] | null
@@ -6579,6 +6744,7 @@ export type Database = {
         Insert: {
           amount: number
           approval_status?: string | null
+          bank_account_id?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
@@ -6598,6 +6764,7 @@ export type Database = {
             | null
           payment_date?: string
           payment_number: string
+          reconciled_at?: string | null
           reference?: string | null
           source_doc_id?: string | null
           source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
@@ -6609,6 +6776,7 @@ export type Database = {
         Update: {
           amount?: number
           approval_status?: string | null
+          bank_account_id?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
@@ -6628,6 +6796,7 @@ export type Database = {
             | null
           payment_date?: string
           payment_number?: string
+          reconciled_at?: string | null
           reference?: string | null
           source_doc_id?: string | null
           source_doc_kind?: Database["public"]["Enums"]["doc_kind"] | null
@@ -6637,6 +6806,13 @@ export type Database = {
           workflow_status?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "supplier_payments_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "supplier_payments_supplier_id_fkey"
             columns: ["supplier_id"]
@@ -7418,6 +7594,19 @@ export type Database = {
         }[]
       }
       acct: { Args: { _code: string; _company_id: string }; Returns: string }
+      bank_reconciliation_summary: {
+        Args: { _company_id: string }
+        Returns: {
+          bank_account_id: string
+          book_balance: number
+          name: string
+          statement_balance: number
+          unreconciled_amount: number
+          unreconciled_lines: number
+        }[]
+      }
+      build_einvoice_payload: { Args: { _invoice_id: string }; Returns: Json }
+      build_eway_payload: { Args: { _dn_id: string }; Returns: Json }
       check_customer_credit: {
         Args: {
           _company_id: string
@@ -7567,6 +7756,16 @@ export type Database = {
         }
         Returns: string
       }
+      post_manual_voucher: {
+        Args: {
+          _company_id: string
+          _date: string
+          _kind?: string
+          _lines: Json
+          _narration: string
+        }
+        Returns: string
+      }
       post_stock_issue: {
         Args: {
           _company_id: string
@@ -7598,6 +7797,10 @@ export type Database = {
         }
         Returns: string
       }
+      reconcile_bank_line: {
+        Args: { _doc_id: string; _doc_kind: string; _line_id: string }
+        Returns: Json
+      }
       record_document_event: {
         Args: {
           _company_id: string
@@ -7613,7 +7816,20 @@ export type Database = {
         Args: { _company_id: string }
         Returns: undefined
       }
+      suggest_bank_matches: {
+        Args: { _line_id: string }
+        Returns: {
+          amount: number
+          doc_date: string
+          doc_id: string
+          doc_kind: string
+          doc_number: string
+          party: string
+          score: number
+        }[]
+      }
       sweep_overdue_invoices: { Args: never; Returns: number }
+      unreconcile_bank_line: { Args: { _line_id: string }; Returns: Json }
     }
     Enums: {
       account_type: "asset" | "liability" | "equity" | "revenue" | "expense"
