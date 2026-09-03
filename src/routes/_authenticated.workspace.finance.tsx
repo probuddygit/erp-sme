@@ -22,7 +22,10 @@ const TABS: { path: string; label: string; icon: LucideIcon; group: string }[] =
   { path: "/workspace/finance/credit-notes",         label: "Credit Note",        icon: FileMinus,       group: "Vouchers" },
 
   { path: "/workspace/finance/debit-notes",          label: "Debit Note",         icon: FilePlus,        group: "Vouchers" },
+  { path: "/workspace/finance/bank-accounts",        label: "Bank Accounts",      icon: Landmark,        group: "Banking" },
+  { path: "/workspace/finance/bank-reconciliation",  label: "Bank Reconciliation", icon: ArrowLeftRight, group: "Banking" },
   { path: "/workspace/finance/general-ledger",       label: "General Ledger",     icon: BookOpenCheck,   group: "Reports" },
+
   { path: "/workspace/finance/trial-balance",        label: "Trial Balance",      icon: Scale,           group: "Reports" },
   { path: "/workspace/finance/balance-sheet",        label: "Balance Sheet",      icon: Landmark,        group: "Reports" },
   { path: "/workspace/finance/profit-loss",          label: "Profit & Loss",      icon: PieChart,        group: "Reports" },
