@@ -18,7 +18,9 @@ const TABS: { path: string; label: string; icon: LucideIcon; group: string }[] =
   { path: "/workspace/finance/payments",             label: "Payments",           icon: Wallet,          group: "Vouchers" },
   { path: "/workspace/finance/receipts",             label: "Receipts",           icon: HandCoins,       group: "Vouchers" },
   { path: "/workspace/finance/contra",               label: "Contra",             icon: ArrowLeftRight,  group: "Vouchers" },
+  { path: "/workspace/finance/vouchers",             label: "Expense/Journal Voucher", icon: BookOpen,   group: "Vouchers" },
   { path: "/workspace/finance/credit-notes",         label: "Credit Note",        icon: FileMinus,       group: "Vouchers" },
+
   { path: "/workspace/finance/debit-notes",          label: "Debit Note",         icon: FilePlus,        group: "Vouchers" },
   { path: "/workspace/finance/general-ledger",       label: "General Ledger",     icon: BookOpenCheck,   group: "Reports" },
   { path: "/workspace/finance/trial-balance",        label: "Trial Balance",      icon: Scale,           group: "Reports" },

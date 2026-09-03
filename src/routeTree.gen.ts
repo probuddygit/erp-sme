@@ -127,6 +127,7 @@ import { Route as AuthenticatedWorkspaceGstGstr1RouteImport } from './routes/_au
 import { Route as AuthenticatedWorkspaceGstEWayBillRouteImport } from './routes/_authenticated.workspace.gst.e-way-bill'
 import { Route as AuthenticatedWorkspaceGstEInvoiceRouteImport } from './routes/_authenticated.workspace.gst.e-invoice'
 import { Route as AuthenticatedWorkspaceGstConfigurationRouteImport } from './routes/_authenticated.workspace.gst.configuration'
+import { Route as AuthenticatedWorkspaceFinanceVouchersRouteImport } from './routes/_authenticated.workspace.finance.vouchers'
 import { Route as AuthenticatedWorkspaceFinanceTrialBalanceRouteImport } from './routes/_authenticated.workspace.finance.trial-balance'
 import { Route as AuthenticatedWorkspaceFinanceReceiptsRouteImport } from './routes/_authenticated.workspace.finance.receipts'
 import { Route as AuthenticatedWorkspaceFinanceProfitLossRouteImport } from './routes/_authenticated.workspace.finance.profit-loss'
@@ -904,6 +905,12 @@ const AuthenticatedWorkspaceGstConfigurationRoute =
     path: '/configuration',
     getParentRoute: () => AuthenticatedWorkspaceGstRoute,
   } as any)
+const AuthenticatedWorkspaceFinanceVouchersRoute =
+  AuthenticatedWorkspaceFinanceVouchersRouteImport.update({
+    id: '/vouchers',
+    path: '/vouchers',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
 const AuthenticatedWorkspaceFinanceTrialBalanceRoute =
   AuthenticatedWorkspaceFinanceTrialBalanceRouteImport.update({
     id: '/trial-balance',
@@ -1635,6 +1642,7 @@ export interface FileRoutesByFullPath {
   '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/workspace/finance/vouchers': typeof AuthenticatedWorkspaceFinanceVouchersRoute
   '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
   '/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
@@ -1830,6 +1838,7 @@ export interface FileRoutesByTo {
   '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/workspace/finance/vouchers': typeof AuthenticatedWorkspaceFinanceVouchersRoute
   '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
   '/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
@@ -2049,6 +2058,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/_authenticated/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/_authenticated/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/_authenticated/workspace/finance/vouchers': typeof AuthenticatedWorkspaceFinanceVouchersRoute
   '/_authenticated/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/_authenticated/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
   '/_authenticated/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
@@ -2268,6 +2278,7 @@ export interface FileRouteTypes {
     | '/workspace/finance/profit-loss'
     | '/workspace/finance/receipts'
     | '/workspace/finance/trial-balance'
+    | '/workspace/finance/vouchers'
     | '/workspace/gst/configuration'
     | '/workspace/gst/e-invoice'
     | '/workspace/gst/e-way-bill'
@@ -2463,6 +2474,7 @@ export interface FileRouteTypes {
     | '/workspace/finance/profit-loss'
     | '/workspace/finance/receipts'
     | '/workspace/finance/trial-balance'
+    | '/workspace/finance/vouchers'
     | '/workspace/gst/configuration'
     | '/workspace/gst/e-invoice'
     | '/workspace/gst/e-way-bill'
@@ -2681,6 +2693,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/finance/profit-loss'
     | '/_authenticated/workspace/finance/receipts'
     | '/_authenticated/workspace/finance/trial-balance'
+    | '/_authenticated/workspace/finance/vouchers'
     | '/_authenticated/workspace/gst/configuration'
     | '/_authenticated/workspace/gst/e-invoice'
     | '/_authenticated/workspace/gst/e-way-bill'
@@ -3592,6 +3605,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/gst/configuration'
       preLoaderRoute: typeof AuthenticatedWorkspaceGstConfigurationRouteImport
       parentRoute: typeof AuthenticatedWorkspaceGstRoute
+    }
+    '/_authenticated/workspace/finance/vouchers': {
+      id: '/_authenticated/workspace/finance/vouchers'
+      path: '/vouchers'
+      fullPath: '/workspace/finance/vouchers'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceVouchersRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
     }
     '/_authenticated/workspace/finance/trial-balance': {
       id: '/_authenticated/workspace/finance/trial-balance'
@@ -4810,6 +4830,7 @@ interface AuthenticatedWorkspaceFinanceRouteChildren {
   AuthenticatedWorkspaceFinanceProfitLossRoute: typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   AuthenticatedWorkspaceFinanceReceiptsRoute: typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   AuthenticatedWorkspaceFinanceTrialBalanceRoute: typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  AuthenticatedWorkspaceFinanceVouchersRoute: typeof AuthenticatedWorkspaceFinanceVouchersRoute
   AuthenticatedWorkspaceFinanceIndexRoute: typeof AuthenticatedWorkspaceFinanceIndexRoute
 }
 
@@ -4843,6 +4864,8 @@ const AuthenticatedWorkspaceFinanceRouteChildren: AuthenticatedWorkspaceFinanceR
       AuthenticatedWorkspaceFinanceReceiptsRoute,
     AuthenticatedWorkspaceFinanceTrialBalanceRoute:
       AuthenticatedWorkspaceFinanceTrialBalanceRoute,
+    AuthenticatedWorkspaceFinanceVouchersRoute:
+      AuthenticatedWorkspaceFinanceVouchersRoute,
     AuthenticatedWorkspaceFinanceIndexRoute:
       AuthenticatedWorkspaceFinanceIndexRoute,
   }
