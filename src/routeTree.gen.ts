@@ -138,6 +138,7 @@ import { Route as AuthenticatedWorkspaceFinanceCreditNotesRouteImport } from './
 import { Route as AuthenticatedWorkspaceFinanceContraRouteImport } from './routes/_authenticated.workspace.finance.contra'
 import { Route as AuthenticatedWorkspaceFinanceChartOfAccountsRouteImport } from './routes/_authenticated.workspace.finance.chart-of-accounts'
 import { Route as AuthenticatedWorkspaceFinanceCashFlowRouteImport } from './routes/_authenticated.workspace.finance.cash-flow'
+import { Route as AuthenticatedWorkspaceFinanceBankReconciliationRouteImport } from './routes/_authenticated.workspace.finance.bank-reconciliation'
 import { Route as AuthenticatedWorkspaceFinanceBankAccountsRouteImport } from './routes/_authenticated.workspace.finance.bank-accounts'
 import { Route as AuthenticatedWorkspaceFinanceBalanceSheetRouteImport } from './routes/_authenticated.workspace.finance.balance-sheet'
 import { Route as AuthenticatedWorkspaceCrmPipelineRouteImport } from './routes/_authenticated.workspace.crm.pipeline'
@@ -969,6 +970,12 @@ const AuthenticatedWorkspaceFinanceCashFlowRoute =
     path: '/cash-flow',
     getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
   } as any)
+const AuthenticatedWorkspaceFinanceBankReconciliationRoute =
+  AuthenticatedWorkspaceFinanceBankReconciliationRouteImport.update({
+    id: '/bank-reconciliation',
+    path: '/bank-reconciliation',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
 const AuthenticatedWorkspaceFinanceBankAccountsRoute =
   AuthenticatedWorkspaceFinanceBankAccountsRouteImport.update({
     id: '/bank-accounts',
@@ -1616,6 +1623,7 @@ export interface FileRoutesByFullPath {
   '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
   '/workspace/finance/bank-accounts': typeof AuthenticatedWorkspaceFinanceBankAccountsRoute
+  '/workspace/finance/bank-reconciliation': typeof AuthenticatedWorkspaceFinanceBankReconciliationRoute
   '/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
   '/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
   '/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
@@ -1810,6 +1818,7 @@ export interface FileRoutesByTo {
   '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
   '/workspace/finance/bank-accounts': typeof AuthenticatedWorkspaceFinanceBankAccountsRoute
+  '/workspace/finance/bank-reconciliation': typeof AuthenticatedWorkspaceFinanceBankReconciliationRoute
   '/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
   '/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
   '/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
@@ -2028,6 +2037,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/_authenticated/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
   '/_authenticated/workspace/finance/bank-accounts': typeof AuthenticatedWorkspaceFinanceBankAccountsRoute
+  '/_authenticated/workspace/finance/bank-reconciliation': typeof AuthenticatedWorkspaceFinanceBankReconciliationRoute
   '/_authenticated/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
   '/_authenticated/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
   '/_authenticated/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
@@ -2246,6 +2256,7 @@ export interface FileRouteTypes {
     | '/workspace/crm/pipeline'
     | '/workspace/finance/balance-sheet'
     | '/workspace/finance/bank-accounts'
+    | '/workspace/finance/bank-reconciliation'
     | '/workspace/finance/cash-flow'
     | '/workspace/finance/chart-of-accounts'
     | '/workspace/finance/contra'
@@ -2440,6 +2451,7 @@ export interface FileRouteTypes {
     | '/workspace/crm/pipeline'
     | '/workspace/finance/balance-sheet'
     | '/workspace/finance/bank-accounts'
+    | '/workspace/finance/bank-reconciliation'
     | '/workspace/finance/cash-flow'
     | '/workspace/finance/chart-of-accounts'
     | '/workspace/finance/contra'
@@ -2657,6 +2669,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/crm/pipeline'
     | '/_authenticated/workspace/finance/balance-sheet'
     | '/_authenticated/workspace/finance/bank-accounts'
+    | '/_authenticated/workspace/finance/bank-reconciliation'
     | '/_authenticated/workspace/finance/cash-flow'
     | '/_authenticated/workspace/finance/chart-of-accounts'
     | '/_authenticated/workspace/finance/contra'
@@ -3655,6 +3668,13 @@ declare module '@tanstack/react-router' {
       path: '/cash-flow'
       fullPath: '/workspace/finance/cash-flow'
       preLoaderRoute: typeof AuthenticatedWorkspaceFinanceCashFlowRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/bank-reconciliation': {
+      id: '/_authenticated/workspace/finance/bank-reconciliation'
+      path: '/bank-reconciliation'
+      fullPath: '/workspace/finance/bank-reconciliation'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceBankReconciliationRouteImport
       parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
     }
     '/_authenticated/workspace/finance/bank-accounts': {
@@ -4778,6 +4798,7 @@ const AuthenticatedWorkspaceCrmRouteWithChildren =
 interface AuthenticatedWorkspaceFinanceRouteChildren {
   AuthenticatedWorkspaceFinanceBalanceSheetRoute: typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
   AuthenticatedWorkspaceFinanceBankAccountsRoute: typeof AuthenticatedWorkspaceFinanceBankAccountsRoute
+  AuthenticatedWorkspaceFinanceBankReconciliationRoute: typeof AuthenticatedWorkspaceFinanceBankReconciliationRoute
   AuthenticatedWorkspaceFinanceCashFlowRoute: typeof AuthenticatedWorkspaceFinanceCashFlowRoute
   AuthenticatedWorkspaceFinanceChartOfAccountsRoute: typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
   AuthenticatedWorkspaceFinanceContraRoute: typeof AuthenticatedWorkspaceFinanceContraRoute
@@ -4798,6 +4819,8 @@ const AuthenticatedWorkspaceFinanceRouteChildren: AuthenticatedWorkspaceFinanceR
       AuthenticatedWorkspaceFinanceBalanceSheetRoute,
     AuthenticatedWorkspaceFinanceBankAccountsRoute:
       AuthenticatedWorkspaceFinanceBankAccountsRoute,
+    AuthenticatedWorkspaceFinanceBankReconciliationRoute:
+      AuthenticatedWorkspaceFinanceBankReconciliationRoute,
     AuthenticatedWorkspaceFinanceCashFlowRoute:
       AuthenticatedWorkspaceFinanceCashFlowRoute,
     AuthenticatedWorkspaceFinanceChartOfAccountsRoute:
