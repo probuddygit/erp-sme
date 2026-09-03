@@ -127,6 +127,7 @@ import { Route as AuthenticatedWorkspaceGstGstr1RouteImport } from './routes/_au
 import { Route as AuthenticatedWorkspaceGstEWayBillRouteImport } from './routes/_authenticated.workspace.gst.e-way-bill'
 import { Route as AuthenticatedWorkspaceGstEInvoiceRouteImport } from './routes/_authenticated.workspace.gst.e-invoice'
 import { Route as AuthenticatedWorkspaceGstConfigurationRouteImport } from './routes/_authenticated.workspace.gst.configuration'
+import { Route as AuthenticatedWorkspaceFinanceVouchersRouteImport } from './routes/_authenticated.workspace.finance.vouchers'
 import { Route as AuthenticatedWorkspaceFinanceTrialBalanceRouteImport } from './routes/_authenticated.workspace.finance.trial-balance'
 import { Route as AuthenticatedWorkspaceFinanceReceiptsRouteImport } from './routes/_authenticated.workspace.finance.receipts'
 import { Route as AuthenticatedWorkspaceFinanceProfitLossRouteImport } from './routes/_authenticated.workspace.finance.profit-loss'
@@ -138,6 +139,7 @@ import { Route as AuthenticatedWorkspaceFinanceCreditNotesRouteImport } from './
 import { Route as AuthenticatedWorkspaceFinanceContraRouteImport } from './routes/_authenticated.workspace.finance.contra'
 import { Route as AuthenticatedWorkspaceFinanceChartOfAccountsRouteImport } from './routes/_authenticated.workspace.finance.chart-of-accounts'
 import { Route as AuthenticatedWorkspaceFinanceCashFlowRouteImport } from './routes/_authenticated.workspace.finance.cash-flow'
+import { Route as AuthenticatedWorkspaceFinanceBankReconciliationRouteImport } from './routes/_authenticated.workspace.finance.bank-reconciliation'
 import { Route as AuthenticatedWorkspaceFinanceBankAccountsRouteImport } from './routes/_authenticated.workspace.finance.bank-accounts'
 import { Route as AuthenticatedWorkspaceFinanceBalanceSheetRouteImport } from './routes/_authenticated.workspace.finance.balance-sheet'
 import { Route as AuthenticatedWorkspaceCrmPipelineRouteImport } from './routes/_authenticated.workspace.crm.pipeline'
@@ -903,6 +905,12 @@ const AuthenticatedWorkspaceGstConfigurationRoute =
     path: '/configuration',
     getParentRoute: () => AuthenticatedWorkspaceGstRoute,
   } as any)
+const AuthenticatedWorkspaceFinanceVouchersRoute =
+  AuthenticatedWorkspaceFinanceVouchersRouteImport.update({
+    id: '/vouchers',
+    path: '/vouchers',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
 const AuthenticatedWorkspaceFinanceTrialBalanceRoute =
   AuthenticatedWorkspaceFinanceTrialBalanceRouteImport.update({
     id: '/trial-balance',
@@ -967,6 +975,12 @@ const AuthenticatedWorkspaceFinanceCashFlowRoute =
   AuthenticatedWorkspaceFinanceCashFlowRouteImport.update({
     id: '/cash-flow',
     path: '/cash-flow',
+    getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
+  } as any)
+const AuthenticatedWorkspaceFinanceBankReconciliationRoute =
+  AuthenticatedWorkspaceFinanceBankReconciliationRouteImport.update({
+    id: '/bank-reconciliation',
+    path: '/bank-reconciliation',
     getParentRoute: () => AuthenticatedWorkspaceFinanceRoute,
   } as any)
 const AuthenticatedWorkspaceFinanceBankAccountsRoute =
@@ -1616,6 +1630,7 @@ export interface FileRoutesByFullPath {
   '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
   '/workspace/finance/bank-accounts': typeof AuthenticatedWorkspaceFinanceBankAccountsRoute
+  '/workspace/finance/bank-reconciliation': typeof AuthenticatedWorkspaceFinanceBankReconciliationRoute
   '/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
   '/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
   '/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
@@ -1627,6 +1642,7 @@ export interface FileRoutesByFullPath {
   '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/workspace/finance/vouchers': typeof AuthenticatedWorkspaceFinanceVouchersRoute
   '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
   '/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
@@ -1810,6 +1826,7 @@ export interface FileRoutesByTo {
   '/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
   '/workspace/finance/bank-accounts': typeof AuthenticatedWorkspaceFinanceBankAccountsRoute
+  '/workspace/finance/bank-reconciliation': typeof AuthenticatedWorkspaceFinanceBankReconciliationRoute
   '/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
   '/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
   '/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
@@ -1821,6 +1838,7 @@ export interface FileRoutesByTo {
   '/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/workspace/finance/vouchers': typeof AuthenticatedWorkspaceFinanceVouchersRoute
   '/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
   '/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
@@ -2028,6 +2046,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/crm/pipeline': typeof AuthenticatedWorkspaceCrmPipelineRoute
   '/_authenticated/workspace/finance/balance-sheet': typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
   '/_authenticated/workspace/finance/bank-accounts': typeof AuthenticatedWorkspaceFinanceBankAccountsRoute
+  '/_authenticated/workspace/finance/bank-reconciliation': typeof AuthenticatedWorkspaceFinanceBankReconciliationRoute
   '/_authenticated/workspace/finance/cash-flow': typeof AuthenticatedWorkspaceFinanceCashFlowRoute
   '/_authenticated/workspace/finance/chart-of-accounts': typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
   '/_authenticated/workspace/finance/contra': typeof AuthenticatedWorkspaceFinanceContraRoute
@@ -2039,6 +2058,7 @@ export interface FileRoutesById {
   '/_authenticated/workspace/finance/profit-loss': typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   '/_authenticated/workspace/finance/receipts': typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   '/_authenticated/workspace/finance/trial-balance': typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  '/_authenticated/workspace/finance/vouchers': typeof AuthenticatedWorkspaceFinanceVouchersRoute
   '/_authenticated/workspace/gst/configuration': typeof AuthenticatedWorkspaceGstConfigurationRoute
   '/_authenticated/workspace/gst/e-invoice': typeof AuthenticatedWorkspaceGstEInvoiceRoute
   '/_authenticated/workspace/gst/e-way-bill': typeof AuthenticatedWorkspaceGstEWayBillRoute
@@ -2246,6 +2266,7 @@ export interface FileRouteTypes {
     | '/workspace/crm/pipeline'
     | '/workspace/finance/balance-sheet'
     | '/workspace/finance/bank-accounts'
+    | '/workspace/finance/bank-reconciliation'
     | '/workspace/finance/cash-flow'
     | '/workspace/finance/chart-of-accounts'
     | '/workspace/finance/contra'
@@ -2257,6 +2278,7 @@ export interface FileRouteTypes {
     | '/workspace/finance/profit-loss'
     | '/workspace/finance/receipts'
     | '/workspace/finance/trial-balance'
+    | '/workspace/finance/vouchers'
     | '/workspace/gst/configuration'
     | '/workspace/gst/e-invoice'
     | '/workspace/gst/e-way-bill'
@@ -2440,6 +2462,7 @@ export interface FileRouteTypes {
     | '/workspace/crm/pipeline'
     | '/workspace/finance/balance-sheet'
     | '/workspace/finance/bank-accounts'
+    | '/workspace/finance/bank-reconciliation'
     | '/workspace/finance/cash-flow'
     | '/workspace/finance/chart-of-accounts'
     | '/workspace/finance/contra'
@@ -2451,6 +2474,7 @@ export interface FileRouteTypes {
     | '/workspace/finance/profit-loss'
     | '/workspace/finance/receipts'
     | '/workspace/finance/trial-balance'
+    | '/workspace/finance/vouchers'
     | '/workspace/gst/configuration'
     | '/workspace/gst/e-invoice'
     | '/workspace/gst/e-way-bill'
@@ -2657,6 +2681,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/crm/pipeline'
     | '/_authenticated/workspace/finance/balance-sheet'
     | '/_authenticated/workspace/finance/bank-accounts'
+    | '/_authenticated/workspace/finance/bank-reconciliation'
     | '/_authenticated/workspace/finance/cash-flow'
     | '/_authenticated/workspace/finance/chart-of-accounts'
     | '/_authenticated/workspace/finance/contra'
@@ -2668,6 +2693,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workspace/finance/profit-loss'
     | '/_authenticated/workspace/finance/receipts'
     | '/_authenticated/workspace/finance/trial-balance'
+    | '/_authenticated/workspace/finance/vouchers'
     | '/_authenticated/workspace/gst/configuration'
     | '/_authenticated/workspace/gst/e-invoice'
     | '/_authenticated/workspace/gst/e-way-bill'
@@ -3580,6 +3606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkspaceGstConfigurationRouteImport
       parentRoute: typeof AuthenticatedWorkspaceGstRoute
     }
+    '/_authenticated/workspace/finance/vouchers': {
+      id: '/_authenticated/workspace/finance/vouchers'
+      path: '/vouchers'
+      fullPath: '/workspace/finance/vouchers'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceVouchersRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
     '/_authenticated/workspace/finance/trial-balance': {
       id: '/_authenticated/workspace/finance/trial-balance'
       path: '/trial-balance'
@@ -3655,6 +3688,13 @@ declare module '@tanstack/react-router' {
       path: '/cash-flow'
       fullPath: '/workspace/finance/cash-flow'
       preLoaderRoute: typeof AuthenticatedWorkspaceFinanceCashFlowRouteImport
+      parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
+    }
+    '/_authenticated/workspace/finance/bank-reconciliation': {
+      id: '/_authenticated/workspace/finance/bank-reconciliation'
+      path: '/bank-reconciliation'
+      fullPath: '/workspace/finance/bank-reconciliation'
+      preLoaderRoute: typeof AuthenticatedWorkspaceFinanceBankReconciliationRouteImport
       parentRoute: typeof AuthenticatedWorkspaceFinanceRoute
     }
     '/_authenticated/workspace/finance/bank-accounts': {
@@ -4778,6 +4818,7 @@ const AuthenticatedWorkspaceCrmRouteWithChildren =
 interface AuthenticatedWorkspaceFinanceRouteChildren {
   AuthenticatedWorkspaceFinanceBalanceSheetRoute: typeof AuthenticatedWorkspaceFinanceBalanceSheetRoute
   AuthenticatedWorkspaceFinanceBankAccountsRoute: typeof AuthenticatedWorkspaceFinanceBankAccountsRoute
+  AuthenticatedWorkspaceFinanceBankReconciliationRoute: typeof AuthenticatedWorkspaceFinanceBankReconciliationRoute
   AuthenticatedWorkspaceFinanceCashFlowRoute: typeof AuthenticatedWorkspaceFinanceCashFlowRoute
   AuthenticatedWorkspaceFinanceChartOfAccountsRoute: typeof AuthenticatedWorkspaceFinanceChartOfAccountsRoute
   AuthenticatedWorkspaceFinanceContraRoute: typeof AuthenticatedWorkspaceFinanceContraRoute
@@ -4789,6 +4830,7 @@ interface AuthenticatedWorkspaceFinanceRouteChildren {
   AuthenticatedWorkspaceFinanceProfitLossRoute: typeof AuthenticatedWorkspaceFinanceProfitLossRoute
   AuthenticatedWorkspaceFinanceReceiptsRoute: typeof AuthenticatedWorkspaceFinanceReceiptsRoute
   AuthenticatedWorkspaceFinanceTrialBalanceRoute: typeof AuthenticatedWorkspaceFinanceTrialBalanceRoute
+  AuthenticatedWorkspaceFinanceVouchersRoute: typeof AuthenticatedWorkspaceFinanceVouchersRoute
   AuthenticatedWorkspaceFinanceIndexRoute: typeof AuthenticatedWorkspaceFinanceIndexRoute
 }
 
@@ -4798,6 +4840,8 @@ const AuthenticatedWorkspaceFinanceRouteChildren: AuthenticatedWorkspaceFinanceR
       AuthenticatedWorkspaceFinanceBalanceSheetRoute,
     AuthenticatedWorkspaceFinanceBankAccountsRoute:
       AuthenticatedWorkspaceFinanceBankAccountsRoute,
+    AuthenticatedWorkspaceFinanceBankReconciliationRoute:
+      AuthenticatedWorkspaceFinanceBankReconciliationRoute,
     AuthenticatedWorkspaceFinanceCashFlowRoute:
       AuthenticatedWorkspaceFinanceCashFlowRoute,
     AuthenticatedWorkspaceFinanceChartOfAccountsRoute:
@@ -4820,6 +4864,8 @@ const AuthenticatedWorkspaceFinanceRouteChildren: AuthenticatedWorkspaceFinanceR
       AuthenticatedWorkspaceFinanceReceiptsRoute,
     AuthenticatedWorkspaceFinanceTrialBalanceRoute:
       AuthenticatedWorkspaceFinanceTrialBalanceRoute,
+    AuthenticatedWorkspaceFinanceVouchersRoute:
+      AuthenticatedWorkspaceFinanceVouchersRoute,
     AuthenticatedWorkspaceFinanceIndexRoute:
       AuthenticatedWorkspaceFinanceIndexRoute,
   }
